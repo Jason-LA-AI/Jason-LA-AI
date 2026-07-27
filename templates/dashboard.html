@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,nofollow">
+    <title>Inquiry Dashboard · Jason在洛杉矶</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/dashboard.css') }}">
+  </head>
+  <body>
+    <main class="page-shell">
+      <header class="page-header">
+        <div>
+          <p class="eyebrow">Internal use only</p>
+          <h1>Jason在洛杉矶</h1>
+          <p class="subtitle">Recent customer inquiries</p>
+        </div>
+        <div class="count-card" aria-label="Inquiry count">
+          <span class="count">{{ inquiries | length }}</span>
+          <span>shown</span>
+        </div>
+      </header>
+
+      {% if inquiries %}
+      <section class="table-card" aria-label="Recent inquiries">
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Source</th>
+                <th>Language</th>
+                <th>Inquiry type</th>
+                <th>Airport</th>
+                <th>Destination</th>
+                <th>Risk</th>
+                <th>Recommended action</th>
+                <th>Received</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for inquiry in inquiries %}
+              <tr>
+                <td>{{ inquiry.source }}</td>
+                <td><span class="language-tag">{{ inquiry.language }}</span></td>
+                <td>{{ inquiry.inquiry_type }}</td>
+                <td>{{ inquiry.airport }}</td>
+                <td>{{ inquiry.destination }}</td>
+                <td>
+                  <span class="risk-tag risk-{{ inquiry.risk_level | lower }}">
+                    {{ inquiry.risk_level }}
+                  </span>
+                </td>
+                <td>{{ inquiry.recommended_action }}</td>
+                <td class="received-time">{{ inquiry.received_time }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {% else %}
+      <section class="empty-state">
+        <h2>No inquiries yet</h2>
+        <p>New inquiries will appear here after they are stored in PostgreSQL.</p>
+      </section>
+      {% endif %}
+
+      <footer>
+        This dashboard has no authentication yet. Keep it on a trusted development environment.
+      </footer>
+    </main>
+  </body>
+</html>

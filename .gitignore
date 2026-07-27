@@ -1,0 +1,11 @@
+# Local environment files may contain database credentials and other secrets.
+.env
+.env.*
+!.env.example
+
+# Python development artifacts.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
