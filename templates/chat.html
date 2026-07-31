@@ -1,0 +1,290 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Jason AI Quote Assistant | Los Angeles Transportation
+{% endblock %}
+
+
+{% block description %}
+AI assistant for Los Angeles airport transportation quotes.
+{% endblock %}
+
+
+
+{% block content %}
+
+
+<header>
+
+<h1>
+Jason AI 询价助手
+</h1>
+
+
+<p>
+Los Angeles Private Transportation
+</p>
+
+
+<p>
+无需立即提供电话，先了解大概费用
+</p>
+
+
+</header>
+
+
+
+
+
+<section>
+
+
+<h2>
+💬 在线询价
+</h2>
+
+
+<div id="chatBox"
+style="
+height:350px;
+overflow:auto;
+background:#f5f5f5;
+padding:20px;
+border-radius:12px;
+">
+
+
+<p>
+🤖 Jason AI:
+您好，我可以帮您估算洛杉矶私人接送费用。
+</p>
+
+
+<p>
+请输入：
+<br>
+日期
+<br>
+机场
+<br>
+人数
+<br>
+行李
+<br>
+目的地
+</p>
+
+
+</div>
+
+
+
+<br>
+
+
+
+<input
+id="message"
+placeholder="例如：8月10日 LAX接机，2个人，3个行李，到Rowland Heights"
+style="
+width:100%;
+padding:12px;
+font-size:16px;
+"
+>
+<input
+id="customerName"
+placeholder="您的姓名"
+style="
+width:100%;
+padding:12px;
+font-size:16px;
+"
+>
+
+<br><br>
+
+<input
+id="customerPhone"
+placeholder="手机号码 / E-mail"
+style="
+width:100%;
+padding:12px;
+font-size:16px;
+"
+>
+
+<br><br>
+
+<input
+id="customerWechat"
+placeholder="微信（可选）"
+style="
+width:100%;
+padding:12px;
+font-size:16px;
+"
+>
+
+<br><br>
+
+
+<br><br>
+
+
+
+<button
+onclick="sendMessage()"
+>
+
+发送询价
+
+</button>
+
+
+</section>
+
+
+
+
+async function loadHistory(){
+
+    const customerId =
+    "8ea7f668-0a35-4306-8232-639e082d2c62";
+
+
+    let response =
+    await fetch(
+        `/api/v1/chat/history/${customerId}`
+    );
+
+
+    let data =
+    await response.json();
+
+
+    let box =
+    document.getElementById("chatBox");
+
+
+    data.forEach(item => {
+
+        box.innerHTML +=
+        `
+        <p style="white-space: pre-line;">
+        🤖 ${item.sender}:
+
+        ${item.message}
+        </p>
+        `;
+
+    });
+
+
+    box.scrollTop =
+    box.scrollHeight;
+
+}
+<script>
+
+
+async function sendMessage(){
+
+
+let input =
+document.getElementById("message");
+
+
+let message =
+input.value;
+let customerName =
+document.getElementById("customerName").value;
+
+
+let customerPhone =
+document.getElementById("customerPhone").value;
+
+
+let customerWechat =
+document.getElementById("customerWechat").value;
+
+
+if(!message){
+return;
+}
+
+
+
+let box =
+document.getElementById("chatBox");
+
+
+
+box.innerHTML +=
+`
+<p style="white-space: pre-line;">
+👤 客户:
+
+${message}
+</p>
+`;
+
+
+input.value="";
+
+
+
+let response =
+await fetch(
+"/api/v1/chat",
+{
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:
+JSON.stringify(
+{
+message: message,
+customer_name: customerName,
+customer_phone: customerPhone,
+customer_wechat: customerWechat
+})
+
+}
+);
+
+
+
+let data =
+await response.json();
+
+
+
+box.innerHTML +=
+`
+<p style="white-space: pre-line;">
+🤖 Jason AI:
+
+${data.reply}
+</p>
+`;
+
+
+box.scrollTop =
+box.scrollHeight;
+
+
+}
+
+window.onload = loadHistory;
+
+</script>
+
+
+
+{% endblock %}
