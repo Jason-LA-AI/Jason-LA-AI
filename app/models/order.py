@@ -6,7 +6,7 @@ from datetime import date, datetime
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-from sqlalchemy import Boolean, CheckConstraint, Date, DateTime, ForeignKey, Index, SmallInteger, String, Text
+from sqlalchemy import Boolean, CheckConstraint, Date, DateTime, ForeignKey, Index, SmallInteger, String, Text, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID as PostgreSQLUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -18,6 +18,7 @@ if TYPE_CHECKING:
     from app.models.customer import Customer
     from app.models.lead import Lead
     from app.models.quote import Quote
+    from app.models.quote_estimate import QuoteEstimate
 
 
 class Order(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -87,10 +88,26 @@ class Order(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             "carry_on_count IS NULL OR carry_on_count >= 0",
             name="ck_orders_carry_on_count",
         ),
+        CheckConstraint(
+            "NOT passenger_count_is_minimum OR "
+            "(passenger_count IS NOT NULL AND passenger_count = 5)",
+            name="ck_orders_passenger_count_minimum",
+        ),
+        CheckConstraint(
+            "NOT large_suitcase_count_is_minimum OR "
+            "(large_suitcase_count IS NOT NULL AND large_suitcase_count = 4)",
+            name="ck_orders_large_suitcase_count_minimum",
+        ),
         Index("ix_orders_status_pickup_at", "status", "pickup_at"),
         Index("ix_orders_customer_service_date", "customer_id", "service_date"),
         Index("ix_orders_airport_service_date", "airport_code", "service_date"),
         Index("ix_orders_route_cities", "pickup_city", "destination_city"),
+        Index(
+            "uq_orders_quote_estimate_id",
+            "quote_estimate_id",
+            unique=True,
+            postgresql_where=text("quote_estimate_id IS NOT NULL"),
+        ),
     )
 
     booking_group_id: Mapped[UUID | None] = mapped_column(PostgreSQLUUID(as_uuid=True))
@@ -102,6 +119,10 @@ class Order(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     lead_id: Mapped[UUID | None] = mapped_column(
         PostgreSQLUUID(as_uuid=True),
         ForeignKey("leads.id", ondelete="SET NULL"),
+    )
+    quote_estimate_id: Mapped[UUID | None] = mapped_column(
+        PostgreSQLUUID(as_uuid=True),
+        ForeignKey("quote_estimates.id", ondelete="RESTRICT"),
     )
     status: Mapped[str] = mapped_column(
         String(40), nullable=False, default="NEW", server_default="NEW"
@@ -123,13 +144,22 @@ class Order(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     pickup_city: Mapped[str | None] = mapped_column(String(100))
     destination: Mapped[str | None] = mapped_column(Text)
     destination_city: Mapped[str | None] = mapped_column(String(100))
+    postal_code: Mapped[str | None] = mapped_column(String(10))
+    pricing_zone: Mapped[str | None] = mapped_column(String(50))
     extra_stops: Mapped[list[dict[str, Any]] | None] = mapped_column(JSONB)
     passenger_count: Mapped[int | None] = mapped_column(SmallInteger)
+    passenger_count_is_minimum: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
     adult_count: Mapped[int | None] = mapped_column(SmallInteger)
     child_count: Mapped[int | None] = mapped_column(SmallInteger)
     large_suitcase_count: Mapped[int | None] = mapped_column(SmallInteger)
+    large_suitcase_count_is_minimum: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False, server_default="false"
+    )
     large_suitcase_details: Mapped[str | None] = mapped_column(Text)
     carry_on_count: Mapped[int | None] = mapped_column(SmallInteger)
+    oversized_items_present: Mapped[bool | None] = mapped_column(Boolean)
     oversized_item_details: Mapped[str | None] = mapped_column(Text)
     child_seat_required: Mapped[str] = mapped_column(
         String(10), nullable=False, default="UNKNOWN", server_default="UNKNOWN"
@@ -161,6 +191,9 @@ class Order(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     customer_details_reconfirmed: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=False, server_default="false"
     )
+    customer_estimate_accepted_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True)
+    )
     confirmation_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     cancelled_by: Mapped[str | None] = mapped_column(String(20))
     cancelled_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
@@ -170,6 +203,7 @@ class Order(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     customer: Mapped["Customer"] = relationship(back_populates="orders")
     lead: Mapped["Lead | None"] = relationship(back_populates="orders")
+    quote_estimate: Mapped["QuoteEstimate | None"] = relationship()
     conversations: Mapped[list["Conversation"]] = relationship(back_populates="order")
     quotes: Mapped[list["Quote"]] = relationship(back_populates="order")
     approvals: Mapped[list["Approval"]] = relationship(back_populates="order")

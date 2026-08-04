@@ -5,7 +5,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, DateTime, Index, SmallInteger, String, Text
+from sqlalchemy import CheckConstraint, DateTime, Index, SmallInteger, String, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -50,12 +50,26 @@ class Customer(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             "primary_contact_type",
             "primary_contact",
         ),
+        Index(
+            "ix_customers_phone_number_normalized",
+            "phone_number_normalized",
+            postgresql_where=text("phone_number_normalized IS NOT NULL"),
+        ),
+        Index(
+            "ix_customers_email_normalized",
+            "email_normalized",
+            postgresql_where=text("email_normalized IS NOT NULL"),
+        ),
     )
 
     display_name: Mapped[str | None] = mapped_column(String(150))
     primary_contact: Mapped[str] = mapped_column(String(255), nullable=False)
     primary_contact_type: Mapped[str] = mapped_column(String(30), nullable=False)
     secondary_contact: Mapped[str | None] = mapped_column(String(255))
+    phone_number: Mapped[str | None] = mapped_column(String(30))
+    phone_number_normalized: Mapped[str | None] = mapped_column(String(30))
+    email: Mapped[str | None] = mapped_column(String(254))
+    email_normalized: Mapped[str | None] = mapped_column(String(254))
     preferred_contact_method: Mapped[str | None] = mapped_column(String(30))
     source: Mapped[str] = mapped_column(String(30), nullable=False)
     source_detail: Mapped[str | None] = mapped_column(String(255))

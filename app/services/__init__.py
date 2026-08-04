@@ -22,6 +22,12 @@ from app.services.pricing_engine import (
 )
 
 
+from app.services.quote_estimate_lookup import (
+    QuoteEstimateLookupError,
+    get_valid_quote_estimate,
+)
+
+
 
 __all__ = [
 
@@ -33,11 +39,15 @@ __all__ = [
 
     "PricingResult",
 
+    "QuoteEstimateLookupError",
+
     "analyze_inquiry",
 
     "calculate_price",
 
     "get_combined_business_context",
+
+    "get_valid_quote_estimate",
 
     "list_available_knowledge_files",
 

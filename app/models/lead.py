@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, SmallInteger, String, Text
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, SmallInteger, String, Text, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID as PostgreSQLUUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -65,9 +65,20 @@ class Lead(UUIDPrimaryKeyMixin, TimestampMixin, Base):
             "('AVOID_RECOMMENDED', 'INFORMATION_REQUIRED', 'JASON_REVIEW_REQUIRED')",
             name="ck_leads_priority_override",
         ),
+        CheckConstraint(
+            "intake_method IN "
+            "('FREE_TEXT', 'STRUCTURED_QUOTE_V2', 'MANUAL', 'DEVELOPMENT_SEED')",
+            name="ck_leads_intake_method",
+        ),
         Index("ix_leads_status_follow_up_at", "status", "follow_up_at"),
         Index("ix_leads_priority_received_at", "priority_level", "received_at"),
         Index("ix_leads_customer_received_at", "customer_id", "received_at"),
+        Index(
+            "uq_leads_idempotency_key",
+            "idempotency_key",
+            unique=True,
+            postgresql_where=text("idempotency_key IS NOT NULL"),
+        ),
     )
 
     customer_id: Mapped[UUID] = mapped_column(
@@ -90,6 +101,11 @@ class Lead(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     analysis_result: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     customer_message_summary: Mapped[str | None] = mapped_column(Text)
     route_summary: Mapped[str | None] = mapped_column(Text)
+    intake_method: Mapped[str] = mapped_column(
+        String(40), nullable=False, default="FREE_TEXT", server_default="FREE_TEXT"
+    )
+    estimate_accepted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    idempotency_key: Mapped[str | None] = mapped_column(String(100))
     vehicle_assessment: Mapped[str | None] = mapped_column(String(30))
     risk_level: Mapped[str | None] = mapped_column(String(10))
     risk_reason: Mapped[str | None] = mapped_column(Text)
