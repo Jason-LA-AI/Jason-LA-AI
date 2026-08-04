@@ -1,13 +1,10 @@
 """Smoke tests for the application skeleton."""
 
-from collections.abc import Generator
 from unittest.mock import MagicMock
 from uuid import UUID
 
 from fastapi.testclient import TestClient
-from sqlalchemy.orm import Session
 
-from app.database.session import get_db_session
 from app.main import app
 from app.models.conversation import Conversation
 from app.models.customer import Customer
@@ -16,32 +13,24 @@ from app.database.seed import DEVELOPMENT_INQUIRIES
 from app.services.inquiry_analyzer import analyze_inquiry
 
 
-client = TestClient(app)
-
-
 def test_application_metadata() -> None:
     assert app.title == "Jason-LA-AI"
     assert app.version == "0.1.0"
 
 
-def test_create_inquiry() -> None:
-    database_session = MagicMock(spec=Session)
-
-    def override_db_session() -> Generator[Session, None, None]:
-        yield database_session
-
-    app.dependency_overrides[get_db_session] = override_db_session
-    try:
-        response = client.post(
-            "/api/v1/inquiries",
-            json={
-                "message": "你好，请问ONT接机多少钱？",
-                "customer_name": "Test Customer",
-                "source": "Xiaohongshu",
-            },
-        )
-    finally:
-        app.dependency_overrides.pop(get_db_session, None)
+def test_create_inquiry(
+    client: TestClient,
+    database_session: MagicMock,
+    telegram_mock: MagicMock,
+) -> None:
+    response = client.post(
+        "/api/v1/inquiries",
+        json={
+            "message": "你好，请问ONT接机多少钱？",
+            "customer_name": "Test Customer",
+            "source": "Xiaohongshu",
+        },
+    )
 
     assert response.status_code == 201
     payload = response.json()
@@ -59,9 +48,10 @@ def test_create_inquiry() -> None:
     assert customer.preferred_language == "zh-CN"
     assert lead.analysis_result["detected_language"] == "zh-CN"
     assert conversation.message_text == "你好，请问ONT接机多少钱？"
+    telegram_mock.assert_called_once()
 
 
-def test_create_inquiry_rejects_unknown_source() -> None:
+def test_create_inquiry_rejects_unknown_source(client: TestClient) -> None:
     response = client.post(
         "/api/v1/inquiries",
         json={"message": "Airport pickup", "source": "Unknown"},
@@ -70,18 +60,12 @@ def test_create_inquiry_rejects_unknown_source() -> None:
     assert response.status_code == 422
 
 
-def test_dashboard_renders_empty_state() -> None:
-    database_session = MagicMock(spec=Session)
+def test_dashboard_renders_empty_state(
+    client: TestClient,
+    database_session: MagicMock,
+) -> None:
     database_session.execute.return_value.all.return_value = []
-
-    def override_db_session() -> Generator[Session, None, None]:
-        yield database_session
-
-    app.dependency_overrides[get_db_session] = override_db_session
-    try:
-        response = client.get("/dashboard")
-    finally:
-        app.dependency_overrides.pop(get_db_session, None)
+    response = client.get("/dashboard")
 
     assert response.status_code == 200
     assert "No inquiries yet" in response.text

@@ -3,6 +3,13 @@
 .env.*
 !.env.example
 
+# Database exports, backups, and standalone secret files.
+*.dump
+*.backup
+*.bak
+*.sql
+*.secret
+
 # Python development artifacts.
 __pycache__/
 *.py[cod]
