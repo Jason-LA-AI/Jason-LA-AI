@@ -280,7 +280,7 @@ San Diego County
 
 <p>
 
-Jason AI 助手会先整理您的行程需求，
+我们会先整理您的行程需求，
 
 <br>
 
@@ -311,48 +311,17 @@ Jason AI 助手会先整理您的行程需求，
 <section>
 
 
-<h2>
-其他联系方式
-</h2>
+<h2>Contact Jason</h2>
 
+<p>For the fastest response, contact Jason through Xiaohongshu or Telegram.</p>
 
-
-
-<p>
-
-💬 WeChat
-
-<br>
-
-中国大陆、台湾客户欢迎使用微信咨询。
-
-</p>
-
-
-
-
-<p>
-
-✈ Telegram
-
-<br>
-
-海外客户咨询。
-
-</p>
-
-
-
-
-<p>
-
-📧 Email
-
-<br>
-
-发送旅行需求。
-
-</p>
+<div class="contact-methods">
+{% if xiaohongshu_url %}<a class="contact-method contact-method--priority" href="{{ xiaohongshu_url }}" target="_blank" rel="noopener noreferrer"><strong>📕 Xiaohongshu 小红书</strong><span>View Jason's profile</span></a>{% endif %}
+{% if telegram_url %}<a class="contact-method contact-method--priority" href="{{ telegram_url }}" target="_blank" rel="noopener noreferrer"><strong>✈ Telegram</strong><span>@{{ telegram_username }}</span></a>{% endif %}
+{% if phone_number %}<a class="contact-method" href="tel:{{ phone_number }}"><strong>📱 Phone / Text</strong><span>{{ phone_number }}</span></a>{% endif %}
+{% if email_address %}<a class="contact-method" href="mailto:{{ email_address }}"><strong>📧 Email</strong><span>{{ email_address }}</span></a>{% endif %}
+<a class="contact-method" href="#facebook-link-coming-soon" aria-label="Facebook link coming soon"><strong>Facebook</strong><span>Facebook page</span><small>Link coming soon</small></a>
+</div>
 
 
 

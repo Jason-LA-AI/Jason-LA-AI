@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 
 from app.database.session import get_db_session
+from app.config.settings import settings
 from app.models.customer import Customer
 from app.models.lead import Lead
 
@@ -31,6 +32,14 @@ DISPLAY_TIMEZONE = ZoneInfo("America/Los_Angeles")
 
 templates = Jinja2Templates(
     directory=str(TEMPLATES_DIRECTORY)
+)
+telegram_username = (settings.telegram_username or "").lstrip("@")
+templates.env.globals.update(
+    phone_number=settings.phone_number,
+    email_address=settings.email_address,
+    telegram_username=telegram_username or None,
+    telegram_url=(f"https://t.me/{telegram_username}" if telegram_username else None),
+    xiaohongshu_url=settings.xiaohongshu_url,
 )
 
 

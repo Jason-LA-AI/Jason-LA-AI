@@ -51,6 +51,29 @@ def test_create_inquiry(
     telegram_mock.assert_called_once()
 
 
+def test_create_inquiry_succeeds_when_telegram_delivery_fails(
+    client: TestClient,
+    database_session: MagicMock,
+    telegram_mock: MagicMock,
+) -> None:
+    telegram_mock.side_effect = RuntimeError("notification unavailable")
+
+    response = client.post(
+        "/api/v1/inquiries",
+        json={
+            "message": "ONT airport pickup to Walnut",
+            "customer_name": "Test Customer",
+            "source": "Website",
+        },
+    )
+
+    assert response.status_code == 201
+    assert response.json()["status"] == "inquiry received"
+    database_session.commit.assert_called_once()
+    database_session.rollback.assert_not_called()
+    telegram_mock.assert_called_once()
+
+
 def test_create_inquiry_rejects_unknown_source(client: TestClient) -> None:
     response = client.post(
         "/api/v1/inquiries",

@@ -182,3 +182,47 @@ button:hover {
     border-radius: 12px;
 
 }
+
+.home-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 24px;
+}
+
+.home-button {
+    border: 2px solid #111827;
+    border-radius: 9px;
+    display: inline-block;
+    font-weight: 700;
+    padding: 13px 22px;
+    text-decoration: none;
+}
+
+.home-button--primary { background: #111827; color: white; }
+.home-button--secondary { background: white; color: #111827; }
+
+.trust-section { max-width: 900px; }
+.about-photo-placeholder { align-items: center; background: linear-gradient(135deg, #eef1f5, #f9fafb); border: 2px dashed #aeb8c5; border-radius: 12px; color: #475569; display: flex; flex-direction: column; justify-content: center; margin: 22px 0; min-height: 260px; text-align: center; }
+.about-photo-placeholder span { font-size: 1.15rem; font-weight: 700; }
+.about-photo-placeholder small { margin-top: 8px; }
+.trust-grid { display: grid; gap: 16px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.trust-grid div { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; }
+.trust-grid strong, .trust-grid span { display: block; }
+.trust-grid span { color: #64748b; line-height: 1.5; margin-top: 8px; }
+
+.contact-methods { display: grid; gap: 14px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.contact-method { background: #f8fafc; border: 1px solid #dbe2ea; border-radius: 10px; color: #1f2937; padding: 18px; text-decoration: none; }
+.contact-method--priority { background: #fff8e9; border-color: #d7aa62; }
+.contact-method strong, .contact-method span, .contact-method small { display: block; }
+.contact-method span { color: #4b5563; margin-top: 7px; }
+.contact-method small { color: #8a5d1e; margin-top: 9px; }
+
+@media (max-width: 760px) {
+    .navbar { align-items: flex-start; padding: 16px 18px; }
+    .menu { flex-wrap: wrap; justify-content: flex-end; }
+    .navbar a { margin: 5px 0 5px 16px; }
+    section { box-sizing: border-box; margin: 24px 12px; padding: 24px 18px; }
+    header h1 { font-size: 42px; }
+    .trust-grid, .contact-methods { grid-template-columns: 1fr; }
+}

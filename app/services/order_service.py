@@ -42,6 +42,7 @@ def create_order_from_quote_request(
         service_timezone=quote_estimate.service_timezone,
         airport_code=quote_estimate.airport_code,
         pickup_at=quote_estimate.service_datetime,
+        flight_number=quote_estimate.flight_number,
         trip_direction="ONE_WAY",
         pickup_location=pickup_location,
         pickup_city=pickup_city,

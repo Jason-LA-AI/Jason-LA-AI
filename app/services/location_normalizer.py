@@ -22,11 +22,19 @@ class NormalizedLocation(TypedDict):
 
 ZIP_LOCATIONS: dict[str, tuple[str, str]] = {
     "91748": ("Rowland Heights", "ROWLAND_HEIGHTS"),
+    "91789": ("Walnut", "WALNUT"),
 }
 
 
 CITY_LOCATIONS: dict[str, tuple[str, str]] = {
+    "arcadia": ("Arcadia", "ARCADIA"),
+    "chino": ("Chino", "CHINO"),
+    "chino hills": ("Chino Hills", "CHINO_HILLS"),
+    "ontario": ("Ontario", "ONTARIO"),
+    "rancho cucamonga": ("Rancho Cucamonga", "RANCHO_CUCAMONGA"),
     "rowland heights": ("Rowland Heights", "ROWLAND_HEIGHTS"),
+    "upland": ("Upland", "UPLAND"),
+    "walnut": ("Walnut", "WALNUT"),
 }
 
 

@@ -23,6 +23,7 @@ from app.services.location_normalizer import UNKNOWN_LOCATION, normalize_locatio
 
 LOS_ANGELES_TIMEZONE = ZoneInfo("America/Los_Angeles")
 DEVELOPMENT_PRICING_SOURCE = "development_mock"
+LONG_DISTANCE_LOCATIONS = {"san diego", "san jose", "santa barbara", "las vegas"}
 
 DEVELOPMENT_MOCK_RANGES: dict[str, tuple[Decimal, Decimal]] = {
     "LAX": (Decimal("130.00"), Decimal("150.00")),
@@ -51,13 +52,19 @@ def create_quote_estimate(
     unknown_location = location["pricing_zone"] == UNKNOWN_LOCATION
     if unknown_location:
         risk_flags.append(UNKNOWN_LOCATION)
+    long_distance_route = _is_long_distance_location(location["input"])
+    if long_distance_route:
+        risk_flags.append("LONG_DISTANCE_ROUTE")
 
     manual_review_required = bool(risk_flags)
-    if manual_review_required:
-        status = QuoteEstimateStatus.MANUAL_REVIEW_REQUIRED
+    minimum_amount, maximum_amount = DEVELOPMENT_MOCK_RANGES[request.airport_code.value]
+    suggested_amount = (minimum_amount + maximum_amount) / Decimal("2")
+    if long_distance_route:
         minimum_amount = None
         maximum_amount = None
         suggested_amount = None
+    if manual_review_required:
+        status = QuoteEstimateStatus.MANUAL_REVIEW_REQUIRED
         vehicle_assessment = _manual_vehicle_assessment(request, unknown_location)
         notices = [
             "Manual review required.",
@@ -67,8 +74,6 @@ def create_quote_estimate(
         ]
     else:
         status = QuoteEstimateStatus.ESTIMATED
-        minimum_amount, maximum_amount = DEVELOPMENT_MOCK_RANGES[request.airport_code.value]
-        suggested_amount = (minimum_amount + maximum_amount) / Decimal("2")
         vehicle_assessment = QuoteVehicleAssessment.LIKELY_COMFORTABLE
         notices = [
             "This is an estimated range.",
@@ -92,6 +97,7 @@ def create_quote_estimate(
             request.service_time.replace(tzinfo=None),
             tzinfo=LOS_ANGELES_TIMEZONE,
         ),
+        flight_number=request.flight_number,
         location_input=location["input"],
         location_input_type=location["input_type"],
         normalized_city=location["normalized_city"],
@@ -162,6 +168,18 @@ def _risk_flags(request: QuoteEstimateCreate) -> list[str]:
     if request.oversized_items:
         flags.append("OVERSIZED_ITEMS")
     return flags
+
+
+def _is_long_distance_location(location_input: str) -> bool:
+    """Return whether the customer location requires custom long-distance pricing."""
+
+    normalized = " ".join(location_input.casefold().replace(",", " ").split())
+    suffixes = (" ca", " california", " nv", " nevada")
+    for suffix in suffixes:
+        if normalized.endswith(suffix):
+            normalized = normalized[: -len(suffix)]
+            break
+    return normalized in LONG_DISTANCE_LOCATIONS
 
 
 def _passenger_count_values(request: QuoteEstimateCreate) -> tuple[int, bool]:

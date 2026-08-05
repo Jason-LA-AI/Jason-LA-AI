@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     app_environment: str = "development"
     debug: bool = False
     api_prefix: str = "/api/v1"
+    phone_number: str | None = None
+    email_address: str | None = None
+    telegram_username: str | None = None
+    xiaohongshu_url: str | None = None
     database_url: str = Field(
         default="postgresql+psycopg://postgres:postgres@localhost:5432/jason_la_ai",
         repr=False,

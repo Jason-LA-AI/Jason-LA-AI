@@ -116,6 +116,7 @@ class QuoteEstimate(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         server_default="America/Los_Angeles",
     )
     service_datetime: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    flight_number: Mapped[str | None] = mapped_column(String(30))
 
     location_input: Mapped[str] = mapped_column(String(255), nullable=False)
     location_input_type: Mapped[str] = mapped_column(String(20), nullable=False)

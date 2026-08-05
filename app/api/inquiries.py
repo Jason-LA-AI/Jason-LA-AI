@@ -1,6 +1,7 @@
 """Customer inquiry intake endpoint."""
 
 from datetime import datetime, timezone
+import logging
 from uuid import uuid4
 
 from fastapi import APIRouter, Depends, status
@@ -23,6 +24,7 @@ from app.services.telegram_notifier import send_approval_notification
 from app.services.order_availability import check_order_availability
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post(
@@ -276,8 +278,11 @@ def create_inquiry(
         )
 
         db_session.commit()
+    except Exception:
+        db_session.rollback()
+        raise
 
-
+    try:
         send_approval_notification(
     str(approval_id),
     f"""
@@ -328,12 +333,16 @@ AI建议价格:
 
 请审核。
 """
-)
-
-
-    except Exception:
-        db_session.rollback()
-        raise
+        )
+    except Exception as exc:
+        # The inquiry is already persisted. Notification delivery must not turn
+        # a successful customer submission into an HTTP 500 response. Avoid
+        # logging the exception message because requests may include the bot
+        # token in its URL.
+        logger.error(
+            "Telegram notification failed after inquiry persisted (%s)",
+            type(exc).__name__,
+        )
 
 
     return {
