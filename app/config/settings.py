@@ -30,6 +30,8 @@ class Settings(BaseSettings):
     email_address: str | None = None
     telegram_username: str | None = None
     xiaohongshu_url: str | None = None
+    dashboard_username: str | None = Field(default=None, repr=False)
+    dashboard_password: str | None = Field(default=None, repr=False)
     database_url: str = Field(
         default="postgresql+psycopg://postgres:postgres@localhost:5432/jason_la_ai",
         repr=False,

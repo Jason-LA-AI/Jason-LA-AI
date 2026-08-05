@@ -3,12 +3,14 @@
 
 from datetime import datetime, timezone
 from pathlib import Path
+import secrets
 from typing import Any
 from zoneinfo import ZoneInfo
 
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -44,6 +46,34 @@ templates.env.globals.update(
 
 
 router = APIRouter()
+dashboard_security = HTTPBasic(auto_error=False)
+
+
+def require_dashboard_auth(
+    credentials: HTTPBasicCredentials | None = Depends(dashboard_security),
+) -> None:
+    """Require configured HTTP Basic credentials for the internal dashboard."""
+
+    expected_username = settings.dashboard_username
+    expected_password = settings.dashboard_password
+
+    # Local development and tests remain convenient until credentials are set.
+    if not expected_username and not expected_password:
+        return
+
+    valid_credentials = bool(
+        credentials
+        and expected_username
+        and expected_password
+        and secrets.compare_digest(credentials.username, expected_username)
+        and secrets.compare_digest(credentials.password, expected_password)
+    )
+    if not valid_credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Dashboard authentication required",
+            headers={"WWW-Authenticate": 'Basic realm="Jason Dashboard"'},
+        )
 
 
 
@@ -181,6 +211,7 @@ def areas_page(
 )
 def dashboard(
     request: Request,
+    _: None = Depends(require_dashboard_auth),
     db_session: Session = Depends(get_db_session),
 ) -> HTMLResponse:
     """Render recent inquiries for Jason review."""

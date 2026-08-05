@@ -6,6 +6,7 @@ from uuid import UUID
 from fastapi.testclient import TestClient
 
 from app.main import app
+from app.api import dashboard as dashboard_module
 from app.models.conversation import Conversation
 from app.models.customer import Customer
 from app.models.lead import Lead
@@ -94,6 +95,24 @@ def test_dashboard_renders_empty_state(
     assert "No inquiries yet" in response.text
     assert response.headers["cache-control"] == "no-store"
     assert response.headers["x-robots-tag"] == "noindex, nofollow"
+
+
+def test_dashboard_requires_configured_credentials(
+    client: TestClient,
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(dashboard_module.settings, "dashboard_username", "jason")
+    monkeypatch.setattr(dashboard_module.settings, "dashboard_password", "secret")
+
+    denied = client.get("/dashboard")
+    allowed = client.get(
+        "/dashboard",
+        auth=("jason", "secret"),
+    )
+
+    assert denied.status_code == 401
+    assert denied.headers["www-authenticate"] == 'Basic realm="Jason Dashboard"'
+    assert allowed.status_code == 200
 
 
 def test_development_seed_analysis_expectations() -> None:
