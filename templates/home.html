@@ -1,235 +1,50 @@
 {% extends "base.html" %}
-
-
-{% block title %}
-Jason | Los Angeles Airport Transportation | Chinese Private Driver
-{% endblock %}
-
-
-{% block description %}
-Jason provides Chinese private airport transportation in Los Angeles.
-LAX, Ontario Airport, Disneyland and San Diego private rides.
-{% endblock %}
-
-
+{% block title %}Jason | Los Angeles Airport Transportation | Chinese Private Driver{% endblock %}
+{% block description %}Private airport transportation personally driven by Jason. Serving LAX, Ontario Airport, Los Angeles, Orange County, and surrounding areas in English and Chinese.{% endblock %}
 
 {% block content %}
-
-
-
-<header>
-
-<h1>
-Jason
-</h1>
-
-
-<p>
-Los Angeles Airport Transportation
-</p>
-
-
-<p>
-中文私人机场接送服务
-</p>
-
-
+<header class="home-hero">
+  <p class="eyebrow">PRIVATE AIRPORT TRANSPORTATION</p>
+  <h1>Welcome to Los Angeles.</h1>
+  <p>中文沟通 · 私人接送 · Jason 全程亲自服务</p>
+  <div class="hero-actions"><a class="home-button home-button--light" href="/quote">Get a Quote</a><a class="text-link" href="/gallery">See real service photos →</a></div>
 </header>
 
-
-
-
-
-
-
-<section>
-
-
-<h2>
-Los Angeles Chinese Private Transportation
-</h2>
-
-
-<p>
-
-Jason provides reliable private transportation
-services in Los Angeles.
-
-</p>
-
-
-
-<p>
-
-We specialize in:
-
-<br>
-
-✓ LAX airport pickup and drop-off
-
-<br>
-
-✓ Ontario Airport transportation
-
-<br>
-
-✓ Disneyland private transportation
-
-<br>
-
-✓ Los Angeles to San Diego private rides
-
-</p>
-
-
-
-<p>
-
-服务区域：
-
-<br>
-
-Los Angeles County
-
-<br>
-
-Orange County
-
-<br>
-
-San Diego County
-
-</p>
-
-
-
+<section class="wide-section meet-jason">
+  <div class="meet-photo"><img src="/static/images/service/01-airport-pickup.webp" srcset="/static/images/service/01-airport-pickup-800.webp 800w, /static/images/service/01-airport-pickup.webp 1600w" sizes="(max-width: 760px) calc(100vw - 60px), 520px" alt="Jason's Toyota RAV4 ready for an airport pickup" width="1600" height="1200" fetchpriority="high" decoding="async"></div>
+  <div class="meet-copy">
+    <p class="eyebrow eyebrow--dark">MEET YOUR DRIVER</p><h2>Meet Jason</h2>
+    <p>Hi, I'm Jason. I provide private airport transportation throughout the Los Angeles area.</p>
+    <p>I personally drive every trip—no dispatch center and no outsourced drivers. From flight tracking to luggage assistance, you always know who is meeting you.</p>
+    <div class="badge-list"><span>Local Driver</span><span>English / 中文</span><span>Flight Tracking</span><span>Clean Hybrid SUV</span></div>
+  </div>
 </section>
 
-
-
-
-
-
-
-
-<section id="services">
-
-
-<h2>
-我们的服务
-</h2>
-
-
-<ul>
-
-<li>
-✈ LAX 洛杉矶国际机场接送
-</li>
-
-
-<li>
-✈ Ontario Airport 安大略机场
-</li>
-
-
-<li>
-✈ Burbank Airport
-</li>
-
-
-<li>
-🚗 Disneyland 私人交通
-</li>
-
-
-<li>
-🌴 Los Angeles ⇄ San Diego 长途接送
-</li>
-
-
-</ul>
-
-
-
+<section class="wide-section">
+  <div class="section-heading"><div><p class="eyebrow eyebrow--dark">BEHIND EVERY RIDE</p><h2>Real Service Photos</h2></div><a href="/gallery">View all 10 photos →</a></div>
+  <div class="service-gallery service-gallery--preview">
+    {% for filename, caption, alt in [
+      ('01-airport-pickup.webp','Airport Pickup','RAV4 ready for airport pickup'),
+      ('02-rear-seats.webp','Comfortable Rear Seats','Clean rear passenger seats'),
+      ('05-cargo-space.webp','Luggage Capacity','RAV4 luggage space'),
+      ('06-ont-pickup.webp','Ontario Airport','Ontario Airport pickup'),
+      ('07-welcome-sign.webp','Welcome Sign Service','Personal welcome-sign service'),
+      ('08-hotel-dropoff.webp','Hotel Drop-off','Passenger hotel arrival')
+    ] %}
+    {% set stem = filename[:-5] %}
+    <figure class="gallery-card"><img src="/static/images/service/{{ filename }}" srcset="/static/images/service/{{ stem }}-800.webp 800w, /static/images/service/{{ filename }} 1600w" sizes="(max-width: 760px) 46vw, 340px" alt="{{ alt }}" loading="lazy" decoding="async" width="1600" height="1200"><figcaption>{{ caption }}</figcaption></figure>
+    {% endfor %}
+  </div>
 </section>
 
-
-
-
-
-
-
-
-<section>
-
-
-<h2>
-我们的车辆
-</h2>
-
-
-<p>
-2026 Toyota RAV4 Hybrid LE
-</p>
-
-
-<p>
-安全 · 舒适 · 准时
-</p>
-
-
-<p>
-适合 1-4 位乘客
-</p>
-
-
+<section class="wide-section stories-section">
+  <div class="section-heading"><div><p class="eyebrow eyebrow--dark">REAL TRIP NOTES</p><h2>Real Trip Stories</h2></div><a href="/stories">More experiences →</a></div>
+  <div class="story-grid">
+    <article><span>ONT → HOTEL</span><h3>Family Arrival from China</h3><p>A late-night pickup for two adults, one child, and four suitcases, with luggage help and a safe hotel arrival.</p></article>
+    <article><span>LAX → IRVINE</span><h3>Business Traveler</h3><p>An early-morning airport transfer with flight tracking, clear pickup coordination, and on-time arrival.</p></article>
+    <article><span>AIRPORT → LOS ANGELES</span><h3>First Visit to California</h3><p>A personal airport welcome, direct hotel transfer, and helpful local recommendations along the way.</p></article>
+  </div>
 </section>
 
-
-
-
-
-
-
-
-<section>
-
-
-<h2>Ready to plan your airport ride?</h2>
-
-<p>Get a quick estimate online, or contact Jason if you have a special request.</p>
-
-<div class="home-actions">
-<a class="home-button home-button--primary" href="/quote">Get a Quote</a>
-<a class="home-button home-button--secondary" href="/contact">Contact Jason</a>
-</div>
-
-
-</section>
-
-
-<section class="trust-section" aria-labelledby="trust-heading">
-
-<h2 id="trust-heading">About Jason</h2>
-
-<p>Los Angeles airport transfer service serving LAX, ONT and surrounding areas.</p>
-
-<div class="about-photo-placeholder" role="img" aria-label="About Jason photo placeholder">
-<span>About Jason Photo</span>
-<small>Production photo placeholder</small>
-</div>
-
-<div class="trust-grid">
-<div><strong>✈ Airport transfer specialist</strong><span>Experienced with Los Angeles-area airports.</span></div>
-<div><strong>🚙 Clean SUV</strong><span>A clean, comfortable private vehicle.</span></div>
-<div><strong>✓ Reliable pickup service</strong><span>Clear trip details and dependable coordination.</span></div>
-<div><strong>📍 Flight tracking support</strong><span>Flight information helps Jason plan your pickup.</span></div>
-</div>
-
-</section>
-
-
-
-
-
+<section class="cta-section"><h2>Ready to plan your airport ride?</h2><p>Get a quick estimate or contact Jason for a special request.</p><div class="home-actions"><a class="home-button home-button--primary" href="/quote">Get a Quote</a><a class="home-button home-button--secondary" href="/contact">Contact Jason</a></div></section>
 {% endblock %}

@@ -4,32 +4,36 @@
 
 
 <url>
-<loc>http://127.0.0.1:8000/</loc>
+<loc>https://jason-la.com/</loc>
 </url>
 
 
 <url>
-<loc>http://127.0.0.1:8000/services</loc>
+<loc>https://jason-la.com/services</loc>
 </url>
 
 
 <url>
-<loc>http://127.0.0.1:8000/vehicle</loc>
+<loc>https://jason-la.com/vehicle</loc>
 </url>
 
 
 <url>
-<loc>http://127.0.0.1:8000/stories</loc>
+<loc>https://jason-la.com/stories</loc>
+</url>
+
+<url>
+<loc>https://jason-la.com/gallery</loc>
 </url>
 
 
 <url>
-<loc>http://127.0.0.1:8000/quote</loc>
+<loc>https://jason-la.com/quote</loc>
 </url>
 
 
 <url>
-<loc>http://127.0.0.1:8000/contact</loc>
+<loc>https://jason-la.com/contact</loc>
 </url>
 
 

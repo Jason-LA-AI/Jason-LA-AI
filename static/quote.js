@@ -46,13 +46,36 @@
     } finally { setLoading(false); }
   });
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
     if (!state.estimateId) { setError("estimateRequest", "Please get a current estimate first."); return; }
     if (!validateContact()) return focusFirstError();
-    form.hidden = true;
-    successPanel.hidden = false;
-    successPanel.focus();
+    const submitButton = document.getElementById("submitRequestButton");
+    submitButton.disabled = true;
+    submitButton.textContent = "Submitting…";
+    clearError("contact");
+    try {
+      const response = await fetch("/api/v1/quote-requests", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({
+          estimate_id: state.estimateId,
+          customer_name: value("customerName").trim(),
+          phone: value("customerPhone").trim() || null,
+          email: value("customerEmail").trim() || null,
+          preferred_contact_method: state.contactMethod === "TEXT" ? "SMS" : "EMAIL",
+          estimate_acceptance: true
+        })
+      });
+      let body = null;
+      try { body = await response.json(); } catch (_) {}
+      if (!response.ok) throw new EstimateRequestError(body?.error?.message || "Unable to submit your request. Please try again.");
+      window.location.assign(`/quote/confirmation?reference=${encodeURIComponent(body.order_id)}`);
+    } catch (error) {
+      setError("contact", error instanceof EstimateRequestError ? error.message : "Unable to submit your request. Please try again.");
+      submitButton.disabled = false;
+      submitButton.textContent = "Submit Booking Request";
+    }
   });
   document.getElementById("startOverButton").addEventListener("click", resetForm);
 
@@ -80,8 +103,10 @@
     clearError("locationInput"); return true;
   }
   function validateContact() {
-    const phone=document.getElementById("customerPhone"), email=document.getElementById("customerEmail"), hasPhone=!!phone.value.trim(), hasEmail=!!email.value.trim();
+    const name=document.getElementById("customerName"), phone=document.getElementById("customerPhone"), email=document.getElementById("customerEmail"), hasPhone=!!phone.value.trim(), hasEmail=!!email.value.trim();
     phone.removeAttribute("aria-invalid"); email.removeAttribute("aria-invalid");
+    name.removeAttribute("aria-invalid");
+    if (!name.value.trim()) { name.setAttribute("aria-invalid","true"); setError("contact","Enter your name."); return false; }
     if (!requireChoice("contactMethod","Choose Text message or Email.")) return false;
     if (!hasPhone && !hasEmail) { phone.setAttribute("aria-invalid","true"); email.setAttribute("aria-invalid","true"); setError("contact","Enter a phone number or email address."); return false; }
     if (state.contactMethod === "TEXT" && !hasPhone) { phone.setAttribute("aria-invalid","true"); setError("contact","Enter a phone number for text contact."); return false; }

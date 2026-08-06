@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Request Received | Jason Transportation{% endblock %}
+{% block description %}Your transportation booking request has been received for Jason's review.{% endblock %}
+{% block content %}
+<main class="page-shell">
+  <section class="success-panel" style="display:block" aria-labelledby="confirmation-title">
+    <div class="success-panel__icon" aria-hidden="true">✓</div>
+    <h1 id="confirmation-title">Your request has been received.</h1>
+    <p>Jason will review the trip details and confirm the final price using your preferred contact method.</p>
+    {% if reference %}<p>Reference: <strong>{{ reference }}</strong></p>{% endif %}
+    <p><a class="primary-button" href="/">Return home</a></p>
+  </section>
+</main>
+{% endblock %}

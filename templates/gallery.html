@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Real Service Gallery | Jason Los Angeles Airport Transportation{% endblock %}
+{% block description %}Real photos from Jason's private airport pickup and transportation service in Los Angeles and Ontario.{% endblock %}
+
+{% block content %}
+<header class="page-hero">
+  <p class="eyebrow">REAL TRIPS · REAL SERVICE</p>
+  <h1>Service Gallery</h1>
+  <p>洛杉矶机场接送真实记录</p>
+</header>
+
+<section class="wide-section gallery-intro">
+  <h2>Every photo comes from a real trip.</h2>
+  <p>Airport pickups, luggage assistance, welcome-sign service, and safe hotel arrivals—personally handled by Jason.</p>
+</section>
+
+<section class="wide-section">
+  <div class="service-gallery service-gallery--full">
+    {% set photos = [
+      ('01-airport-pickup.webp', 'Airport Pickup', 'RAV4 ready for an airport pickup'),
+      ('02-rear-seats.webp', 'Comfortable Rear Seats', 'Clean and comfortable rear seating'),
+      ('03-luggage.webp', 'Luggage Assistance', 'Luggage prepared for a safe transfer'),
+      ('04-rav4-exterior.webp', 'Clean Hybrid SUV', 'Jason’s Toyota RAV4 Hybrid'),
+      ('05-cargo-space.webp', 'Large Luggage Capacity', 'RAV4 cargo space for passenger luggage'),
+      ('06-ont-pickup.webp', 'Ontario Airport Pickup', 'Pickup service at Ontario International Airport'),
+      ('07-welcome-sign.webp', 'Welcome Sign Service', 'Personal welcome-sign airport pickup'),
+      ('08-hotel-dropoff.webp', 'Hotel Drop-off', 'Safe arrival at the passenger’s hotel'),
+      ('09-lax-transfer.webp', 'LAX Transfer', 'Airport transportation in Los Angeles'),
+      ('10-hotel-waiting.webp', 'Ready When You Are', 'Jason waiting outside the hotel')
+    ] %}
+    {% for filename, caption, alt in photos %}
+    {% set stem = filename[:-5] %}
+    <figure class="gallery-card">
+      <img src="/static/images/service/{{ filename }}" srcset="/static/images/service/{{ stem }}-800.webp 800w, /static/images/service/{{ filename }} 1600w" sizes="(max-width: 760px) calc(100vw - 60px), 340px" alt="{{ alt }}" loading="lazy" decoding="async" width="1600" height="1200">
+      <figcaption>{{ caption }}</figcaption>
+    </figure>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="cta-section">
+  <h2>Need an airport ride?</h2>
+  <p>Tell Jason your flight, destination, passenger count, and luggage details.</p>
+  <div class="home-actions"><a class="home-button home-button--primary" href="/quote">Get a Quote</a><a class="home-button home-button--secondary" href="/contact">Contact Jason</a></div>
+</section>
+{% endblock %}

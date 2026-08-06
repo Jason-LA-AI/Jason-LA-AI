@@ -3,8 +3,7 @@
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -26,12 +25,16 @@ class Settings(BaseSettings):
     app_environment: str = "development"
     debug: bool = False
     api_prefix: str = "/api/v1"
+    site_url: str = "http://127.0.0.1:8000"
+    allowed_hosts: str = "127.0.0.1,localhost,testserver"
     phone_number: str | None = None
     email_address: str | None = None
     telegram_username: str | None = None
     xiaohongshu_url: str | None = None
     dashboard_username: str | None = Field(default=None, repr=False)
     dashboard_password: str | None = Field(default=None, repr=False)
+    telegram_bot_token: str | None = Field(default=None, repr=False)
+    telegram_chat_id: str | None = Field(default=None, repr=False)
     database_url: str = Field(
         default="postgresql+psycopg://postgres:postgres@localhost:5432/jason_la_ai",
         repr=False,
@@ -48,6 +51,14 @@ class Settings(BaseSettings):
         if value.startswith("postgresql://"):
             return value.replace("postgresql://", "postgresql+psycopg://", 1)
         return value
+
+    @property
+    def is_production(self) -> bool:
+        return self.app_environment.lower() == "production"
+
+    @property
+    def trusted_hosts(self) -> list[str]:
+        return [host.strip() for host in self.allowed_hosts.split(",") if host.strip()]
 
 
 @lru_cache

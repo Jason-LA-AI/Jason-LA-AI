@@ -19,6 +19,18 @@ def test_application_metadata() -> None:
     assert app.version == "0.1.0"
 
 
+def test_public_brand_pages_render(client: TestClient) -> None:
+    home = client.get("/")
+    gallery = client.get("/gallery")
+
+    assert home.status_code == 200
+    assert "Meet Jason" in home.text
+    assert "/gallery" in home.text
+    assert gallery.status_code == 200
+    assert "Service Gallery" in gallery.text
+    assert 'loading="lazy"' in gallery.text
+
+
 def test_create_inquiry(
     client: TestClient,
     database_session: MagicMock,

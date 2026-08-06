@@ -88,12 +88,12 @@
           <h3>Contact details</h3><p>Provide a phone number or email so Jason can confirm the final price.</p>
           <fieldset class="choice-fieldset"><legend>Preferred contact</legend><div class="choice-grid choice-grid--two" data-choice-group="contactMethod"><button class="choice-card choice-card--compact" type="button" data-value="TEXT" aria-pressed="false">💬 Text message</button><button class="choice-card choice-card--compact" type="button" data-value="EMAIL" aria-pressed="false">✉ Email</button></div><p class="field-error" data-error-for="contactMethod" role="alert"></p></fieldset>
           <div class="field-grid field-grid--contact">
-            <label class="field"><span>Name</span><input id="customerName" name="customerName" type="text" maxlength="100" autocomplete="name"></label>
+            <label class="field"><span>Name</span><input id="customerName" name="customerName" type="text" maxlength="100" autocomplete="name" required></label>
             <label class="field"><span>Phone</span><input id="customerPhone" name="customerPhone" type="tel" maxlength="30" autocomplete="tel"></label>
             <label class="field"><span>Email</span><input id="customerEmail" name="customerEmail" type="email" maxlength="254" autocomplete="email"></label>
           </div>
           <p class="field-error" data-error-for="contact" role="alert"></p>
-          <button class="primary-button" type="submit">Preview Final Request</button>
+          <button class="primary-button" id="submitRequestButton" type="submit">Submit Booking Request</button>
         </div>
       </section>
     </form>
@@ -103,4 +103,4 @@
 </main>
 {% endblock %}
 
-{% block extra_js %}<script src="/static/quote.js?v=20260805-3" defer></script>{% endblock %}
+{% block extra_js %}<script src="/static/quote.js?v=20260806-1" defer></script>{% endblock %}

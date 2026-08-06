@@ -2,14 +2,6 @@
 <html lang="zh-CN">
 
 <head>
-<meta property="og:title" content="Jason Transportation | Los Angeles Private Driver">
-
-<meta property="og:description" content="Chinese private airport transportation in Los Angeles. LAX, Ontario Airport, Disneyland and San Diego private rides.">
-
-<meta property="og:type" content="website">
-
-<meta property="og:locale" content="en_US">
-
     <meta charset="UTF-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -37,21 +29,18 @@
           Ontario Airport transportation,
           Disneyland transportation
           ">
-<meta property="og:title" content="Jason Transportation | Los Angeles Private Driver">
+    <link rel="canonical" href="{{ site_url }}{{ request.url.path }}">
+    <meta property="og:title" content="{% block og_title %}Jason Transportation | Los Angeles Private Driver{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}Private airport transportation in Los Angeles, including LAX, Ontario Airport, Disneyland and San Diego rides.{% endblock %}">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:url" content="{{ site_url }}{{ request.url.path }}">
+    <meta property="og:image" content="{{ site_url }}/static/images/service/01-airport-pickup.webp">
 
 
-<meta property="og:description" content="Chinese private airport transportation in Los Angeles. LAX, Ontario Airport, Disneyland and San Diego private rides.">
-
-
-<meta property="og:type" content="website">
-
-
-<meta property="og:locale" content="en_US">
-
-
-    <link rel="stylesheet" href="/static/home.css?v=20260805-3">
+    <link rel="stylesheet" href="/static/home.css?v=20260805-6">
     {% block extra_css %}{% endblock %}
-    <link rel="icon" href="/static/favicon.png">
+    <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
 <script type="application/ld+json">
 
 {

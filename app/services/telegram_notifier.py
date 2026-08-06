@@ -1,14 +1,5 @@
-import os
-
 import requests
-from dotenv import load_dotenv
-
-
-load_dotenv()
-
-
-BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+from app.config.settings import settings
 
 
 
@@ -17,19 +8,21 @@ def _send_message(
     reply_markup: dict | None = None,
 ) -> None:
 
-    if not BOT_TOKEN or not CHAT_ID:
+    bot_token = settings.telegram_bot_token
+    chat_id = settings.telegram_chat_id
+    if not bot_token or not chat_id:
         print("Telegram configuration missing")
         return
 
 
     url = (
         f"https://api.telegram.org/"
-        f"bot{BOT_TOKEN}/sendMessage"
+        f"bot{bot_token}/sendMessage"
     )
 
 
     payload = {
-        "chat_id": CHAT_ID,
+        "chat_id": chat_id,
         "text": text,
     }
 
@@ -128,14 +121,15 @@ def send_telegram_text(
     """
 
 
-    if not BOT_TOKEN:
+    bot_token = settings.telegram_bot_token
+    if not bot_token:
         print("Telegram bot token missing")
         return
 
 
     url = (
         f"https://api.telegram.org/"
-        f"bot{BOT_TOKEN}/sendMessage"
+        f"bot{bot_token}/sendMessage"
     )
 
 

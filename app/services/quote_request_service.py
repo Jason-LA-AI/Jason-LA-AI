@@ -19,6 +19,7 @@ from app.services.lead_service import create_lead_from_quote_request
 from app.services.order_service import create_order_from_quote_request
 from app.services.outbox_service import create_outbox_event
 from app.services.quote_service import create_quote_from_quote_request
+from app.services.telegram_notifier import send_approval_notification
 
 
 CONTACT_METHOD_REQUIRED = "CONTACT_METHOD_REQUIRED"
@@ -121,6 +122,19 @@ def process_quote_request(
             estimate_id=estimate.id,
         )
         db.commit()
+        try:
+            send_approval_notification(
+                str(approval.id),
+                "New website booking request\n"
+                f"Customer: {customer.display_name}\n"
+                f"Route: {estimate.route_summary}\n"
+                f"Service: {estimate.service_type}\n"
+                f"Phone: {phone or '-'}\nEmail: {email or '-'}",
+            )
+        except Exception:
+            # The booking is already safely committed; notification delivery must
+            # never turn a successful customer request into an error response.
+            pass
         return result
     except Exception:
         db.rollback()

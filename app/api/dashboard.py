@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, PlainTextResponse, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
@@ -42,6 +42,7 @@ templates.env.globals.update(
     telegram_username=telegram_username or None,
     telegram_url=(f"https://t.me/{telegram_username}" if telegram_username else None),
     xiaohongshu_url=settings.xiaohongshu_url,
+    site_url=settings.site_url.rstrip("/"),
 )
 
 
@@ -57,9 +58,14 @@ def require_dashboard_auth(
     expected_username = settings.dashboard_username
     expected_password = settings.dashboard_password
 
-    # Local development and tests remain convenient until credentials are set.
-    if not expected_username and not expected_password:
-        return
+    if not expected_username or not expected_password:
+        if settings.is_production:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Dashboard credentials are not configured",
+            )
+        if not expected_username and not expected_password:
+            return
 
     valid_credentials = bool(
         credentials
@@ -108,6 +114,17 @@ def stories_page(
     )
 
 
+@router.get(
+    "/gallery",
+    response_class=HTMLResponse,
+    include_in_schema=False,
+)
+def gallery_page(request: Request) -> HTMLResponse:
+    """Render Jason's real service photo gallery."""
+
+    return templates.TemplateResponse(request=request, name="gallery.html")
+
+
 
 @router.get(
     "/services",
@@ -137,6 +154,32 @@ def quote_page(
     return templates.TemplateResponse(
         request=request,
         name="quote.html",
+    )
+
+
+@router.get("/quote/confirmation", response_class=HTMLResponse, include_in_schema=False)
+def quote_confirmation_page(request: Request) -> HTMLResponse:
+    """Show a durable acknowledgement after a booking request is saved."""
+    return templates.TemplateResponse(
+        request=request,
+        name="quote_confirmation.html",
+        context={"reference": request.query_params.get("reference")},
+    )
+
+
+@router.get("/robots.txt", response_class=PlainTextResponse, include_in_schema=False)
+def robots() -> str:
+    return f"User-agent: *\nAllow: /\nDisallow: /dashboard\nSitemap: {settings.site_url.rstrip('/')}/sitemap.xml\n"
+
+
+@router.get("/sitemap.xml", include_in_schema=False)
+def sitemap() -> Response:
+    base = settings.site_url.rstrip("/")
+    paths = ("/", "/services", "/vehicle", "/stories", "/gallery", "/quote", "/contact", "/areas")
+    urls = "".join(f"<url><loc>{base}{path}</loc></url>" for path in paths)
+    return Response(
+        content=f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>',
+        media_type="application/xml",
     )
 
 
