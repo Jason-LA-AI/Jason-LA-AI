@@ -257,8 +257,8 @@ button:hover {
 .social-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 22px; }
 .social-actions span { color: #475569; }
 .social-actions a { background: #f3eee5; border-radius: 999px; color: #6f4b18; font-weight: 700; padding: 10px 15px; text-decoration: none; }
-.vehicle-showcase { overflow: hidden; padding: 0; }
-.vehicle-showcase > img { aspect-ratio: 16 / 9; display: block; height: auto; object-fit: cover; width: 100%; }
+.vehicle-showcase { box-sizing: border-box; max-width: 1080px; overflow: hidden; padding: 0; width: calc(100% - 40px); }
+.vehicle-showcase > img { aspect-ratio: 16 / 9; display: block; height: auto; max-width: 100%; object-fit: cover; width: 100%; }
 .vehicle-showcase__copy { padding: 34px 40px 40px; }
 .vehicle-showcase__copy h2 { margin: 6px 0 14px; }
 .vehicle-showcase__copy > p { line-height: 1.7; max-width: 760px; }
@@ -274,7 +274,7 @@ button:hover {
     .section-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
     .hero-actions { align-items: stretch; flex-direction: column; }
     .gallery-card img { height: min(72vw, 320px); }
-    .vehicle-showcase { padding: 0; }
+    .vehicle-showcase { margin-left: 12px; margin-right: 12px; max-width: 100%; padding: 0; width: calc(100% - 24px); }
     .vehicle-showcase__copy { padding: 26px 22px 30px; }
     .vehicle-details { grid-template-columns: 1fr; }
 }
