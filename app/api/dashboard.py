@@ -42,6 +42,7 @@ templates.env.globals.update(
     telegram_username=telegram_username or None,
     telegram_url=(f"https://t.me/{telegram_username}" if telegram_username else None),
     xiaohongshu_url=settings.xiaohongshu_url,
+    facebook_url=settings.facebook_url,
     site_url=settings.site_url.rstrip("/"),
 )
 

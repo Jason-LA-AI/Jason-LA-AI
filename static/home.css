@@ -254,6 +254,9 @@ button:hover {
 .story-grid article p { color: #475569; line-height: 1.65; }
 .cta-section { text-align: center; }
 .cta-section .home-actions { justify-content: center; }
+.social-actions { align-items: center; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 22px; }
+.social-actions span { color: #475569; }
+.social-actions a { background: #f3eee5; border-radius: 999px; color: #6f4b18; font-weight: 700; padding: 10px 15px; text-decoration: none; }
 .vehicle-showcase { overflow: hidden; padding: 0; }
 .vehicle-showcase > img { aspect-ratio: 16 / 9; display: block; height: auto; object-fit: cover; width: 100%; }
 .vehicle-showcase__copy { padding: 34px 40px 40px; }

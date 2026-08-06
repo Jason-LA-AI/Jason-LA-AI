@@ -8,7 +8,8 @@
     <h1 id="confirmation-title">Your request has been received.</h1>
     <p>Jason will review the trip details and confirm the final price using your preferred contact method.</p>
     {% if reference %}<p>Reference: <strong>{{ reference }}</strong></p>{% endif %}
-    <p><a class="primary-button" href="/">Return home</a></p>
+    <div class="home-actions"><a class="home-button home-button--primary" href="/">Return Home</a><a class="home-button home-button--secondary" href="/stories">See Real Trip Stories</a></div>
+    {% if xiaohongshu_url or facebook_url %}<div class="social-actions" aria-label="Follow Jason for service updates"><span>See more real service updates:</span>{% if xiaohongshu_url %}<a href="{{ xiaohongshu_url }}" target="_blank" rel="noopener noreferrer">Xiaohongshu 小红书</a>{% endif %}{% if facebook_url %}<a href="{{ facebook_url }}" target="_blank" rel="noopener noreferrer">Facebook</a>{% endif %}</div>{% endif %}
   </section>
 </main>
 {% endblock %}

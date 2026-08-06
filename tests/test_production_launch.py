@@ -42,3 +42,34 @@ def test_production_dashboard_fails_closed_without_credentials(
     response = client.get("/dashboard")
 
     assert response.status_code == 503
+
+
+def test_social_links_are_hidden_until_configured(client: TestClient, monkeypatch) -> None:
+    monkeypatch.setitem(dashboard_module.templates.env.globals, "xiaohongshu_url", None)
+    monkeypatch.setitem(dashboard_module.templates.env.globals, "facebook_url", None)
+
+    home = client.get("/")
+    contact = client.get("/contact")
+    confirmation = client.get("/quote/confirmation")
+
+    assert "Xiaohongshu 小红书" not in home.text
+    assert "Facebook page" not in contact.text
+    assert "See more real service updates" not in confirmation.text
+
+
+def test_configured_social_links_render(client: TestClient, monkeypatch) -> None:
+    monkeypatch.setitem(
+        dashboard_module.templates.env.globals,
+        "xiaohongshu_url",
+        "https://example.com/xiaohongshu",
+    )
+    monkeypatch.setitem(
+        dashboard_module.templates.env.globals,
+        "facebook_url",
+        "https://example.com/facebook",
+    )
+
+    for path in ("/", "/contact", "/quote/confirmation"):
+        response = client.get(path)
+        assert 'href="https://example.com/xiaohongshu"' in response.text
+        assert 'href="https://example.com/facebook"' in response.text

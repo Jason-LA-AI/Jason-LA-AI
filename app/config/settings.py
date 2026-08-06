@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     email_address: str | None = None
     telegram_username: str | None = None
     xiaohongshu_url: str | None = None
+    facebook_url: str | None = None
     dashboard_username: str | None = Field(default=None, repr=False)
     dashboard_password: str | None = Field(default=None, repr=False)
     telegram_bot_token: str | None = Field(default=None, repr=False)

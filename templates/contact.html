@@ -313,18 +313,24 @@ San Diego County
 
 <h2>Contact Jason</h2>
 
-<p>For the fastest response, contact Jason through Xiaohongshu or Telegram.</p>
+<p>Choose any configured channel below for service updates or a direct response from Jason.</p>
 
 <div class="contact-methods">
 {% if xiaohongshu_url %}<a class="contact-method contact-method--priority" href="{{ xiaohongshu_url }}" target="_blank" rel="noopener noreferrer"><strong>📕 Xiaohongshu 小红书</strong><span>View Jason's profile</span></a>{% endif %}
+{% if facebook_url %}<a class="contact-method contact-method--priority" href="{{ facebook_url }}" target="_blank" rel="noopener noreferrer"><strong>Facebook</strong><span>Follow Jason's service updates</span></a>{% endif %}
 {% if telegram_url %}<a class="contact-method contact-method--priority" href="{{ telegram_url }}" target="_blank" rel="noopener noreferrer"><strong>✈ Telegram</strong><span>@{{ telegram_username }}</span></a>{% endif %}
 {% if phone_number %}<a class="contact-method" href="tel:{{ phone_number }}"><strong>📱 Phone / Text</strong><span>{{ phone_number }}</span></a>{% endif %}
 {% if email_address %}<a class="contact-method" href="mailto:{{ email_address }}"><strong>📧 Email</strong><span>{{ email_address }}</span></a>{% endif %}
-<a class="contact-method" href="#facebook-link-coming-soon" aria-label="Facebook link coming soon"><strong>Facebook</strong><span>Facebook page</span><small>Link coming soon</small></a>
 </div>
 
 
 
+</section>
+
+<section class="cta-section">
+<h2>See real trips before you book</h2>
+<p>Browse Jason's real airport pickups, luggage assistance, and passenger stories.</p>
+<div class="home-actions"><a class="home-button home-button--primary" href="/gallery">View Service Photos</a><a class="home-button home-button--secondary" href="/stories">Read Trip Stories</a></div>
 </section>
 
 
