@@ -1,272 +1,46 @@
 {% extends "base.html" %}
 
-
-{% block title %}
-
-Jason Vehicle | 2026 Toyota RAV4 Hybrid LE Transportation
-
-{% endblock %}
-
-
-
-{% block description %}
-
-Jason provides private transportation with a 2026 Toyota RAV4 Hybrid LE,
-serving Los Angeles airport pickup, Disneyland trips and family transportation.
-
-{% endblock %}
-
-
-
-
+{% block title %}Jason's Vehicle | 2026 Toyota RAV4 Hybrid LE{% endblock %}
+{% block description %}Ride with Jason in a clean 2026 Toyota RAV4 Hybrid LE for private airport transportation throughout Los Angeles.{% endblock %}
 
 {% block content %}
-
-
-
-
-
-<header>
-
-
-<h1>
-Our Vehicle
-</h1>
-
-
-<p>
-2026 Toyota RAV4 Hybrid LE
-</p>
-
-
-<p>
-安全 · 舒适 · 准时
-</p>
-
-
+<header class="page-hero">
+  <p class="eyebrow">CLEAN · COMFORTABLE · RELIABLE</p>
+  <h1>Our Vehicle</h1>
+  <p>2026 Toyota RAV4 Hybrid LE</p>
 </header>
 
-
-
-
-
-
-
-<section>
-
-
-<h2>
-🚗 2026 Toyota RAV4 Hybrid LE
-</h2>
-
-
-
-<div class="photo-box">
-
-以后上传车辆照片
-
-</div>
-
-
-
-<p>
-
-Jason 使用 2026 Toyota RAV4 Hybrid LE
-提供洛杉矶地区私人交通服务。
-
-</p>
-
-
-
-<p>
-
-车辆特点：
-
-<br>
-
-✓ Hybrid 混合动力
-
-<br>
-
-✓ 安静舒适
-
-<br>
-
-✓ 适合家庭出行
-
-<br>
-
-✓ 干净整洁
-
-<br>
-
-✓ 安全可靠
-
-</p>
-
-
-
+<section class="wide-section vehicle-showcase" aria-labelledby="vehicle-intro-heading">
+  <img
+    src="/static/images/service/04-rav4-exterior.webp"
+    srcset="/static/images/service/04-rav4-exterior-800.webp 800w, /static/images/service/04-rav4-exterior.webp 1600w"
+    sizes="(max-width: 760px) calc(100vw - 60px), 1080px"
+    alt="Jason's clean Toyota RAV4 Hybrid used for private airport transportation"
+    width="1600"
+    height="1200"
+    fetchpriority="high"
+    decoding="async"
+  >
+  <div class="vehicle-showcase__copy">
+    <p class="eyebrow eyebrow--dark">YOUR PRIVATE RIDE</p>
+    <h2 id="vehicle-intro-heading">Comfort for every airport trip</h2>
+    <p>Jason personally drives every trip in a clean and quiet 2026 Toyota RAV4 Hybrid LE—ideal for airport pickups, family travel, and private transportation around Los Angeles.</p>
+    <div class="badge-list"><span>Hybrid SUV</span><span>1–4 passengers</span><span>Clean interior</span><span>中文沟通</span></div>
+  </div>
 </section>
 
-
-
-
-
-
-
-
-<section>
-
-
-<h2>
-乘坐容量
-</h2>
-
-
-
-<p>
-
-适合：
-
-<br>
-
-✓ 1-4 位乘客
-
-<br>
-
-✓ 家庭旅行
-
-<br>
-
-✓ 机场接送
-
-<br>
-
-✓ Disneyland 行程
-
-</p>
-
-
-
+<section class="wide-section">
+  <div class="section-heading"><div><p class="eyebrow eyebrow--dark">TRIP READY</p><h2>Space and service</h2></div></div>
+  <div class="vehicle-details">
+    <article><h3>Passenger comfort</h3><p>Comfortable seating for 1–4 passengers, with a quiet hybrid ride for airport transfers and family trips.</p></article>
+    <article><h3>Luggage space</h3><p>Best suited for 2–3 large suitcases plus carry-on bags. Tell Jason in advance if you have oversized or extra luggage.</p></article>
+    <article><h3>Family travel</h3><p>Child-seat needs and other family requirements can be requested during your quote for Jason to confirm.</p></article>
+  </div>
 </section>
 
-
-
-
-
-
-
-
-<section>
-
-
-<h2>
-行李空间
-</h2>
-
-
-
-<p>
-
-适合携带：
-
-<br>
-
-✓ 2-3 个大型行李箱
-
-<br>
-
-✓ 登机箱
-
-<br>
-
-✓ 普通旅行用品
-
-</p>
-
-
-
-<p>
-
-如有大量行李，请提前告知，
-Jason 会确认车辆空间是否适合。
-
-</p>
-
-
-
+<section class="cta-section">
+  <h2>Ready to reserve your ride?</h2>
+  <p>Share your flight, destination, passenger count, and luggage details.</p>
+  <div class="home-actions"><a class="home-button home-button--primary" href="/quote">Get a Quote</a><a class="home-button home-button--secondary" href="/gallery">View Service Photos</a></div>
 </section>
-
-
-
-
-
-
-
-
-<section>
-
-
-<h2>
-儿童与家庭服务
-</h2>
-
-
-
-<p>
-
-适合家庭客户：
-
-<br>
-
-✓ 儿童乘坐
-
-<br>
-
-✓ 家庭旅游
-
-<br>
-
-✓ 中文沟通
-
-<br>
-
-✓ 提前确认需求
-
-</p>
-
-
-
-</section>
-
-
-
-
-
-
-
-
-<section>
-
-
-<h2>
-需要预约？
-
-</h2>
-
-
-<a href="/quote">
-
-立即询价
-
-</a>
-
-
-
-</section>
-
-
-
-
-
 {% endblock %}
