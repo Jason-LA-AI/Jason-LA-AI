@@ -1,7 +1,6 @@
 """FastAPI application entry point."""
 
 from fastapi import FastAPI, Request
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 
@@ -20,7 +19,6 @@ def create_application() -> FastAPI:
     application.include_router(api_router, prefix=settings.api_prefix)
     application.include_router(dashboard_router)
     if settings.is_production:
-        application.add_middleware(HTTPSRedirectMiddleware)
         application.add_middleware(
             TrustedHostMiddleware,
             allowed_hosts=settings.trusted_hosts,
