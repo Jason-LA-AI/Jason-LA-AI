@@ -20,6 +20,17 @@
   </div>
 </section>
 
+<section class="home-contact" aria-labelledby="home-contact-title">
+  <p class="eyebrow eyebrow--dark">READY WHEN YOU ARE</p>
+  <h2 id="home-contact-title">Contact Jason</h2>
+  <p>Questions about your airport ride? Contact Jason directly or request a quote online.</p>
+  <div class="home-actions">
+    {% if phone_number %}<a class="home-button home-button--secondary" href="tel:{{ phone_number }}">Call / Text</a>{% endif %}
+    {% if telegram_url %}<a class="home-button home-button--secondary" href="{{ telegram_url }}" target="_blank" rel="noopener noreferrer">Telegram</a>{% endif %}
+    <a class="home-button home-button--primary" href="/quote">Get a Quote</a>
+  </div>
+</section>
+
 <section class="wide-section">
   <div class="section-heading"><div><p class="eyebrow eyebrow--dark">BEHIND EVERY RIDE</p><h2>Real Service Photos</h2></div><a href="/gallery">View all 10 photos →</a></div>
   <div class="service-gallery service-gallery--preview">
