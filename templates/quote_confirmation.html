@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 {% block title %}Request Received | Jason Transportation{% endblock %}
-{% block description %}Your transportation booking request has been received for Jason's review.{% endblock %}
+{% block description %}Your request has been received. Jason will review your transportation details and final fare.{% endblock %}
 {% block content %}
 <main class="page-shell">
   <section class="success-panel" style="display:block" aria-labelledby="confirmation-title">
     <div class="success-panel__icon" aria-hidden="true">✓</div>
-    <h1 id="confirmation-title">Your request has been received.</h1>
-    <p>Jason will review the trip details and confirm the final price using your preferred contact method.</p>
+    <h1 id="confirmation-title">Thank you for your request!</h1>
+    <p>Jason has received your trip details.</p>
+    <p>I will review:</p>
+    <p>✓ Flight information<br>✓ Pickup and drop-off details<br>✓ Vehicle availability<br>✓ Final fare</p>
+    <p>I will contact you shortly by phone or text to confirm your reservation.</p>
+    <p>Thank you for choosing Jason in Los Angeles.</p>
     {% if reference %}<p>Reference: <strong>{{ reference }}</strong></p>{% endif %}
     <div class="home-actions"><a class="home-button home-button--primary" href="/">Return Home</a><a class="home-button home-button--secondary" href="/stories">See Real Trip Stories</a></div>
     {% if xiaohongshu_url or facebook_url %}<div class="social-actions" aria-label="Follow Jason for service updates"><span>See more real service updates:</span>{% if xiaohongshu_url %}<a href="{{ xiaohongshu_url }}" target="_blank" rel="noopener noreferrer">Xiaohongshu 小红书</a>{% endif %}{% if facebook_url %}<a href="{{ facebook_url }}" target="_blank" rel="noopener noreferrer">Facebook</a>{% endif %}</div>{% endif %}
