@@ -5,11 +5,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 import secrets
 from typing import Any
+from uuid import UUID
 from zoneinfo import ZoneInfo
 
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import HTMLResponse, PlainTextResponse, Response
+from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse, Response
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from sqlalchemy import select
@@ -20,6 +21,8 @@ from app.database.session import get_db_session
 from app.config.settings import settings
 from app.models.customer import Customer
 from app.models.lead import Lead
+from app.schemas.manual_lead import ManualLeadCreate, ManualLeadStatusUpdate
+from app.services.manual_lead_service import create_manual_lead, update_manual_lead_status
 
 
 
@@ -81,6 +84,45 @@ def require_dashboard_auth(
             detail="Dashboard authentication required",
             headers={"WWW-Authenticate": 'Basic realm="Jason Dashboard"'},
         )
+
+
+@router.post("/dashboard/leads", status_code=status.HTTP_201_CREATED, include_in_schema=False)
+def create_dashboard_lead(
+    payload: ManualLeadCreate,
+    _: None = Depends(require_dashboard_auth),
+    db_session: Session = Depends(get_db_session),
+) -> JSONResponse:
+    """Create a manual lead without entering quote or notification flows."""
+
+    try:
+        lead = create_manual_lead(db_session, payload)
+    except Exception:
+        db_session.rollback()
+        raise
+    return JSONResponse(
+        status_code=status.HTTP_201_CREATED,
+        content={"lead_id": str(lead.id), "status": lead.status},
+    )
+
+
+@router.patch("/dashboard/leads/{lead_id}/status", include_in_schema=False)
+def update_dashboard_lead_status(
+    lead_id: UUID,
+    payload: ManualLeadStatusUpdate,
+    _: None = Depends(require_dashboard_auth),
+    db_session: Session = Depends(get_db_session),
+) -> JSONResponse:
+    """Immediately persist one lead status change from the dashboard."""
+
+    lead = db_session.get(Lead, lead_id)
+    if lead is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Lead not found")
+    try:
+        update_manual_lead_status(db_session, lead, payload.status)
+    except Exception:
+        db_session.rollback()
+        raise
+    return JSONResponse(content={"lead_id": str(lead.id), "status": payload.status.value})
 
 
 
@@ -320,9 +362,19 @@ def _build_inquiry_view(
 
     return {
 
+        "lead_id": str(lead.id),
+
         "source": _display_source(
             lead.source or customer.source
         ),
+
+        "customer_name": customer.display_name or "Unknown",
+
+        "contact": customer.primary_contact,
+
+        "status": _dashboard_status(lead, analysis),
+
+        "route": lead.route_summary or "Not provided",
 
         "language": str(
             analysis.get("detected_language")
@@ -385,6 +437,10 @@ def _display_source(
 
         "UNKNOWN": "Unknown",
 
+        "PHONE": "Phone",
+
+        "WECHAT": "WeChat",
+
     }.get(
         source or "UNKNOWN",
         source or "Unknown",
@@ -410,6 +466,22 @@ def _display_intent(
         intent or "",
         "unknown",
     )
+
+
+def _dashboard_status(lead: Lead, analysis: dict[str, Any]) -> str:
+    manual_status = analysis.get("manual_status")
+    if manual_status in {"NEW", "QUOTED", "WAITING", "CONFIRMED", "COMPLETED", "LOST"}:
+        return str(manual_status)
+    return {
+        "NEW": "NEW",
+        "QUOTED": "QUOTED",
+        "AWAITING_DETAILS": "WAITING",
+        "PENDING_JASON": "WAITING",
+        "FOLLOW_UP": "WAITING",
+        "CONVERTED": "CONFIRMED",
+        "LOST": "LOST",
+        "UNAVAILABLE": "LOST",
+    }.get(lead.status, "NEW")
 
 
 

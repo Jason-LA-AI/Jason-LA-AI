@@ -25,7 +25,7 @@ class Lead(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     __table_args__ = (
         CheckConstraint(
             "source IN ('WEBSITE', 'XIAOHONGSHU', 'FACEBOOK', 'GOOGLE', "
-            "'REFERRAL', 'OTHER', 'UNKNOWN')",
+            "'PHONE', 'WECHAT', 'REFERRAL', 'OTHER', 'UNKNOWN')",
             name="ck_leads_source",
         ),
         CheckConstraint(

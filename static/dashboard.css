@@ -69,6 +69,7 @@ h1 {
 }
 
 .table-card,
+.form-card,
 .empty-state {
   overflow: hidden;
   border: 1px solid #dce1e9;
@@ -76,6 +77,46 @@ h1 {
   background: #fff;
   box-shadow: 0 10px 30px rgb(29 42 68 / 6%);
 }
+
+.form-card {
+  margin-bottom: 24px;
+  padding: 22px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.section-header h2 { margin: 0; }
+.table-title { padding: 20px 20px 0; }
+
+.primary-button,
+.secondary-button {
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 16px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.primary-button { background: #b2492f; color: #fff; }
+.secondary-button { background: #eef1f5; color: #172033; }
+
+#manualLeadForm { margin-top: 22px; }
+.form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.form-grid label { display: grid; gap: 6px; color: #4e596b; font-size: .82rem; font-weight: 650; }
+.form-grid input, .form-grid select, .form-grid textarea { width: 100%; border: 1px solid #ccd3dd; border-radius: 8px; padding: 10px; background: #fff; color: #172033; font: inherit; }
+.full-width { grid-column: 1 / -1; }
+.form-message { min-height: 22px; color: #647084; }
+.form-message.error { color: #a43d2e; }
+.form-message.success { color: #23754b; }
+.status-tag { display: inline-flex; border-radius: 999px; padding: 4px 9px; background: #eef3ff; color: #345ea8; font-size: .75rem; font-weight: 700; white-space: nowrap; }
+.lead-status { border: 1px solid #ccd3dd; border-radius: 8px; padding: 7px; background: #fff; color: #172033; font: inherit; font-size: .8rem; font-weight: 700; }
+.status-save { display: block; min-height: 16px; margin-top: 4px; color: #647084; font-size: .7rem; }
 
 .table-scroll {
   overflow-x: auto;
@@ -191,4 +232,6 @@ footer {
   .count-card {
     min-width: 76px;
   }
+
+  .form-grid { grid-template-columns: 1fr; }
 }

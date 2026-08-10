@@ -21,18 +21,44 @@
         </div>
       </header>
 
+      <section class="form-card" aria-labelledby="new-lead-title">
+        <div class="section-header">
+          <div><p class="eyebrow">Manual intake</p><h2 id="new-lead-title">New Lead</h2></div>
+          <button id="toggleLeadForm" class="secondary-button" type="button" aria-expanded="false">Add lead</button>
+        </div>
+        <form id="manualLeadForm" hidden>
+          <div class="form-grid">
+            <label><span>Customer name *</span><input name="customer_name" maxlength="150" required></label>
+            <label><span>Source *</span><select name="source" required><option value="">Select source</option><option value="FACEBOOK">Facebook</option><option value="XIAOHONGSHU">Xiaohongshu</option><option value="PHONE">Phone</option><option value="WECHAT">WeChat</option><option value="OTHER">Other</option></select></label>
+            <label><span>Status *</span><select name="status" required><option value="NEW">New</option><option value="QUOTED">Quoted</option><option value="WAITING">Waiting</option><option value="CONFIRMED">Confirmed</option><option value="COMPLETED">Completed</option><option value="LOST">Lost</option></select></label>
+            <label><span>Phone</span><input name="phone" type="tel" maxlength="30"></label>
+            <label><span>WeChat</span><input name="wechat" maxlength="255"></label>
+            <label><span>Facebook / Xiaohongshu contact</span><input name="social_contact" maxlength="255"></label>
+            <label><span>Trip type</span><select name="intent"><option value="">Not known</option><option value="AIRPORT_PICKUP">Airport pickup</option><option value="AIRPORT_DROPOFF">Airport dropoff</option><option value="PRIVATE_TRANSPORTATION">Private transportation</option><option value="LONG_DISTANCE">Long distance</option></select></label>
+            <label><span>Service date</span><input name="service_date" type="date"></label>
+            <label><span>Airport</span><input name="airport" maxlength="10" placeholder="LAX"></label>
+            <label><span>Pickup</span><input name="pickup" maxlength="255"></label>
+            <label><span>Destination</span><input name="destination" maxlength="255"></label>
+            <label class="full-width"><span>Notes</span><textarea name="notes" maxlength="2000" rows="3"></textarea></label>
+          </div>
+          <p id="manualLeadMessage" class="form-message" role="status"></p>
+          <button class="primary-button" type="submit">Save lead</button>
+        </form>
+      </section>
+
       {% if inquiries %}
-      <section class="table-card" aria-label="Recent inquiries">
+      <section class="table-card" aria-label="Lead list">
+        <div class="section-header table-title"><div><p class="eyebrow">Lead list</p><h2>Recent leads</h2></div></div>
         <div class="table-scroll">
           <table>
             <thead>
               <tr>
+                <th>Customer</th>
+                <th>Contact</th>
                 <th>Source</th>
-                <th>Language</th>
-                <th>Inquiry type</th>
-                <th>Airport</th>
-                <th>Destination</th>
-                <th>Risk</th>
+                <th>Status</th>
+                <th>Trip type</th>
+                <th>Route</th>
                 <th>Recommended action</th>
                 <th>Received</th>
               </tr>
@@ -40,16 +66,12 @@
             <tbody>
               {% for inquiry in inquiries %}
               <tr>
+                <td>{{ inquiry.customer_name }}</td>
+                <td>{{ inquiry.contact }}</td>
                 <td>{{ inquiry.source }}</td>
-                <td><span class="language-tag">{{ inquiry.language }}</span></td>
+                <td><select class="lead-status" data-lead-id="{{ inquiry.lead_id }}" aria-label="Status for {{ inquiry.customer_name }}">{% for status in ["NEW", "QUOTED", "WAITING", "CONFIRMED", "COMPLETED", "LOST"] %}<option value="{{ status }}"{% if inquiry.status == status %} selected{% endif %}>{{ status }}</option>{% endfor %}</select><span class="status-save" aria-live="polite"></span></td>
                 <td>{{ inquiry.inquiry_type }}</td>
-                <td>{{ inquiry.airport }}</td>
-                <td>{{ inquiry.destination }}</td>
-                <td>
-                  <span class="risk-tag risk-{{ inquiry.risk_level | lower }}">
-                    {{ inquiry.risk_level }}
-                  </span>
-                </td>
+                <td>{{ inquiry.route }}</td>
                 <td>{{ inquiry.recommended_action }}</td>
                 <td class="received-time">{{ inquiry.received_time }}</td>
               </tr>
@@ -60,14 +82,16 @@
       </section>
       {% else %}
       <section class="empty-state">
+        <p class="eyebrow">Lead list</p>
         <h2>No inquiries yet</h2>
-        <p>New inquiries will appear here after they are stored in PostgreSQL.</p>
+        <p>New quote requests and manual leads will appear here.</p>
       </section>
       {% endif %}
 
       <footer>
-        This dashboard has no authentication yet. Keep it on a trusted development environment.
+        Internal lead management dashboard.
       </footer>
     </main>
+    <script src="{{ url_for('static', path='/manual-leads.js') }}" defer></script>
   </body>
 </html>
