@@ -21,6 +21,8 @@ from app.database.session import get_db_session
 from app.config.settings import settings
 from app.models.customer import Customer
 from app.models.lead import Lead
+from app.models.order import Order
+from app.models.quote import Quote
 from app.schemas.manual_lead import ManualLeadCreate, ManualLeadStatusUpdate
 from app.services.manual_lead_service import create_manual_lead, update_manual_lead_status
 
@@ -302,9 +304,19 @@ def dashboard(
 ) -> HTMLResponse:
     """Render recent inquiries for Jason review."""
 
+    latest_quote_id = (
+        select(Quote.id)
+        .join(Order, Quote.order_id == Order.id)
+        .where(Order.lead_id == Lead.id)
+        .order_by(Quote.version_number.desc())
+        .limit(1)
+        .correlate(Lead)
+        .scalar_subquery()
+    )
     statement = (
-        select(Lead, Customer)
+        select(Lead, Customer, Quote)
         .join(Customer, Lead.customer_id == Customer.id)
+        .outerjoin(Quote, Quote.id == latest_quote_id)
         .order_by(Lead.received_at.desc())
         .limit(100)
     )
@@ -314,8 +326,8 @@ def dashboard(
 
 
     inquiries = [
-        _build_inquiry_view(lead, customer)
-        for lead, customer in rows
+        _build_inquiry_view(lead, customer, quote)
+        for lead, customer, quote in rows
     ]
 
 
@@ -341,6 +353,7 @@ def dashboard(
 def _build_inquiry_view(
     lead: Lead,
     customer: Customer,
+    quote: Quote | None = None,
 ) -> dict[str, str]:
 
     analysis = (
@@ -375,6 +388,18 @@ def _build_inquiry_view(
         "status": _dashboard_status(lead, analysis),
 
         "route": lead.route_summary or "Not provided",
+
+        "suggested_price": _display_money(
+            quote.suggested_amount if quote else None,
+            quote.currency_code if quote else None,
+            missing="Not estimated" if quote is None else "Manual review required",
+        ),
+
+        "price_range": _display_price_range(quote),
+
+        "pricing_source": (
+            quote.pricing_source or "Not provided" if quote else "Not estimated"
+        ),
 
         "language": str(
             analysis.get("detected_language")
@@ -493,6 +518,24 @@ def _display_value(
         return "Not provided"
 
     return str(value)
+
+
+def _display_money(value: Any, currency: str | None, *, missing: str) -> str:
+    if value is None:
+        return missing
+    return f"{currency or 'USD'} {value:,.2f}"
+
+
+def _display_price_range(quote: Quote | None) -> str:
+    if quote is None:
+        return "Not estimated"
+    if quote.suggested_min_amount is None or quote.suggested_max_amount is None:
+        return "Manual review required"
+    currency = quote.currency_code or "USD"
+    return (
+        f"{currency} {quote.suggested_min_amount:,.2f}–"
+        f"{quote.suggested_max_amount:,.2f}"
+    )
 
 
 

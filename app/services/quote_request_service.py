@@ -133,7 +133,8 @@ def process_quote_request(
                 f"Route: {estimate.route_summary}\n"
                 f"Service: {estimate.service_type}\n"
                 f"Source: {request.source.value}\n"
-                f"Phone: {phone or '-'}\nEmail: {email or '-'}",
+                f"Phone: {phone or '-'}\nEmail: {email or '-'}\n\n"
+                + _pricing_recommendation_text(estimate),
             )
         except Exception:
             # The booking is already safely committed; notification delivery must
@@ -152,3 +153,27 @@ def accept_quote_request(
     """Backward-compatible alias for the transactional orchestrator."""
 
     return process_quote_request(db, request)
+
+
+def _pricing_recommendation_text(estimate: object) -> str:
+    source = getattr(estimate, "pricing_source", None) or "Not provided"
+    status_value = getattr(estimate, "status", None) or "MANUAL_REVIEW_REQUIRED"
+    suggested = getattr(estimate, "suggested_amount", None)
+    minimum = getattr(estimate, "estimated_min_amount", None)
+    maximum = getattr(estimate, "estimated_max_amount", None)
+    if suggested is None or minimum is None or maximum is None:
+        return (
+            "Pricing Recommendation:\n"
+            "Manual Review Required\n"
+            f"Pricing Source: {source}\n"
+            f"Pricing Status: {status_value}"
+        )
+    currency = getattr(estimate, "currency_code", None) or "USD"
+    return (
+        "Pricing Recommendation:\n"
+        f"Suggested Amount: {suggested}\n"
+        f"Range: {minimum} - {maximum}\n"
+        f"Currency: {currency}\n"
+        f"Pricing Source: {source}\n"
+        f"Pricing Status: {status_value}"
+    )

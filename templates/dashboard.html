@@ -59,6 +59,9 @@
                 <th>Status</th>
                 <th>Trip type</th>
                 <th>Route</th>
+                <th>Suggested Price</th>
+                <th>Price Range</th>
+                <th>Pricing Source</th>
                 <th>Recommended action</th>
                 <th>Received</th>
               </tr>
@@ -72,6 +75,9 @@
                 <td><select class="lead-status" data-lead-id="{{ inquiry.lead_id }}" aria-label="Status for {{ inquiry.customer_name }}">{% for status in ["NEW", "QUOTED", "WAITING", "CONFIRMED", "COMPLETED", "LOST"] %}<option value="{{ status }}"{% if inquiry.status == status %} selected{% endif %}>{{ status }}</option>{% endfor %}</select><span class="status-save" aria-live="polite"></span></td>
                 <td>{{ inquiry.inquiry_type }}</td>
                 <td>{{ inquiry.route }}</td>
+                <td>{{ inquiry.suggested_price }}</td>
+                <td>{{ inquiry.price_range }}</td>
+                <td><span class="pricing-source">{{ inquiry.pricing_source }}</span></td>
                 <td>{{ inquiry.recommended_action }}</td>
                 <td class="received-time">{{ inquiry.received_time }}</td>
               </tr>

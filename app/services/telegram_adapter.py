@@ -61,6 +61,8 @@ def _render_quote_request_review(notification: Notification) -> str:
             f"Service Type: {_payload_value(payload, 'service_type')}",
             f"Source: {payload.get('source') or 'UNKNOWN'}",
             f"Route Summary: {_payload_value(payload, 'route_summary')}",
+            "",
+            *_pricing_recommendation_lines(payload),
         )
     )
 
@@ -70,3 +72,26 @@ def _payload_value(payload: dict[str, Any], key: str) -> str:
     if value is None:
         raise ValueError(f"Notification payload is missing {key}.")
     return str(value)
+
+
+def _pricing_recommendation_lines(payload: dict[str, Any]) -> tuple[str, ...]:
+    suggested = payload.get("suggested_amount")
+    minimum = payload.get("estimated_min_amount")
+    maximum = payload.get("estimated_max_amount")
+    source = payload.get("pricing_source") or "Not provided"
+    status = payload.get("pricing_status") or "MANUAL_REVIEW_REQUIRED"
+    if suggested is None or minimum is None or maximum is None:
+        return (
+            "Pricing Recommendation:",
+            "Manual Review Required",
+            f"Pricing Source: {source}",
+            f"Pricing Status: {status}",
+        )
+    return (
+        "Pricing Recommendation:",
+        f"Suggested Amount: {suggested}",
+        f"Range: {minimum} - {maximum}",
+        f"Currency: {payload.get('currency_code') or 'USD'}",
+        f"Pricing Source: {source}",
+        f"Pricing Status: {status}",
+    )

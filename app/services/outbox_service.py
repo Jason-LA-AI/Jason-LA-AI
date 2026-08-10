@@ -38,6 +38,12 @@ def create_outbox_event(
             "route_summary": quote_estimate.route_summary,
             "service_type": quote_estimate.service_type,
             "source": source,
+            "suggested_amount": _amount_string(quote_estimate.suggested_amount),
+            "estimated_min_amount": _amount_string(quote_estimate.estimated_min_amount),
+            "estimated_max_amount": _amount_string(quote_estimate.estimated_max_amount),
+            "currency_code": quote_estimate.currency_code,
+            "pricing_source": quote_estimate.pricing_source,
+            "pricing_status": quote_estimate.status,
         },
         status="PENDING",
         attempt_count=0,
@@ -48,3 +54,7 @@ def create_outbox_event(
     db.add(event)
     db.flush()
     return event
+
+
+def _amount_string(value: object | None) -> str | None:
+    return str(value) if value is not None else None

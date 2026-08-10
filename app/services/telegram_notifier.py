@@ -59,7 +59,7 @@ def send_telegram_notification(
             "inline_keyboard": [
                 [
                     {
-                        "text": "✅ 使用AI价格",
+                        "text": "✅ 使用建议价格",
                         "callback_data": (
                             f"approve:{approval_id}"
                         ),

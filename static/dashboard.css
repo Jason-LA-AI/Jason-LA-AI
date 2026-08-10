@@ -117,6 +117,7 @@ h1 {
 .status-tag { display: inline-flex; border-radius: 999px; padding: 4px 9px; background: #eef3ff; color: #345ea8; font-size: .75rem; font-weight: 700; white-space: nowrap; }
 .lead-status { border: 1px solid #ccd3dd; border-radius: 8px; padding: 7px; background: #fff; color: #172033; font: inherit; font-size: .8rem; font-weight: 700; }
 .status-save { display: block; min-height: 16px; margin-top: 4px; color: #647084; font-size: .7rem; }
+.pricing-source { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .78rem; white-space: nowrap; }
 
 .table-scroll {
   overflow-x: auto;
