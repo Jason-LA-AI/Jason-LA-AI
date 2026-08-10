@@ -64,6 +64,7 @@
           phone: value("customerPhone").trim() || null,
           email: value("customerEmail").trim() || null,
           preferred_contact_method: state.contactMethod === "TEXT" ? "SMS" : "EMAIL",
+          source: value("source"),
           estimate_acceptance: true
         })
       });
@@ -103,10 +104,12 @@
     clearError("locationInput"); return true;
   }
   function validateContact() {
-    const name=document.getElementById("customerName"), phone=document.getElementById("customerPhone"), email=document.getElementById("customerEmail"), hasPhone=!!phone.value.trim(), hasEmail=!!email.value.trim();
+    const name=document.getElementById("customerName"), phone=document.getElementById("customerPhone"), email=document.getElementById("customerEmail"), source=document.getElementById("source"), hasPhone=!!phone.value.trim(), hasEmail=!!email.value.trim();
     phone.removeAttribute("aria-invalid"); email.removeAttribute("aria-invalid");
     name.removeAttribute("aria-invalid");
     if (!name.value.trim()) { name.setAttribute("aria-invalid","true"); setError("contact","Enter your name."); return false; }
+    source.removeAttribute("aria-invalid");
+    if (!source.value) { source.setAttribute("aria-invalid","true"); setError("contact","Choose how you found us."); return false; }
     if (!requireChoice("contactMethod","Choose Text message or Email.")) return false;
     if (!hasPhone && !hasEmail) { phone.setAttribute("aria-invalid","true"); email.setAttribute("aria-invalid","true"); setError("contact","Enter a phone number or email address."); return false; }
     if (state.contactMethod === "TEXT" && !hasPhone) { phone.setAttribute("aria-invalid","true"); setError("contact","Enter a phone number for text contact."); return false; }

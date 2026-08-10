@@ -21,6 +21,7 @@ def create_outbox_event(
     quote: Quote,
     customer: Customer,
     quote_estimate: QuoteEstimate,
+    source: str,
 ) -> OutboxEvent:
     """Store a pending quote-request event in the current transaction."""
 
@@ -36,6 +37,7 @@ def create_outbox_event(
             "estimate_id": str(quote_estimate.id),
             "route_summary": quote_estimate.route_summary,
             "service_type": quote_estimate.service_type,
+            "source": source,
         },
         status="PENDING",
         attempt_count=0,

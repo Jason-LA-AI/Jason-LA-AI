@@ -28,7 +28,7 @@ class Customer(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         ),
         CheckConstraint(
             "source IN "
-            "('XIAOHONGSHU', 'FACEBOOK', 'GOOGLE_WEBSITE', "
+            "('WEBSITE', 'XIAOHONGSHU', 'FACEBOOK', 'GOOGLE', "
             "'REFERRAL', 'OTHER', 'UNKNOWN')",
             name="ck_customers_source",
         ),

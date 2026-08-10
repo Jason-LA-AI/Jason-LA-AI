@@ -373,6 +373,10 @@ def _display_source(
 
         "FACEBOOK": "Facebook",
 
+        "WEBSITE": "Website",
+
+        "GOOGLE": "Google Search",
+
         "GOOGLE_WEBSITE": "Website",
 
         "REFERRAL": "Referral",

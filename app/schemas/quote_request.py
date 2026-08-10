@@ -14,6 +14,17 @@ class PreferredContactMethod(StrEnum):
     EMAIL = "EMAIL"
 
 
+class QuoteRequestSource(StrEnum):
+    """Attribution values accepted by the public quote form."""
+
+    WEBSITE = "WEBSITE"
+    XIAOHONGSHU = "XIAOHONGSHU"
+    FACEBOOK = "FACEBOOK"
+    GOOGLE = "GOOGLE"
+    REFERRAL = "REFERRAL"
+    OTHER = "OTHER"
+
+
 class QuoteRequestCreate(BaseModel):
     """Customer acceptance and contact details for a formal quote request."""
 
@@ -24,6 +35,7 @@ class QuoteRequestCreate(BaseModel):
     phone: str | None = Field(default=None, max_length=30)
     email: EmailStr | None = None
     preferred_contact_method: PreferredContactMethod
+    source: QuoteRequestSource
     estimate_acceptance: Literal[True]
 
 

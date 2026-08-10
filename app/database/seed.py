@@ -46,7 +46,7 @@ DEVELOPMENT_INQUIRIES: tuple[DevelopmentInquiry, ...] = (
     DevelopmentInquiry(
         key="english-ontario-airport",
         customer_name="Development English Customer",
-        source="GOOGLE_WEBSITE",
+        source="WEBSITE",
         message="Hello, I need transportation from Ontario Airport. Can you provide a quote?",
         expected_language="English",
         expected_risk="MEDIUM",

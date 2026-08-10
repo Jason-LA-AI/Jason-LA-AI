@@ -20,6 +20,7 @@ def create_or_match_customer(
     phone: str | None,
     email: str | None,
     preferred_contact_method: str,
+    source: str,
 ) -> Customer:
     """Return a contact-matched customer or create a new customer profile."""
 
@@ -60,7 +61,7 @@ def create_or_match_customer(
         display_name=customer_name.strip(),
         primary_contact=primary_contact,
         primary_contact_type=primary_contact_type,
-        source="GOOGLE_WEBSITE",
+        source=source,
         preferred_contact_method=contact_method,
         phone_number=phone_number,
         phone_number_normalized=phone_normalized,

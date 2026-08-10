@@ -84,6 +84,8 @@ def handle_outbox_event(event: OutboxEvent) -> bool:
         "estimate_id": _payload_string(payload, "estimate_id"),
         "route_summary": payload.get("route_summary"),
         "service_type": payload.get("service_type"),
+        # Legacy pending events predate source tracking; keep them deliverable.
+        "source": payload.get("source") or "UNKNOWN",
     }
     with db.begin_nested():
         create_notification(

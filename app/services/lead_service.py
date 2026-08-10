@@ -18,6 +18,7 @@ def create_lead_from_quote_request(
     customer: Customer,
     quote_estimate: QuoteEstimate,
     customer_contact_information: Mapping[str, Any],
+    source: str,
 ) -> Lead:
     """Create a website lead linked to the customer for an accepted estimate."""
 
@@ -27,7 +28,7 @@ def create_lead_from_quote_request(
     accepted_at = datetime.now(timezone.utc)
     lead = Lead(
         customer_id=customer.id,
-        source="GOOGLE_WEBSITE",
+        source=source,
         intent=quote_estimate.service_type,
         status="PENDING_JASON",
         received_at=accepted_at,

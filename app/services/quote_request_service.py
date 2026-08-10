@@ -77,6 +77,7 @@ def process_quote_request(
             phone=phone,
             email=email,
             preferred_contact_method=request.preferred_contact_method,
+            source=request.source.value,
         )
         lead = create_lead_from_quote_request(
             db,
@@ -87,6 +88,7 @@ def process_quote_request(
                 "email": email,
                 "preferred_contact_method": request.preferred_contact_method.value,
             },
+            source=request.source.value,
         )
         order = create_order_from_quote_request(
             db,
@@ -112,6 +114,7 @@ def process_quote_request(
             quote=quote,
             customer=customer,
             quote_estimate=estimate,
+            source=request.source.value,
         )
         result = QuoteRequestProcessed(
             customer_id=customer.id,
@@ -129,6 +132,7 @@ def process_quote_request(
                 f"Customer: {customer.display_name}\n"
                 f"Route: {estimate.route_summary}\n"
                 f"Service: {estimate.service_type}\n"
+                f"Source: {request.source.value}\n"
                 f"Phone: {phone or '-'}\nEmail: {email or '-'}",
             )
         except Exception:

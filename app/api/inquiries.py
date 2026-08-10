@@ -357,7 +357,7 @@ def _database_source(source: str | None) -> str:
     return {
         "Xiaohongshu": "XIAOHONGSHU",
         "Facebook": "FACEBOOK",
-        "Website": "GOOGLE_WEBSITE",
+        "Website": "WEBSITE",
         "Referral": "REFERRAL",
     }.get(source, "UNKNOWN")
 

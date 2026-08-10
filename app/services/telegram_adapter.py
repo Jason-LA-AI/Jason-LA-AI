@@ -59,6 +59,7 @@ def _render_quote_request_review(notification: Notification) -> str:
             f"Quote ID: {_payload_value(payload, 'quote_id')}",
             f"Estimate ID: {_payload_value(payload, 'estimate_id')}",
             f"Service Type: {_payload_value(payload, 'service_type')}",
+            f"Source: {payload.get('source') or 'UNKNOWN'}",
             f"Route Summary: {_payload_value(payload, 'route_summary')}",
         )
     )
