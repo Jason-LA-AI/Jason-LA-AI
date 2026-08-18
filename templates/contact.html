@@ -308,23 +308,42 @@ San Diego County
 
 
 
-<section>
-
-
+<section class="wide-section contact-channel-section">
+<p class="eyebrow eyebrow--dark">Direct communication</p>
 <h2>Contact Jason</h2>
+<p>Choose the channel that is most convenient for you and your family.</p>
 
-<p>Choose any configured channel below for service updates or a direct response from Jason.</p>
+<div class="contact-channel-grid">
+{% if phone_number %}
+<article class="contact-channel-card contact-channel-card--phone">
+<h3>Call / Text Jason</h3>
+<p>For customers in the United States who prefer a direct call or text message.</p>
+<a class="home-button home-button--primary" href="tel:{{ phone_number }}">Call {{ phone_number }}</a>
+</article>
+{% endif %}
 
-<div class="contact-methods">
-{% if xiaohongshu_url %}<a class="contact-method contact-method--priority" href="{{ xiaohongshu_url }}" target="_blank" rel="noopener noreferrer"><strong>📕 Xiaohongshu 小红书</strong><span>View Jason's profile</span></a>{% endif %}
-{% if facebook_url %}<a class="contact-method contact-method--priority" href="{{ facebook_url }}" target="_blank" rel="noopener noreferrer"><strong>Facebook</strong><span>Follow Jason's service updates</span></a>{% endif %}
-{% if telegram_url %}<a class="contact-method contact-method--priority" href="{{ telegram_url }}" target="_blank" rel="noopener noreferrer"><strong>✈ Telegram</strong><span>@{{ telegram_username }}</span></a>{% endif %}
-{% if phone_number %}<a class="contact-method" href="tel:{{ phone_number }}"><strong>📱 Phone / Text</strong><span>{{ phone_number }}</span></a>{% endif %}
-{% if email_address %}<a class="contact-method" href="mailto:{{ email_address }}"><strong>📧 Email</strong><span>{{ email_address }}</span></a>{% endif %}
+<article class="contact-channel-card">
+<h3>WeChat 微信</h3>
+<p>For travelers and families from Mainland China / 中国大陆客户可通过微信联系 Jason</p>
+<picture><source type="image/webp" srcset="/static/images/contact/wechat-qr.webp"><img class="contact-qr" src="/static/images/contact/wechat-qr.png" width="643" height="669" loading="lazy" alt="WeChat QR code to contact Jason"></picture>
+</article>
+
+<article class="contact-channel-card">
+<h3>LINE</h3>
+<p>For travelers from Taiwan / 台湾旅客可通过 LINE 联系 Jason</p>
+<picture><source type="image/webp" srcset="/static/images/contact/line-qr-800.webp 800w, /static/images/contact/line-qr.webp 900w" sizes="(max-width: 760px) calc(100vw - 60px), 320px"><img class="contact-qr" src="/static/images/contact/line-qr.png" width="900" height="900" loading="lazy" alt="LINE QR code to contact Jason"></picture>
+</article>
 </div>
 
+{% if email_address %}<p class="contact-email">Prefer email? <a href="mailto:{{ email_address }}">Email Jason at {{ email_address }}</a>.</p>{% endif %}
 
+{% if xiaohongshu_url or facebook_url or telegram_url %}<div class="social-actions" aria-label="Jason's social channels"><span>Service updates:</span>{% if xiaohongshu_url %}<a href="{{ xiaohongshu_url }}" target="_blank" rel="noopener noreferrer">Xiaohongshu 小红书</a>{% endif %}{% if facebook_url %}<a href="{{ facebook_url }}" target="_blank" rel="noopener noreferrer">Facebook</a>{% endif %}{% if telegram_url %}<a href="{{ telegram_url }}" target="_blank" rel="noopener noreferrer">Telegram</a>{% endif %}</div>{% endif %}
+</section>
 
+<section class="cta-section">
+<h2>Ready to plan your ride?</h2>
+<p>Share your date, route, passenger and luggage details with Jason.</p>
+<div class="home-actions"><a class="home-button home-button--primary" href="/quote">Get a Quote</a></div>
 </section>
 
 <section class="cta-section">

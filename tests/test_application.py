@@ -31,6 +31,129 @@ def test_public_brand_pages_render(client: TestClient) -> None:
     assert 'loading="lazy"' in gallery.text
 
 
+def test_private_car_service_page_render_and_seo(client: TestClient) -> None:
+    response = client.get("/private-car-service")
+
+    assert response.status_code == 200
+    assert "Private Car Service in Los Angeles" in response.text
+    assert "Request a Custom Quote" in response.text
+    assert (
+        "Private car service in Los Angeles for airport transfers, events, "
+        "shopping, family trips and customized transportation."
+        in response.text
+    )
+    assert '<link rel="canonical"' in response.text
+
+
+def test_sitemap_includes_private_car_service(client: TestClient) -> None:
+    response = client.get("/sitemap.xml")
+
+    assert response.status_code == 200
+    assert "/private-car-service</loc>" in response.text
+
+
+def test_ont_airport_transportation_page_render_and_seo(client: TestClient) -> None:
+    response = client.get("/ont-airport-transportation")
+
+    assert response.status_code == 200
+    assert response.text.count("<h1>") == 1
+    assert "<h1>ONT Airport Transportation</h1>" in response.text
+    assert "Request Your ONT Airport Ride" in response.text
+    assert "Real Trip Stories" in response.text
+    assert (
+        "Reliable ONT Airport Transportation with a local private driver. "
+        "Airport pickup and drop-off service for Ontario, Chino, Eastvale, "
+        "Rowland Heights and surrounding areas."
+        in response.text
+    )
+    assert '<link rel="canonical"' in response.text
+
+
+def test_sitemap_includes_ont_airport_transportation(client: TestClient) -> None:
+    response = client.get("/sitemap.xml")
+
+    assert response.status_code == 200
+    assert "/ont-airport-transportation</loc>" in response.text
+
+
+def test_student_airport_pickup_page_render_and_seo(client: TestClient) -> None:
+    response = client.get("/student-airport-pickup")
+
+    assert response.status_code == 200
+    assert response.text.count("<h1>") == 1
+    assert "<h1>Student Airport Pickup in Los Angeles</h1>" in response.text
+    assert "Ontario International Airport (ONT)" in response.text
+    assert "Los Angeles International Airport (LAX)" in response.text
+    assert "Hollywood Burbank Airport (BUR)" in response.text
+    assert 'href="/stories"' in response.text
+    assert 'href="/quote">Request a Quote</a>' in response.text
+    assert (
+        "Reliable student airport pickup service in Los Angeles for international "
+        "students and families. Serving ONT, LAX and surrounding areas."
+        in response.text
+    )
+    assert (
+        "Student Airport Pickup in Los Angeles | International Student "
+        "Transportation | Jason in Los Angeles"
+        in response.text
+    )
+    assert '<link rel="canonical"' in response.text
+    assert '<meta property="og:title"' in response.text
+    assert '<meta property="og:description"' in response.text
+    assert '<meta property="og:url"' in response.text
+    assert "ont-terminal2-baggage-claim-800.webp" in response.text
+
+
+def test_sitemap_includes_student_airport_pickup(client: TestClient) -> None:
+    response = client.get("/sitemap.xml")
+
+    assert response.status_code == 200
+    assert "/student-airport-pickup</loc>" in response.text
+
+
+def test_contact_channels_and_public_images_render(
+    client: TestClient,
+    monkeypatch,
+) -> None:
+    monkeypatch.setitem(
+        dashboard_module.templates.env.globals,
+        "phone_number",
+        "+16265550123",
+    )
+    contact = client.get("/contact")
+    ont = client.get("/ont-airport-transportation")
+    private_car = client.get("/private-car-service")
+
+    assert contact.status_code == 200
+    assert "WeChat 微信" in contact.text
+    assert "For travelers from Taiwan / 台湾旅客可通过 LINE 联系 Jason" in contact.text
+    assert 'alt="WeChat QR code to contact Jason"' in contact.text
+    assert 'alt="LINE QR code to contact Jason"' in contact.text
+    assert 'href="tel:+16265550123"' in contact.text
+    assert 'href="/quote">Get a Quote</a>' in contact.text
+    assert 'loading="lazy"' in contact.text
+    assert ont.status_code == 200
+    assert "ont-arrivals-rainbow-800.webp" in ont.text
+    assert "ont-terminal2-baggage-claim-800.webp" in ont.text
+    assert private_car.status_code == 200
+    assert "costco-shopping-sunset-800.webp" in private_car.text
+    assert "sonesta-hotel-transfer-800.webp" in private_car.text
+
+    for path in (
+        "/static/images/contact/wechat-qr.png",
+        "/static/images/contact/wechat-qr.webp",
+        "/static/images/contact/line-qr.png",
+        "/static/images/contact/line-qr-800.webp",
+        "/static/images/service/costco-shopping-sunset-800.webp",
+        "/static/images/service/sonesta-hotel-transfer-800.webp",
+        "/static/images/service/ont-arrivals-rainbow-800.webp",
+        "/static/images/service/ont-terminal2-baggage-claim-800.webp",
+    ):
+        response = client.get(path)
+        assert response.status_code == 200
+        assert response.content
+
+
 def test_create_inquiry(
     client: TestClient,
     database_session: MagicMock,

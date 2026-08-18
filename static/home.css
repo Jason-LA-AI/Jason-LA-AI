@@ -226,6 +226,17 @@ button:hover {
 .contact-method strong, .contact-method span, .contact-method small { display: block; }
 .contact-method span { color: #4b5563; margin-top: 7px; }
 .contact-method small { color: #8a5d1e; margin-top: 9px; }
+.contact-channel-section { text-align: center; }
+.contact-channel-grid { align-items: stretch; display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 28px; }
+.contact-channel-card { background: #f8fafc; border: 1px solid #dbe2ea; border-radius: 14px; box-sizing: border-box; padding: 24px; }
+.contact-channel-card h3 { margin-top: 0; }
+.contact-channel-card p { color: #475569; line-height: 1.55; }
+.contact-channel-card--phone { display: flex; flex-direction: column; justify-content: center; }
+.contact-channel-card--phone .home-button { align-self: center; overflow-wrap: anywhere; }
+.contact-channel-card picture { display: block; margin: 20px auto 0; max-width: 320px; }
+.contact-qr { background: #fff; display: block; height: auto; image-rendering: auto; max-width: 100%; width: 100%; }
+.contact-email { color: #475569; margin-top: 24px; }
+.contact-email a { color: #6f4b18; font-weight: 700; overflow-wrap: anywhere; }
 
 @media (max-width: 760px) {
     .navbar { align-items: flex-start; padding: 16px 18px; }
@@ -233,7 +244,8 @@ button:hover {
     .navbar a { margin: 5px 0 5px 16px; }
     section { box-sizing: border-box; margin: 24px 12px; padding: 24px 18px; }
     header h1 { font-size: 42px; }
-    .trust-grid, .contact-methods { grid-template-columns: 1fr; }
+    .trust-grid, .contact-methods, .contact-channel-grid { grid-template-columns: 1fr; }
+    .contact-channel-card { padding: 20px 16px; }
     .home-contact .home-actions { display: grid; grid-template-columns: 1fr; }
     .home-contact .home-button { min-width: 0; width: 100%; }
     .story-photo-grid { grid-template-columns: 1fr; }
@@ -280,10 +292,18 @@ button:hover {
 .vehicle-details article { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 13px; padding: 24px; }
 .vehicle-details h3 { margin-top: 0; }
 .vehicle-details p { color: #475569; line-height: 1.65; }
+.content-photo-grid { display: grid; gap: 22px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.single-content-photo { margin: 0 auto; max-width: 720px; }
+.content-photo { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; margin: 0; overflow: hidden; }
+.content-photo picture { display: block; }
+.content-photo img { aspect-ratio: 3 / 4; display: block; height: auto; object-fit: cover; width: 100%; }
+.content-photo figcaption { padding: 18px 20px 20px; }
+.content-photo figcaption strong, .content-photo figcaption span { display: block; }
+.content-photo figcaption span { color: #475569; line-height: 1.55; margin-top: 7px; }
 
 @media (max-width: 760px) {
     .meet-jason { gap: 26px; grid-template-columns: 1fr; }
-    .service-gallery, .story-grid { grid-template-columns: 1fr; }
+    .service-gallery, .story-grid, .content-photo-grid { grid-template-columns: 1fr; }
     .service-gallery--preview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .section-heading { align-items: flex-start; flex-direction: column; gap: 8px; }
     .hero-actions { align-items: stretch; flex-direction: column; }

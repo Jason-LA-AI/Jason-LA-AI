@@ -186,6 +186,48 @@ def services_page(
     )
 
 
+@router.get(
+    "/private-car-service",
+    response_class=HTMLResponse,
+    include_in_schema=False,
+)
+def private_car_service_page(request: Request) -> HTMLResponse:
+    """Render the Los Angeles private car service landing page."""
+
+    return templates.TemplateResponse(
+        request=request,
+        name="private_car_service.html",
+    )
+
+
+@router.get(
+    "/ont-airport-transportation",
+    response_class=HTMLResponse,
+    include_in_schema=False,
+)
+def ont_airport_transportation_page(request: Request) -> HTMLResponse:
+    """Render the Ontario International Airport transportation landing page."""
+
+    return templates.TemplateResponse(
+        request=request,
+        name="ont_airport_transportation.html",
+    )
+
+
+@router.get(
+    "/student-airport-pickup",
+    response_class=HTMLResponse,
+    include_in_schema=False,
+)
+def student_airport_pickup_page(request: Request) -> HTMLResponse:
+    """Render the international student airport pickup landing page."""
+
+    return templates.TemplateResponse(
+        request=request,
+        name="student_airport_pickup.html",
+    )
+
+
 
 @router.get(
     "/quote",
@@ -220,7 +262,19 @@ def robots() -> str:
 @router.get("/sitemap.xml", include_in_schema=False)
 def sitemap() -> Response:
     base = settings.site_url.rstrip("/")
-    paths = ("/", "/services", "/vehicle", "/stories", "/gallery", "/quote", "/contact", "/areas")
+    paths = (
+        "/",
+        "/services",
+        "/private-car-service",
+        "/ont-airport-transportation",
+        "/student-airport-pickup",
+        "/vehicle",
+        "/stories",
+        "/gallery",
+        "/quote",
+        "/contact",
+        "/areas",
+    )
     urls = "".join(f"<url><loc>{base}{path}</loc></url>" for path in paths)
     return Response(
         content=f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>',
