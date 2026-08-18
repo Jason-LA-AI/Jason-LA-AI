@@ -1,12 +1,29 @@
 """FastAPI application entry point."""
 
 from fastapi import FastAPI, Request
+from fastapi.responses import RedirectResponse
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from app.api.dashboard import STATIC_DIRECTORY, router as dashboard_router
 from app.api.router import api_router
 from app.config.settings import settings
+
+
+PUBLIC_CANONICAL_PATHS = frozenset(
+    {
+        "/areas",
+        "/contact",
+        "/gallery",
+        "/ont-airport-transportation",
+        "/private-car-service",
+        "/quote",
+        "/services",
+        "/stories",
+        "/student-airport-pickup",
+        "/vehicle",
+    }
+)
 
 
 def create_application() -> FastAPI:
@@ -26,7 +43,14 @@ def create_application() -> FastAPI:
 
     @application.middleware("http")
     async def production_security_headers(request: Request, call_next):
-        response = await call_next(request)
+        canonical_path = request.url.path.rstrip("/")
+        if request.url.path.endswith("/") and canonical_path in PUBLIC_CANONICAL_PATHS:
+            destination = f"{settings.site_url.rstrip('/')}{canonical_path}"
+            if request.url.query:
+                destination = f"{destination}?{request.url.query}"
+            response = RedirectResponse(url=destination, status_code=308)
+        else:
+            response = await call_next(request)
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")

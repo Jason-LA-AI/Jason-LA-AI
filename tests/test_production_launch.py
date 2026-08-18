@@ -2,6 +2,8 @@
 
 from fastapi.testclient import TestClient
 
+from app.config.settings import settings
+
 from app.api import dashboard as dashboard_module
 
 
@@ -19,6 +21,61 @@ def test_seo_endpoints_and_metadata(client: TestClient) -> None:
     assert sitemap.status_code == 200
     assert "/gallery</loc>" in sitemap.text
     assert "/dashboard</loc>" not in sitemap.text
+
+
+def test_core_service_pages_have_contextual_internal_links(client: TestClient) -> None:
+    expected_links = {
+        "/": (
+            "/ont-airport-transportation",
+            "/student-airport-pickup",
+            "/private-car-service",
+        ),
+        "/services": (
+            "/ont-airport-transportation",
+            "/student-airport-pickup",
+            "/private-car-service",
+        ),
+        "/stories": (
+            "/ont-airport-transportation",
+            "/private-car-service",
+        ),
+    }
+
+    for source_path, destination_paths in expected_links.items():
+        response = client.get(source_path)
+        assert response.status_code == 200
+        for destination_path in destination_paths:
+            assert f'href="{destination_path}"' in response.text
+
+
+def test_public_trailing_slashes_redirect_directly_to_canonical_https(
+    client: TestClient,
+) -> None:
+    canonical_base = settings.site_url.rstrip("/")
+    paths = (
+        "/areas",
+        "/contact",
+        "/gallery",
+        "/quote",
+        "/services",
+        "/stories",
+        "/vehicle",
+        "/ont-airport-transportation",
+        "/student-airport-pickup",
+        "/private-car-service",
+    )
+
+    for path in paths:
+        response = client.get(f"{path}/", follow_redirects=False)
+        assert response.status_code == 308
+        assert response.headers["location"] == f"{canonical_base}{path}"
+
+        final_response = client.get(f"{path}/")
+        assert final_response.status_code == 200
+        assert final_response.url.path == path
+
+    query_response = client.get("/contact/?source=seo", follow_redirects=False)
+    assert query_response.headers["location"] == f"{canonical_base}/contact?source=seo"
 
 
 def test_confirmation_page_and_security_headers(client: TestClient) -> None:
