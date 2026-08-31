@@ -1,6 +1,7 @@
 """Tests for structured airport quote estimates."""
 
 from datetime import datetime
+from decimal import Decimal
 from unittest.mock import MagicMock
 from uuid import uuid4
 from zoneinfo import ZoneInfo
@@ -100,3 +101,59 @@ def test_known_local_routes_keep_automatic_estimates(location: str) -> None:
     assert response.status.value == "ESTIMATED"
     assert response.estimated_min_amount == 100
     assert response.estimated_max_amount == 140
+
+
+def test_quote_estimate_endpoint_returns_frontend_contract(
+    client, database_session: MagicMock
+) -> None:
+    """A normal Step 3 quote returns JSON that the browser can render."""
+
+    def refresh(estimate: object) -> None:
+        estimate.id = uuid4()
+
+    database_session.refresh.side_effect = refresh
+    response = client.post(
+        "/api/v1/quote-estimates",
+        json={
+            "service_type": "AIRPORT_DROPOFF",
+            "airport_code": "ONT",
+            "service_date": "2026-09-15",
+            "service_time": "08:30",
+            "service_timezone": "America/Los_Angeles",
+            "flight_number": "UA123",
+            "location_input": "91789",
+            "passenger_count": "2",
+            "large_luggage_count": "3",
+            "child_seat_required": False,
+            "oversized_items": False,
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("application/json")
+    body = response.json()
+    assert set(body) == {
+        "estimate_id",
+        "status",
+        "route_summary",
+        "estimated_min_amount",
+        "estimated_max_amount",
+        "currency_code",
+        "vehicle_assessment",
+        "requires_jason_review",
+        "risk_flags",
+        "notices",
+        "valid_until",
+    }
+    assert body["status"] == "ESTIMATED"
+    assert Decimal(str(body["estimated_min_amount"])) == Decimal("100")
+    assert Decimal(str(body["estimated_max_amount"])) == Decimal("140")
+
+
+def test_api_paths_are_not_canonical_redirected(client) -> None:
+    """The public-page canonical middleware must never capture API routes."""
+
+    response = client.post("/api/v1/quote-estimates/", json={}, follow_redirects=False)
+
+    assert response.status_code == 307
+    assert response.headers["location"] == "http://testserver/api/v1/quote-estimates"
