@@ -4,12 +4,13 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 
 from app.models.conversation import Conversation
+from app.api.dashboard import require_dashboard_auth
 
 from app.database.session import get_db_session
 from app.schemas.inquiry import InquiryCreate
 from app.api.inquiries import create_inquiry
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.services.inquiry_analyzer import analyze_inquiry
 from app.services.pricing_engine import calculate_price
@@ -19,10 +20,10 @@ router = APIRouter()
 
 
 class ChatRequest(BaseModel):
-    message: str
-    customer_name: str | None = None
-    customer_phone: str | None = None
-    customer_wechat: str | None = None
+    message: str = Field(min_length=1, max_length=4000)
+    customer_name: str | None = Field(default=None, max_length=150)
+    customer_phone: str | None = Field(default=None, max_length=255)
+    customer_wechat: str | None = Field(default=None, max_length=255)
 
 
 class ChatResponse(BaseModel):
@@ -249,6 +250,7 @@ def chat(
 @router.get("/history/{customer_id}")
 def chat_history(
     customer_id: UUID,
+    _: None = Depends(require_dashboard_auth),
     db_session: Session = Depends(get_db_session),
 ):
 

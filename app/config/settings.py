@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     dashboard_password: str | None = Field(default=None, repr=False)
     telegram_bot_token: str | None = Field(default=None, repr=False)
     telegram_chat_id: str | None = Field(default=None, repr=False)
+    telegram_webhook_secret: str | None = Field(default=None, repr=False)
     database_url: str = Field(
         default="postgresql+psycopg://postgres:postgres@localhost:5432/jason_la_ai",
         repr=False,
