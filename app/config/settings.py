@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     allowed_hosts: str = "127.0.0.1,localhost,testserver"
     phone_number: str | None = None
     email_address: str | None = None
+    wechat_id: str | None = None
+    line_id: str | None = None
+    line_url: str | None = None
     telegram_username: str | None = None
     xiaohongshu_url: str | None = None
     facebook_url: str | None = None

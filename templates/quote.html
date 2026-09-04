@@ -60,6 +60,7 @@
           <fieldset class="choice-fieldset"><legend>Oversized items</legend><div class="choice-grid choice-grid--two" data-choice-group="oversizedItems"><button class="choice-card choice-card--compact" type="button" data-value="YES" aria-pressed="false">Yes</button><button class="choice-card choice-card--compact" type="button" data-value="NO" aria-pressed="false">No</button></div><p class="field-error" data-error-for="oversizedItems" role="alert"></p></fieldset>
         </div>
         <p class="field-error" data-error-for="estimateRequest" role="alert"></p>
+        <p class="estimate-error-contact" id="estimateErrorContact" hidden>Prefer not to retry? <a href="/contact">Contact Jason directly</a>{% if phone_number %}, <a href="tel:{{ phone_number }}">call</a>, or <a href="sms:{{ phone_number }}">text</a>{% endif %}.</p>
       </div>
 
       <button class="primary-button next-button" id="continueButton" type="button">Next: Get Estimate</button>
@@ -67,22 +68,23 @@
       <section class="estimate-panel" id="estimatePanel" aria-labelledby="estimate-heading" tabindex="-1" hidden>
         <div class="section-heading"><span>✓</span><h2 id="estimate-heading">Your estimated range</h2></div>
         <div class="estimate-card">
-          <p class="estimate-card__label">Estimated Price Range</p><p class="estimate-card__price" id="estimateRange"></p>
+          <p class="estimate-card__label">Estimated Fare Range</p><p class="estimate-card__price" id="estimateRange"></p>
           <div class="manual-review" id="manualReview" hidden><strong>Jason will confirm final price shortly.</strong></div>
           <div class="route-summary"><span>Route</span><strong id="estimateRoute"></strong></div>
           <dl class="estimate-summary" id="estimateSummary"></dl>
-          <div class="estimate-notice" id="estimateNotices"></div><p class="estimate-validity" id="estimateValidity"></p>
+          <div class="estimate-notice" id="estimateNotices"><p>This is a preliminary planning range. Jason will review the exact route, pickup time, luggage, and availability before confirming the final fare.</p></div><p class="estimate-validity" id="estimateValidity"></p>
           <p class="price-variation-note">Final price may vary depending on waiting time, extra stops, and special requirements.</p>
         </div>
 
-        {% if telegram_url or phone_number or email_address %}<aside class="quote-contact-cta" aria-labelledby="quote-contact-heading">
+        <aside class="quote-contact-cta" aria-labelledby="quote-contact-heading">
           <h3 id="quote-contact-heading">Need confirmation? Contact Jason</h3>
           <div class="quote-contact-links">
+            <a href="/contact">Contact Jason</a>
             {% if telegram_url %}<a href="{{ telegram_url }}" target="_blank" rel="noopener noreferrer">Telegram</a>{% endif %}
-            {% if phone_number %}<a href="tel:{{ phone_number }}">Phone / Text</a>{% endif %}
+            {% if phone_number %}<a href="tel:{{ phone_number }}">Call</a><a href="sms:{{ phone_number }}">Text</a>{% endif %}
             {% if email_address %}<a href="mailto:{{ email_address }}">Email</a>{% endif %}
           </div>
-        </aside>{% endif %}
+        </aside>
 
         <div class="contact-block">
           <h3>Contact details</h3><p>Provide a phone number or email so Jason can confirm the final price.</p>

@@ -44,6 +44,9 @@ telegram_username = (settings.telegram_username or "").lstrip("@")
 templates.env.globals.update(
     phone_number=settings.phone_number,
     email_address=settings.email_address,
+    wechat_id=settings.wechat_id,
+    line_id=settings.line_id,
+    line_url=settings.line_url,
     telegram_username=telegram_username or None,
     telegram_url=(f"https://t.me/{telegram_username}" if telegram_username else None),
     xiaohongshu_url=settings.xiaohongshu_url,

@@ -318,19 +318,21 @@ San Diego County
 <article class="contact-channel-card contact-channel-card--phone">
 <h3>Call / Text Jason</h3>
 <p>For customers in the United States who prefer a direct call or text message.</p>
-<a class="home-button home-button--primary" href="tel:{{ phone_number }}">Call {{ phone_number }}</a>
+<div class="home-actions"><a class="home-button home-button--primary" href="tel:{{ phone_number }}">Call {{ phone_number }}</a><a class="home-button home-button--secondary" href="sms:{{ phone_number }}">Text Jason</a></div>
 </article>
 {% endif %}
 
 <article class="contact-channel-card">
 <h3>WeChat 微信</h3>
 <p>For travelers and families from Mainland China / 中国大陆客户可通过微信联系 Jason</p>
+{% if wechat_id %}<p class="contact-id">WeChat ID: <strong>{{ wechat_id }}</strong></p><button class="copy-contact-button" type="button" data-copy-value="{{ wechat_id }}" data-copy-label="WeChat ID">Copy WeChat ID</button>{% endif %}
 <picture><source type="image/webp" srcset="/static/images/contact/wechat-qr.webp"><img class="contact-qr" src="/static/images/contact/wechat-qr.png" width="643" height="669" loading="lazy" alt="WeChat QR code to contact Jason"></picture>
 </article>
 
 <article class="contact-channel-card">
 <h3>LINE</h3>
 <p>For travelers from Taiwan / 台湾旅客可通过 LINE 联系 Jason</p>
+{% if line_url %}<p><a class="home-button home-button--primary" href="{{ line_url }}" target="_blank" rel="noopener noreferrer">Open LINE</a></p>{% elif line_id %}<p class="contact-id">LINE ID: <strong>{{ line_id }}</strong></p><button class="copy-contact-button" type="button" data-copy-value="{{ line_id }}" data-copy-label="LINE ID">Copy LINE ID</button>{% endif %}
 <picture><source type="image/webp" srcset="/static/images/contact/line-qr-800.webp 800w, /static/images/contact/line-qr.webp 900w" sizes="(max-width: 760px) calc(100vw - 60px), 320px"><img class="contact-qr" src="/static/images/contact/line-qr.png" width="900" height="900" loading="lazy" alt="LINE QR code to contact Jason"></picture>
 </article>
 </div>
@@ -384,3 +386,5 @@ San Diego County
 
 
 {% endblock %}
+
+{% block extra_js %}<script src="/static/contact.js?v=20260904-1" defer></script>{% endblock %}

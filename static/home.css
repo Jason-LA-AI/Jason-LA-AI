@@ -142,13 +142,41 @@ button:hover {
 
 
 
-.menu {
-
+.menu,
+.menu-primary,
+.menu-secondary {
     display: flex;
-
     align-items: center;
-
 }
+
+.menu-primary,
+.menu-secondary { min-width: 0; }
+.menu-secondary__label,
+.nav-toggle { display: none; }
+.navbar,
+.menu,
+.menu-primary,
+.menu-secondary,
+section,
+header,
+main { box-sizing: border-box; }
+.navbar > *,
+.meet-jason > *,
+.story-grid > *,
+.trust-grid > *,
+.content-photo-grid > *,
+.vehicle-details > * { min-width: 0; }
+img,
+picture,
+input,
+select,
+textarea,
+button { max-width: 100%; }
+h1,
+h2,
+h3,
+p,
+a { overflow-wrap: break-word; }
 .photo-box {
 
     width: 100%;
@@ -237,11 +265,23 @@ button:hover {
 .contact-qr { background: #fff; display: block; height: auto; image-rendering: auto; max-width: 100%; width: 100%; }
 .contact-email { color: #475569; margin-top: 24px; }
 .contact-email a { color: #6f4b18; font-weight: 700; overflow-wrap: anywhere; }
+.contact-id { overflow-wrap: anywhere; }
+.copy-contact-button { background: #fff; border: 1px solid #aeb7c4; color: #172033; font-size: .9rem; min-height: 44px; padding: 9px 14px; }
+.contact-channel-card--phone .home-actions { justify-content: center; }
 
-@media (max-width: 760px) {
-    .navbar { align-items: flex-start; padding: 16px 18px; }
-    .menu { flex-wrap: wrap; justify-content: flex-end; }
-    .navbar a { margin: 5px 0 5px 16px; }
+@media (max-width: 768px) {
+    .navbar { align-items: center; flex-wrap: wrap; padding: 14px 18px; position: relative; }
+    .logo { min-width: 0; }
+    .logo a { margin: 0; }
+    .nav-toggle { align-items: center; background: transparent; border: 1px solid #ffffff73; color: #fff; display: inline-flex; font-size: 1rem; gap: 7px; margin-left: auto; min-height: 44px; padding: 8px 12px; }
+    .nav-toggle:hover { opacity: 1; }
+    .menu { align-items: stretch; display: none; flex: 0 0 100%; min-width: 0; padding-top: 12px; width: 100%; }
+    .menu.is-open { display: block; }
+    .menu-primary, .menu-secondary { align-items: stretch; display: grid; grid-template-columns: 1fr; }
+    .menu-secondary { border-top: 1px solid #ffffff2e; margin-top: 8px; padding-top: 8px; }
+    .menu-secondary__label { color: #aeb8c8; display: block; font-size: .72rem; font-weight: 700; letter-spacing: .08em; padding: 7px 0; text-transform: uppercase; }
+    .navbar .menu a { border-radius: 7px; margin: 0; min-height: 44px; padding: 11px 8px; }
+    .navbar .menu a:focus-visible, .navbar .menu a:hover { background: #ffffff14; }
     section { box-sizing: border-box; margin: 24px 12px; padding: 24px 18px; }
     header h1 { font-size: 42px; }
     .trust-grid, .contact-methods, .contact-channel-grid { grid-template-columns: 1fr; }

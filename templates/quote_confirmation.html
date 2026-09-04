@@ -14,7 +14,7 @@
     {% if reference %}<p>Reference: <strong>{{ reference }}</strong></p>{% endif %}
     <div class="home-actions"><a class="home-button home-button--primary" href="/">Return Home</a><a class="home-button home-button--secondary" href="/stories">See Real Trip Stories</a></div>
     {% if xiaohongshu_url or facebook_url %}<div class="social-actions" aria-label="Follow Jason for service updates"><span>See more real service updates:</span>{% if xiaohongshu_url %}<a href="{{ xiaohongshu_url }}" target="_blank" rel="noopener noreferrer">Xiaohongshu 小红书</a>{% endif %}{% if facebook_url %}<a href="{{ facebook_url }}" target="_blank" rel="noopener noreferrer">Facebook</a>{% endif %}</div>{% endif %}
-    {% if phone_number %}<aside class="social-actions" aria-label="Urgent trip update contact"><span>Need to update your trip urgently?<br>Call or text Jason:</span><strong style="overflow-wrap:anywhere">{{ phone_number }}</strong></aside>{% endif %}
+    {% if phone_number %}<aside class="social-actions" aria-label="Urgent trip update contact"><span>Need to update your trip urgently?<br>Call or text Jason:</span><strong style="overflow-wrap:anywhere">{{ phone_number }}</strong><a href="tel:{{ phone_number }}">Call Jason</a><a href="sms:{{ phone_number }}">Text Jason</a></aside>{% endif %}
   </section>
 </main>
 {% endblock %}

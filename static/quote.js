@@ -140,7 +140,7 @@
     document.getElementById("estimateRoute").textContent = estimate.route_summary;
     const summary = [["Passengers",trip.passengers],["Luggage",trip.luggage],["Child seat",trip.childSeat === "YES" ? "Requested" : "No"],["Vehicle",displayVehicle(estimate.vehicle_assessment)],["Date & time",`${trip.date} · ${formatTime(trip.time)}`]];
     document.getElementById("estimateSummary").innerHTML = summary.map(([k,v])=>`<div><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`).join("");
-    const notices = ["Jason will confirm final price shortly."]; if (trip.childSeat === "YES") notices.push("Child seat availability will be confirmed with your trip.");
+    const notices = ["This is a preliminary planning range. Jason will review the exact route, pickup time, luggage, and availability before confirming the final fare."]; if (trip.childSeat === "YES") notices.push("Child seat availability will be confirmed with your trip.");
     document.getElementById("estimateNotices").innerHTML = notices.map((x)=>`<p>${escapeHtml(x)}</p>`).join("");
     document.getElementById("estimateValidity").textContent = formatValidity(estimate.valid_until);
   }
@@ -158,7 +158,7 @@
   function setLoading(on) { continueButton.disabled=on; continueButton.textContent=on ? "Getting estimate…" : "Next: Get Estimate"; form.setAttribute("aria-busy",String(on)); }
   function updateLabels() { const drop=state.serviceType === "AIRPORT_DROPOFF"; document.getElementById("locationLabel").textContent=drop?"Pickup ZIP Code or City":"Destination ZIP Code or City"; document.getElementById("dateLabel").textContent=drop?"Pickup Date":"Flight Arrival Date"; document.getElementById("timeLabel").textContent=drop?"Pickup Time":"Flight Arrival Time"; document.getElementById("scheduleGuidance").textContent=drop?"When should Jason pick you up? Los Angeles time zone.":"Enter your scheduled flight arrival time. Los Angeles time zone."; }
   function focusFirstError(){ const target=form.querySelector('[aria-invalid="true"], .field-error:not(:empty)'); if(target){ target.focus?.(); target.scrollIntoView({behavior:"smooth",block:"center"}); } }
-  function setError(key,msg){ const el=form.querySelector(`[data-error-for="${key}"]`); if(el) el.textContent=msg; } function clearError(key){setError(key,"");} function value(id){return document.getElementById(id).value;}
+  function setError(key,msg){ const el=form.querySelector(`[data-error-for="${key}"]`); if(el) el.textContent=msg; if(key === "estimateRequest") document.getElementById("estimateErrorContact").hidden = !msg; } function clearError(key){setError(key,"");} function value(id){return document.getElementById(id).value;}
   function formatUsd(v){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(Number(v));}
   function formatTime(v){const [h,m]=v.split(":"),n=Number(h);return `${n%12||12}:${m} ${n>=12?"PM":"AM"}`;}
   function displayVehicle(v){return ({LIKELY_COMFORTABLE:"Likely comfortable",NEEDS_CONFIRMATION:"Needs confirmation",NOT_RECOMMENDED:"Not recommended",INSUFFICIENT_INFORMATION:"Needs more information"})[v]||"Jason review required";}
