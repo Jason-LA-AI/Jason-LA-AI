@@ -10,6 +10,7 @@
   const todayValue = dateInTimeZone("America/Los_Angeles");
   document.getElementById("serviceDate").min = todayValue;
   populateArrivalTimes();
+  updateContactFields();
 
   form.querySelectorAll("[data-choice-group]").forEach((group) => group.addEventListener("click", (event) => {
     const button = event.target.closest("button[data-value]");
@@ -24,6 +25,7 @@
     });
     clearError(key);
     if (key === "serviceType") updateLabels();
+    if (key === "contactMethod") updateContactFields();
   }));
 
   ["serviceDate", "flightNumber", "locationInput"].forEach((id) => document.getElementById(id).addEventListener("input", invalidateEstimate));
@@ -63,8 +65,10 @@
           customer_name: value("customerName").trim(),
           phone: value("customerPhone").trim() || null,
           email: value("customerEmail").trim() || null,
-          preferred_contact_method: state.contactMethod === "TEXT" ? "SMS" : "EMAIL",
-          source: value("source"),
+          wechat_id: value("customerWechat").trim() || null,
+          line_id: value("customerLine").trim() || null,
+          preferred_contact_method: state.contactMethod || null,
+          source: value("source") || null,
           estimate_acceptance: true
         })
       });
@@ -75,10 +79,25 @@
     } catch (error) {
       setError("contact", error instanceof EstimateRequestError ? error.message : "Unable to submit your request. Please try again.");
       submitButton.disabled = false;
-      submitButton.textContent = "Submit Booking Request";
+      submitButton.textContent = "Send request to Jason — final fare to be confirmed";
     }
   });
   document.getElementById("startOverButton").addEventListener("click", resetForm);
+  document.getElementById("requestConfirmationButton").addEventListener("click", () => {
+    const contactDetails = document.getElementById("contactDetails");
+    contactDetails.scrollIntoView({ behavior:"smooth", block:"start" });
+    contactDetails.focus({ preventScroll:true });
+  });
+  form.querySelectorAll("[data-copy-contact]").forEach((button) => button.addEventListener("click", async () => {
+    const label = button.dataset.copyLabel || "Contact information";
+    const original = button.textContent;
+    try {
+      await navigator.clipboard.writeText(button.dataset.copyContact || "");
+      button.textContent = `${label} copied`;
+    } catch (_) {
+      button.textContent = button.dataset.copyContact || original;
+    }
+  }));
 
   function validateTrip() {
     const checks = [
@@ -104,18 +123,25 @@
     clearError("locationInput"); return true;
   }
   function validateContact() {
-    const name=document.getElementById("customerName"), phone=document.getElementById("customerPhone"), email=document.getElementById("customerEmail"), source=document.getElementById("source"), hasPhone=!!phone.value.trim(), hasEmail=!!email.value.trim();
-    phone.removeAttribute("aria-invalid"); email.removeAttribute("aria-invalid");
+    const name=document.getElementById("customerName"), phone=document.getElementById("customerPhone"), email=document.getElementById("customerEmail"), wechat=document.getElementById("customerWechat"), line=document.getElementById("customerLine"), hasPhone=!!phone.value.trim(), hasEmail=!!email.value.trim(), hasWechat=!!wechat.value.trim(), hasLine=!!line.value.trim();
+    phone.removeAttribute("aria-invalid"); email.removeAttribute("aria-invalid"); wechat.removeAttribute("aria-invalid"); line.removeAttribute("aria-invalid");
     name.removeAttribute("aria-invalid");
     if (!name.value.trim()) { name.setAttribute("aria-invalid","true"); setError("contact","Enter your name."); return false; }
-    source.removeAttribute("aria-invalid");
-    if (!source.value) { source.setAttribute("aria-invalid","true"); setError("contact","Choose how you found us."); return false; }
-    if (!requireChoice("contactMethod","Choose Text message or Email.")) return false;
-    if (!hasPhone && !hasEmail) { phone.setAttribute("aria-invalid","true"); email.setAttribute("aria-invalid","true"); setError("contact","Enter a phone number or email address."); return false; }
-    if (state.contactMethod === "TEXT" && !hasPhone) { phone.setAttribute("aria-invalid","true"); setError("contact","Enter a phone number for text contact."); return false; }
+    if (!hasPhone && !hasEmail && !hasWechat && !hasLine) { phone.setAttribute("aria-invalid","true"); email.setAttribute("aria-invalid","true"); wechat.setAttribute("aria-invalid","true"); line.setAttribute("aria-invalid","true"); setError("contact","Enter a phone number, email address, WeChat ID, or LINE ID."); return false; }
+    if (state.contactMethod === "SMS" && !hasPhone) { phone.setAttribute("aria-invalid","true"); setError("contact","Enter a phone number for text contact."); return false; }
     if (state.contactMethod === "EMAIL" && !hasEmail) { email.setAttribute("aria-invalid","true"); setError("contact","Enter an email address for email contact."); return false; }
+    if (state.contactMethod === "WECHAT" && !hasWechat) { wechat.setAttribute("aria-invalid","true"); setError("contact","Enter a WeChat ID."); return false; }
+    if (state.contactMethod === "LINE" && !hasLine) { line.setAttribute("aria-invalid","true"); setError("contact","Enter a LINE ID or other contact information."); return false; }
     if (hasEmail && !email.checkValidity()) { email.setAttribute("aria-invalid","true"); setError("contact","Enter a valid email address."); return false; }
     clearError("contact"); return true;
+  }
+
+  function updateContactFields() {
+    const method = state.contactMethod;
+    document.getElementById("phoneField").hidden = !!method && method !== "SMS";
+    document.getElementById("emailField").hidden = !!method && method !== "EMAIL";
+    document.getElementById("wechatField").hidden = method !== "WECHAT";
+    document.getElementById("lineField").hidden = method !== "LINE";
   }
 
   function collectTripData() { return { serviceType:state.serviceType, airportCode:state.airportCode, date:value("serviceDate"), time:value("flight-arrival-time"), flightNumber:value("flightNumber").trim(), location:value("locationInput").trim(), passengers:state.passengerCount, luggage:state.luggageCount, childSeat:state.childSeat, oversizedItems:state.oversizedItems }; }
@@ -165,6 +191,6 @@
   function formatValidity(v){const t=Date.parse(v);return Number.isFinite(t)?`Estimate valid until ${new Intl.DateTimeFormat("en-US",{timeZone:"America/Los_Angeles",month:"short",day:"numeric",hour:"numeric",minute:"2-digit",timeZoneName:"short"}).format(t)}. Final price requires Jason confirmation.`:"Final price requires Jason confirmation.";}
   function dateInTimeZone(zone){const p=new Intl.DateTimeFormat("en-US",{timeZone:zone,year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(Date.now()),o=Object.fromEntries(p.map(x=>[x.type,x.value]));return `${o.year}-${o.month}-${o.day}`;}
   function escapeHtml(v){const e=document.createElement("span");e.textContent=String(v);return e.innerHTML;}
-  function resetForm(){form.reset();Object.keys(state).forEach((k)=>state[k]=null);form.querySelectorAll(".is-selected").forEach((x)=>x.classList.remove("is-selected"));form.querySelectorAll("[aria-pressed]").forEach((x)=>x.setAttribute("aria-pressed","false"));form.querySelectorAll(".field-error").forEach((x)=>x.textContent="");form.hidden=false;estimatePanel.hidden=true;successPanel.hidden=true;window.scrollTo({top:form.offsetTop,behavior:"smooth"});}
+  function resetForm(){form.reset();Object.keys(state).forEach((k)=>state[k]=null);form.querySelectorAll(".is-selected").forEach((x)=>x.classList.remove("is-selected"));form.querySelectorAll("[aria-pressed]").forEach((x)=>x.setAttribute("aria-pressed","false"));form.querySelectorAll(".field-error").forEach((x)=>x.textContent="");form.hidden=false;estimatePanel.hidden=true;successPanel.hidden=true;updateContactFields();window.scrollTo({top:form.offsetTop,behavior:"smooth"});}
   class EstimateRequestError extends Error {}
 })();

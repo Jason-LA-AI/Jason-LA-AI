@@ -12,6 +12,8 @@ class PreferredContactMethod(StrEnum):
 
     SMS = "SMS"
     EMAIL = "EMAIL"
+    WECHAT = "WECHAT"
+    LINE = "LINE"
 
 
 class QuoteRequestSource(StrEnum):
@@ -34,8 +36,10 @@ class QuoteRequestCreate(BaseModel):
     customer_name: str = Field(min_length=1, max_length=100)
     phone: str | None = Field(default=None, max_length=30)
     email: EmailStr | None = None
-    preferred_contact_method: PreferredContactMethod
-    source: QuoteRequestSource
+    wechat_id: str | None = Field(default=None, max_length=100)
+    line_id: str | None = Field(default=None, max_length=100)
+    preferred_contact_method: PreferredContactMethod | None = None
+    source: QuoteRequestSource | None = None
     estimate_acceptance: Literal[True]
 
 

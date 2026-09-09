@@ -103,10 +103,22 @@ async function main() {
       const panel = document.querySelector('#estimatePanel');
       panel.hidden = false;
       document.querySelector('#estimateRange').textContent = '$000–$000';
+      const requestConfirmationButton = document.querySelector('#requestConfirmationButton');
+      const contactDetails = document.querySelector('#contactDetails');
+      requestConfirmationButton.click();
+      const confirmationCta = {
+        visible: requestConfirmationButton.getBoundingClientRect().width > 0,
+        fullWidth: Math.abs(requestConfirmationButton.getBoundingClientRect().width - contactDetails.getBoundingClientRect().width) < 1,
+        contactFocused: document.activeElement === contactDetails
+      };
+      document.querySelector('[data-choice-group="contactMethod"] [data-value="WECHAT"]').click();
+      const wechatFieldVisible = !document.querySelector('#wechatField').hidden;
+      document.querySelector('[data-choice-group="contactMethod"] [data-value="LINE"]').click();
+      const lineFieldVisible = !document.querySelector('#lineField').hidden;
       const error = document.querySelector('[data-error-for="estimateRequest"]');
       error.textContent = 'We could not load an estimate. Please try again.';
       document.querySelector('#estimateErrorContact').hidden = false;
-      const selectors = '.choice-grid--airports button, #passengers, #luggage, .next-button, .estimate-card, [data-error-for="estimateRequest"], #estimateErrorContact, .quote-contact-cta';
+      const selectors = '.choice-grid--airports button, #passengers, #luggage, .next-button, .estimate-card, #requestConfirmationButton, #contactDetails, #customerWechat, #customerLine, #submitRequestButton, [data-error-for="estimateRequest"], #estimateErrorContact, .quote-contact-cta';
       const inspected = [...document.querySelectorAll(selectors)];
       const clipped = inspected.filter((element) => {
         const rect = element.getBoundingClientRect();
@@ -119,6 +131,11 @@ async function main() {
         scrollWidth: document.documentElement.scrollWidth,
         airportOptions: document.querySelectorAll('.choice-grid--airports button').length,
         clipped,
+        confirmationCta,
+        wechatFieldVisible,
+        lineFieldVisible,
+        finalSubmitVisible: document.querySelector('#submitRequestButton').getBoundingClientRect().width > 0,
+        directFallbackVisible: document.querySelector('.quote-contact-cta--compact a[href="/contact"]')?.getBoundingClientRect().width > 0,
         fareWording: document.querySelector('.estimate-card__label')?.textContent.trim() === 'Estimated Fare Range',
         disclaimer: text.includes('This is a preliminary planning range. Jason will review the exact route, pickup time, luggage, and availability before confirming the final fare.'),
         forbiddenTerms: ['development_mock', 'development-only', 'development only'].filter((term) => text.toLowerCase().includes(term)),

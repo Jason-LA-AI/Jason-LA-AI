@@ -89,6 +89,13 @@ def test_quote_uses_preliminary_fare_wording_and_contact_fallback(client: TestCl
     assert "Estimated Fare Range" in response.text
     assert "This is a preliminary planning range." in response.text
     assert "before confirming the final fare" in response.text
+    assert "Request Jason’s final confirmation" in response.text
+    assert "Final fare is not confirmed yet." in response.text
+    assert "Send request to Jason — final fare to be confirmed" in response.text
+    assert "How did you find us? <small>(optional)</small>" in response.text
+    assert 'name="source" required' not in response.text
+    assert 'data-value="WECHAT"' in response.text
+    assert 'data-value="LINE"' in response.text
     assert "development_mock" not in response.text
     assert 'id="estimateErrorContact"' in response.text
     assert 'href="/contact">Contact Jason' in response.text

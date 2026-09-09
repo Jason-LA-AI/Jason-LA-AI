@@ -25,6 +25,8 @@ from app.services.telegram_notifier import send_approval_notification
 CONTACT_METHOD_REQUIRED = "CONTACT_METHOD_REQUIRED"
 PHONE_REQUIRED_FOR_SMS = "PHONE_REQUIRED_FOR_SMS"
 EMAIL_REQUIRED_FOR_EMAIL = "EMAIL_REQUIRED_FOR_EMAIL"
+WECHAT_REQUIRED = "WECHAT_REQUIRED"
+LINE_REQUIRED = "LINE_REQUIRED"
 
 
 class QuoteRequestError(Exception):
@@ -55,29 +57,18 @@ def process_quote_request(
 
     try:
         estimate = get_valid_quote_estimate(db, request.estimate_id)
-        phone = request.phone.strip() if request.phone else None
-        email = str(request.email) if request.email else None
-
-        if not phone and not email:
-            raise QuoteRequestError(CONTACT_METHOD_REQUIRED)
-        if (
-            request.preferred_contact_method == PreferredContactMethod.SMS
-            and not phone
-        ):
-            raise QuoteRequestError(PHONE_REQUIRED_FOR_SMS)
-        if (
-            request.preferred_contact_method == PreferredContactMethod.EMAIL
-            and not email
-        ):
-            raise QuoteRequestError(EMAIL_REQUIRED_FOR_EMAIL)
+        phone, email, wechat_id, line_id, contact_method = _resolve_contact(request)
+        source = _source_for_request(request)
 
         customer = create_or_match_customer(
             db,
             customer_name=request.customer_name,
             phone=phone,
             email=email,
-            preferred_contact_method=request.preferred_contact_method,
-            source=request.source.value,
+            wechat_id=wechat_id,
+            line_id=line_id,
+            preferred_contact_method=contact_method,
+            source=source,
         )
         lead = create_lead_from_quote_request(
             db,
@@ -86,9 +77,11 @@ def process_quote_request(
             customer_contact_information={
                 "phone": phone,
                 "email": email,
-                "preferred_contact_method": request.preferred_contact_method.value,
+                "wechat_id": wechat_id,
+                "line_id": line_id,
+                "preferred_contact_method": contact_method.value,
             },
-            source=request.source.value,
+            source=source,
         )
         order = create_order_from_quote_request(
             db,
@@ -114,7 +107,7 @@ def process_quote_request(
             quote=quote,
             customer=customer,
             quote_estimate=estimate,
-            source=request.source.value,
+            source=source,
         )
         result = QuoteRequestProcessed(
             customer_id=customer.id,
@@ -132,7 +125,7 @@ def process_quote_request(
                 f"Customer: {customer.display_name}\n"
                 f"Route: {estimate.route_summary}\n"
                 f"Service: {estimate.service_type}\n"
-                f"Source: {request.source.value}\n"
+                f"Source: {source}\n"
                 f"Phone: {phone or '-'}\nEmail: {email or '-'}\n\n"
                 + _pricing_recommendation_text(estimate),
             )
@@ -153,6 +146,67 @@ def accept_quote_request(
     """Backward-compatible alias for the transactional orchestrator."""
 
     return process_quote_request(db, request)
+
+
+def _resolve_contact(
+    request: QuoteRequestCreate,
+) -> tuple[str | None, str | None, str | None, str | None, PreferredContactMethod]:
+    """Validate one reachable channel and infer its method when not selected."""
+
+    phone = request.phone.strip() if request.phone else None
+    email = str(request.email) if request.email else None
+    wechat_id = request.wechat_id.strip() if request.wechat_id else None
+    line_id = request.line_id.strip() if request.line_id else None
+
+    if not any((phone, email, wechat_id, line_id)):
+        raise QuoteRequestError(CONTACT_METHOD_REQUIRED)
+
+    contact_method = request.preferred_contact_method or _infer_contact_method(
+        phone=phone,
+        email=email,
+        wechat_id=wechat_id,
+        line_id=line_id,
+    )
+    required_value = {
+        PreferredContactMethod.SMS: phone,
+        PreferredContactMethod.EMAIL: email,
+        PreferredContactMethod.WECHAT: wechat_id,
+        PreferredContactMethod.LINE: line_id,
+    }[contact_method]
+    if required_value:
+        return phone, email, wechat_id, line_id, contact_method
+
+    error_code = {
+        PreferredContactMethod.SMS: PHONE_REQUIRED_FOR_SMS,
+        PreferredContactMethod.EMAIL: EMAIL_REQUIRED_FOR_EMAIL,
+        PreferredContactMethod.WECHAT: WECHAT_REQUIRED,
+        PreferredContactMethod.LINE: LINE_REQUIRED,
+    }[contact_method]
+    raise QuoteRequestError(error_code)
+
+
+def _infer_contact_method(
+    *,
+    phone: str | None,
+    email: str | None,
+    wechat_id: str | None,
+    line_id: str | None,
+) -> PreferredContactMethod:
+    if phone:
+        return PreferredContactMethod.SMS
+    if email:
+        return PreferredContactMethod.EMAIL
+    if wechat_id:
+        return PreferredContactMethod.WECHAT
+    if line_id:
+        return PreferredContactMethod.LINE
+    raise QuoteRequestError(CONTACT_METHOD_REQUIRED)
+
+
+def _source_for_request(request: QuoteRequestCreate) -> str:
+    """Preserve the required stored source while making form attribution optional."""
+
+    return request.source.value if request.source else "UNKNOWN"
 
 
 def _pricing_recommendation_text(estimate: object) -> str:

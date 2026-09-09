@@ -440,7 +440,7 @@ def _build_inquiry_view(
 
         "customer_name": customer.display_name or "Unknown",
 
-        "contact": customer.primary_contact,
+        "contact": _display_customer_contact(customer),
 
         "status": _dashboard_status(lead, analysis),
 
@@ -495,6 +495,17 @@ def _build_inquiry_view(
 
     }
 
+
+
+def _display_customer_contact(customer: Customer) -> str:
+    """Give chat-channel contacts an explicit, actionable dashboard label."""
+
+    contact = customer.primary_contact or "Not provided"
+    if customer.preferred_contact_method == "LINE":
+        return f"LINE: {contact}"
+    if customer.preferred_contact_method == "WECHAT":
+        return f"WeChat: {contact}"
+    return contact
 
 
 def _display_source(

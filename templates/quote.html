@@ -76,27 +76,46 @@
           <p class="price-variation-note">Final price may vary depending on waiting time, extra stops, and special requirements.</p>
         </div>
 
+        <div class="estimate-next-step">
+          <button class="primary-button estimate-next-step__button" id="requestConfirmationButton" type="button">Request Jason’s final confirmation</button>
+          <p>Final fare is not confirmed yet.<br>Jason will review your trip details before confirming.</p>
+        </div>
+
         <aside class="quote-contact-cta" aria-labelledby="quote-contact-heading">
-          <h3 id="quote-contact-heading">Need confirmation? Contact Jason</h3>
+          <h3 id="quote-contact-heading">Prefer to contact Jason directly?</h3>
           <div class="quote-contact-links">
             <a href="/contact">Contact Jason</a>
             {% if telegram_url %}<a href="{{ telegram_url }}" target="_blank" rel="noopener noreferrer">Telegram</a>{% endif %}
             {% if phone_number %}<a href="tel:{{ phone_number }}">Call</a><a href="sms:{{ phone_number }}">Text</a>{% endif %}
             {% if email_address %}<a href="mailto:{{ email_address }}">Email</a>{% endif %}
+            {% if wechat_id %}<button class="contact-link-button" type="button" data-copy-contact="{{ wechat_id }}" data-copy-label="WeChat ID">Copy WeChat ID</button>{% endif %}
+            {% if line_url %}<a href="{{ line_url }}" target="_blank" rel="noopener noreferrer">Open LINE</a>{% elif line_id %}<button class="contact-link-button" type="button" data-copy-contact="{{ line_id }}" data-copy-label="LINE ID">Copy LINE ID</button>{% endif %}
           </div>
         </aside>
 
-        <div class="contact-block">
-          <h3>Contact details</h3><p>Provide a phone number or email so Jason can confirm the final price.</p>
-          <fieldset class="choice-fieldset"><legend>Preferred contact</legend><div class="choice-grid choice-grid--two" data-choice-group="contactMethod"><button class="choice-card choice-card--compact" type="button" data-value="TEXT" aria-pressed="false">💬 Text message</button><button class="choice-card choice-card--compact" type="button" data-value="EMAIL" aria-pressed="false">✉ Email</button></div><p class="field-error" data-error-for="contactMethod" role="alert"></p></fieldset>
+        <div class="contact-block" id="contactDetails" tabindex="-1">
+          <h3>Contact details</h3><p>Provide one way Jason can reach you to confirm the final price.</p>
+          <fieldset class="choice-fieldset"><legend>Preferred contact <small>(optional)</small></legend><div class="choice-grid choice-grid--four" data-choice-group="contactMethod"><button class="choice-card choice-card--compact" type="button" data-value="SMS" aria-pressed="false">💬 Text</button><button class="choice-card choice-card--compact" type="button" data-value="EMAIL" aria-pressed="false">✉ Email</button><button class="choice-card choice-card--compact" type="button" data-value="WECHAT" aria-pressed="false">WeChat</button><button class="choice-card choice-card--compact" type="button" data-value="LINE" aria-pressed="false">LINE</button></div><p class="field-hint">Choose a preferred method, or enter a phone number or email below.</p><p class="field-error" data-error-for="contactMethod" role="alert"></p></fieldset>
           <div class="field-grid field-grid--contact">
             <label class="field"><span>Name</span><input id="customerName" name="customerName" type="text" maxlength="100" autocomplete="name" required></label>
-            <label class="field"><span>Phone</span><input id="customerPhone" name="customerPhone" type="tel" maxlength="30" autocomplete="tel"></label>
-            <label class="field"><span>Email</span><input id="customerEmail" name="customerEmail" type="email" maxlength="254" autocomplete="email"></label>
+            <label class="field" id="phoneField"><span>Phone</span><input id="customerPhone" name="customerPhone" type="tel" maxlength="30" autocomplete="tel"></label>
+            <label class="field" id="emailField"><span>Email</span><input id="customerEmail" name="customerEmail" type="email" maxlength="254" autocomplete="email"></label>
+            <label class="field" id="wechatField" hidden><span>WeChat ID</span><input id="customerWechat" name="customerWechat" type="text" maxlength="100" autocomplete="off"></label>
+            <label class="field" id="lineField" hidden><span>LINE ID or other contact information</span><input id="customerLine" name="customerLine" type="text" maxlength="100" autocomplete="off"></label>
           </div>
-          <label class="field"><span>How did you find us?</span><select id="source" name="source" required><option value="">Select a source</option><option value="WEBSITE">Website</option><option value="XIAOHONGSHU">Xiaohongshu</option><option value="FACEBOOK">Facebook</option><option value="GOOGLE">Google Search</option><option value="REFERRAL">Friend Referral</option><option value="OTHER">Other</option></select></label>
+          <label class="field"><span>How did you find us? <small>(optional)</small></span><select id="source" name="source"><option value="">Prefer not to say</option><option value="WEBSITE">Website</option><option value="XIAOHONGSHU">Xiaohongshu</option><option value="FACEBOOK">Facebook</option><option value="GOOGLE">Google Search</option><option value="REFERRAL">Friend Referral</option><option value="OTHER">Other</option></select></label>
           <p class="field-error" data-error-for="contact" role="alert"></p>
-          <button class="primary-button" id="submitRequestButton" type="submit">Submit Booking Request</button>
+          <button class="primary-button" id="submitRequestButton" type="submit">Send request to Jason — final fare to be confirmed</button>
+          <p class="submit-assurance">This does not confirm the final fare or reservation yet.<br>Jason will review your request and contact you as soon as possible.</p>
+          <aside class="quote-contact-cta quote-contact-cta--compact" aria-label="Direct contact fallback">
+            <div class="quote-contact-links">
+              <a href="/contact">Contact Jason</a>
+              {% if phone_number %}<a href="tel:{{ phone_number }}">Call</a><a href="sms:{{ phone_number }}">Text</a>{% endif %}
+              {% if email_address %}<a href="mailto:{{ email_address }}">Email</a>{% endif %}
+              {% if wechat_id %}<button class="contact-link-button" type="button" data-copy-contact="{{ wechat_id }}" data-copy-label="WeChat ID">Copy WeChat ID</button>{% endif %}
+              {% if line_url %}<a href="{{ line_url }}" target="_blank" rel="noopener noreferrer">Open LINE</a>{% elif line_id %}<button class="contact-link-button" type="button" data-copy-contact="{{ line_id }}" data-copy-label="LINE ID">Copy LINE ID</button>{% endif %}
+            </div>
+          </aside>
         </div>
       </section>
     </form>

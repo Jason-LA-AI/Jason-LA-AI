@@ -28,9 +28,11 @@ ERROR_STATUS_CODES = {
 }
 
 ERROR_MESSAGES = {
-    "CONTACT_METHOD_REQUIRED": "Provide a phone number or email address.",
+    "CONTACT_METHOD_REQUIRED": "Provide a phone number, email address, WeChat ID, or LINE ID.",
     "PHONE_REQUIRED_FOR_SMS": "A phone number is required for SMS contact.",
     "EMAIL_REQUIRED_FOR_EMAIL": "An email address is required for email contact.",
+    "WECHAT_REQUIRED": "A WeChat ID is required for WeChat contact.",
+    "LINE_REQUIRED": "A LINE ID is required for LINE contact.",
     ESTIMATE_NOT_FOUND: "The estimate was not found.",
     ESTIMATE_EXPIRED: "The estimate has expired.",
     ESTIMATE_NOT_AVAILABLE: "The estimate is no longer available.",
