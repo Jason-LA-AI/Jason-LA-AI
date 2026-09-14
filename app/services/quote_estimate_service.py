@@ -18,7 +18,11 @@ from app.schemas.quote_estimate import (
     QuoteServiceType,
     QuoteVehicleAssessment,
 )
-from app.services.location_normalizer import UNKNOWN_LOCATION, normalize_location
+from app.services.location_normalizer import (
+    UNKNOWN_LOCATION,
+    location_has_sufficient_detail,
+    normalize_location,
+)
 
 
 LOS_ANGELES_TIMEZONE = ZoneInfo("America/Los_Angeles")
@@ -49,8 +53,8 @@ def create_quote_estimate(
     route_summary = _build_route_summary(request, location_name)
     risk_flags = _risk_flags(request)
 
-    unknown_location = location["pricing_zone"] == UNKNOWN_LOCATION
-    if unknown_location:
+    location_is_sufficient = location_has_sufficient_detail(location["input"])
+    if not location_is_sufficient:
         risk_flags.append(UNKNOWN_LOCATION)
     long_distance_route = _is_long_distance_location(location["input"])
     if long_distance_route:
@@ -65,12 +69,9 @@ def create_quote_estimate(
         suggested_amount = None
     if manual_review_required:
         status = QuoteEstimateStatus.MANUAL_REVIEW_REQUIRED
-        vehicle_assessment = _manual_vehicle_assessment(request, unknown_location)
+        vehicle_assessment = _manual_vehicle_assessment(request, not location_is_sufficient)
         notices = [
-            "Manual review required.",
-            "Jason will confirm vehicle availability and final price.",
-            f"Pricing source: {DEVELOPMENT_PRICING_SOURCE}.",
-            "Development mock only. This is not a real quote.",
+            "Jason will review your trip details and confirm the fare.",
         ]
     else:
         status = QuoteEstimateStatus.ESTIMATED
@@ -78,8 +79,6 @@ def create_quote_estimate(
         notices = [
             "This is an estimated range.",
             "Final price requires Jason confirmation.",
-            f"Pricing source: {DEVELOPMENT_PRICING_SOURCE}.",
-            "Development mock only. This is not a real quote.",
         ]
 
     passenger_count, passenger_count_is_minimum = _passenger_count_values(request)
@@ -120,6 +119,7 @@ def create_quote_estimate(
             "airport_code": request.airport_code.value,
             "pricing_zone": location["pricing_zone"],
             "service_type": request.service_type.value,
+            "location_quality": "sufficient" if location_is_sufficient else "insufficient",
         },
         vehicle_assessment=vehicle_assessment.value,
         risk_flags=risk_flags,
@@ -137,18 +137,56 @@ def create_quote_estimate(
         db_session.rollback()
         raise
 
+    customer_price_available = customer_numeric_fare_is_available(
+        pricing_source=estimate.pricing_source,
+        risk_flags=estimate.risk_flags,
+    )
+    customer_notices = (
+        notices
+        if customer_price_available
+        else [_customer_fare_review_notice(location_is_sufficient)]
+    )
     return QuoteEstimateResponse(
         estimate_id=estimate.id,
         status=QuoteEstimateStatus(estimate.status),
         route_summary=estimate.route_summary,
-        estimated_min_amount=estimate.estimated_min_amount,
-        estimated_max_amount=estimate.estimated_max_amount,
+        # Keep development figures as an internal recommendation, but never
+        # expose a numeric route fare to a customer with an insufficient end
+        # location.  The persisted estimate remains available to Jason.
+        estimated_min_amount=(estimate.estimated_min_amount if customer_price_available else None),
+        estimated_max_amount=(estimate.estimated_max_amount if customer_price_available else None),
         currency_code="USD",
         vehicle_assessment=QuoteVehicleAssessment(estimate.vehicle_assessment),
         requires_jason_review=estimate.requires_jason_review,
         risk_flags=estimate.risk_flags or [],
-        notices=notices,
+        notices=customer_notices,
         valid_until=estimate.expires_at,
+    )
+
+
+def customer_numeric_fare_is_available(
+    *,
+    pricing_source: str | None,
+    risk_flags: list[str] | None,
+) -> bool:
+    """Apply the single customer-facing fare-display policy.
+
+    Development mock numbers are Jason-only planning guidance.  A future
+    route-based/approved pricing source can be displayed without changing this
+    policy, subject to the existing location eligibility check.
+    """
+
+    if pricing_source == DEVELOPMENT_PRICING_SOURCE:
+        return False
+    return UNKNOWN_LOCATION not in (risk_flags or [])
+
+
+def _customer_fare_review_notice(location_is_sufficient: bool) -> str:
+    if not location_is_sufficient:
+        return "Jason needs the exact pickup/drop-off location to confirm the fare."
+    return (
+        "Jason will review the exact route, pickup time, luggage, and availability "
+        "before confirming the fare."
     )
 
 

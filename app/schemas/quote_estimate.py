@@ -81,7 +81,9 @@ class QuoteEstimateCreate(BaseModel):
     service_time: time
     service_timezone: Literal["America/Los_Angeles"] = "America/Los_Angeles"
     flight_number: str | None = Field(default=None, max_length=30)
-    location_input: str = Field(min_length=1, max_length=80)
+    # Leaves room for the airport and direction in the existing 255-character
+    # route summary column while accepting real addresses and place names.
+    location_input: str = Field(min_length=1, max_length=240)
     passenger_count: PassengerCount
     large_luggage_count: LargeLuggageCount
     child_seat_required: bool

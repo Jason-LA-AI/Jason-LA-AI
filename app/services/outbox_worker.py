@@ -84,6 +84,12 @@ def handle_outbox_event(event: OutboxEvent) -> bool:
         "estimate_id": _payload_string(payload, "estimate_id"),
         "route_summary": payload.get("route_summary"),
         "service_type": payload.get("service_type"),
+        "customer_name": payload.get("customer_name"),
+        "preferred_contact_method": payload.get("preferred_contact_method"),
+        "phone": payload.get("phone"),
+        "email": payload.get("email"),
+        "wechat_id": payload.get("wechat_id"),
+        "line_id": payload.get("line_id"),
         # Legacy pending events predate source tracking; keep them deliverable.
         "source": payload.get("source") or "UNKNOWN",
         "suggested_amount": payload.get("suggested_amount"),
@@ -92,6 +98,17 @@ def handle_outbox_event(event: OutboxEvent) -> bool:
         "currency_code": payload.get("currency_code"),
         "pricing_source": payload.get("pricing_source"),
         "pricing_status": payload.get("pricing_status"),
+        "manual_review_reason": payload.get("manual_review_reason"),
+        "airport_code": payload.get("airport_code"),
+        "service_date": payload.get("service_date"),
+        "service_time": payload.get("service_time"),
+        "service_timezone": payload.get("service_timezone"),
+        "flight_number": payload.get("flight_number"),
+        "location_input": payload.get("location_input"),
+        "passenger_count": payload.get("passenger_count"),
+        "large_luggage_count": payload.get("large_luggage_count"),
+        "child_seat_required": payload.get("child_seat_required"),
+        "oversized_items": payload.get("oversized_items"),
     }
     with db.begin_nested():
         create_notification(

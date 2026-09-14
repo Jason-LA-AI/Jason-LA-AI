@@ -8,6 +8,15 @@ from typing import Literal, TypedDict
 
 UNKNOWN_LOCATION = "UNKNOWN_LOCATION"
 ZIP_PATTERN = re.compile(r"^\d{5}$")
+STREET_ADDRESS_PATTERN = re.compile(r"^\d+[\w-]*(?:\s|,).+")
+STREET_SUFFIX_PATTERN = re.compile(
+    r"\b(?:street|st|avenue|ave|road|rd|boulevard|blvd|drive|dr|lane|ln|way|place|pl|court|ct)\b",
+    re.IGNORECASE,
+)
+PLACE_DETAIL_PATTERN = re.compile(
+    r"\b(?:hotel|inn|resort|suites|university|college|school|campus|dorm|apartment|apt|building|tower|terminal|station|mall|center|centre|plaza|park)\b",
+    re.IGNORECASE,
+)
 
 
 class NormalizedLocation(TypedDict):
@@ -82,3 +91,28 @@ def normalize_location(location_input: str) -> NormalizedLocation:
         "postal_code": None,
         "pricing_zone": UNKNOWN_LOCATION,
     }
+
+
+def location_has_sufficient_detail(location_input: str) -> bool:
+    """Return whether free-text location can identify a real trip endpoint.
+
+    This deliberately does not require a US mailing-address format.  A street
+    address, hotel, school, campus, apartment/dorm, or descriptive place name
+    can be enough for Jason to review a route.  A ZIP code or a configured city
+    name alone cannot identify the actual pickup or drop-off point.
+    """
+
+    cleaned = " ".join(location_input.strip().split())
+    if not cleaned or ZIP_PATTERN.fullmatch(cleaned):
+        return False
+    if cleaned.casefold() in CITY_LOCATIONS:
+        return False
+    if STREET_ADDRESS_PATTERN.match(cleaned) or STREET_SUFFIX_PATTERN.search(cleaned):
+        return True
+    if PLACE_DETAIL_PATTERN.search(cleaned):
+        return True
+
+    # A multiword proper-place entry (for example, "The Getty") is useful to
+    # review, while a single unqualified word remains too ambiguous.
+    words = re.findall(r"[A-Za-z][A-Za-z'.-]*", cleaned)
+    return len(words) >= 2 and len(cleaned) >= 6

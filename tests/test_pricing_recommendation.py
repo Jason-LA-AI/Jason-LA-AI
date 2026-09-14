@@ -8,7 +8,7 @@ from app.models.customer import Customer
 from app.models.lead import Lead
 from app.models.notification import Notification
 from app.models.quote import Quote
-from app.services.quote_request_service import _pricing_recommendation_text
+from app.services.quote_request_service import _pricing_recommendation_text, _telegram_review_text
 from app.services.telegram_adapter import _render_quote_request_review
 
 
@@ -134,3 +134,78 @@ def test_direct_approval_notification_uses_persisted_estimate_values() -> None:
     assert "Suggested Amount: 140.00" in message
     assert "Range: 130.00 - 150.00" in message
     assert "Pricing Source: development_mock" in message
+
+
+def test_telegram_review_includes_wechat_contact_and_exact_trip_details() -> None:
+    estimate = type(
+        "Estimate",
+        (),
+        {
+            "service_type": "AIRPORT_PICKUP",
+            "airport_code": "LAX",
+            "location_input": "Hyatt Regency LAX",
+            "route_summary": "LAX → Hyatt Regency LAX",
+            "service_date": "2026-09-15",
+            "service_time": "08:30",
+            "service_timezone": "America/Los_Angeles",
+            "flight_number": "UA123",
+            "passenger_count": 2,
+            "large_suitcase_count": 3,
+            "child_seat_required": "NO",
+            "oversized_items_present": False,
+            "suggested_amount": Decimal("140.00"),
+            "estimated_min_amount": Decimal("130.00"),
+            "estimated_max_amount": Decimal("150.00"),
+            "currency_code": "USD",
+            "pricing_source": "development_mock",
+            "status": "ESTIMATED",
+            "manual_review_reason": None,
+        },
+    )()
+
+    message = _telegram_review_text(
+        estimate=estimate,
+        customer_name="Jenny",
+        source="WEBSITE",
+        phone=None,
+        email=None,
+        wechat_id="superjennygo",
+        line_id=None,
+        preferred_contact_method="WECHAT",
+    )
+
+    assert "Customer: Jenny" in message
+    assert "Preferred Contact: WECHAT" in message
+    assert "WeChat: superjennygo" in message
+    assert "Phone:" not in message
+    assert "LINE:" not in message
+    assert "Pickup: LAX" in message
+    assert "Drop-off: Hyatt Regency LAX" in message
+    assert "Flight Number: UA123" in message
+
+
+def test_telegram_review_includes_line_contact_without_empty_channels() -> None:
+    estimate = type(
+        "Estimate",
+        (),
+        {"service_type": "AIRPORT_DROPOFF", "airport_code": "ONT", "location_input": "UCLA Campus", "route_summary": "UCLA Campus → ONT", "service_date": "2026-09-15", "service_time": "08:30", "service_timezone": "America/Los_Angeles", "flight_number": None, "passenger_count": 1, "large_suitcase_count": 0, "child_seat_required": "NO", "oversized_items_present": False, "suggested_amount": None, "estimated_min_amount": None, "estimated_max_amount": None, "currency_code": "USD", "pricing_source": "development_mock", "status": "MANUAL_REVIEW_REQUIRED", "manual_review_reason": "UNKNOWN_LOCATION"},
+    )()
+    message = _telegram_review_text(estimate=estimate, customer_name="Line Customer", source="WEBSITE", phone=None, email=None, wechat_id=None, line_id="line-123", preferred_contact_method="LINE")
+
+    assert "Preferred Contact: LINE" in message
+    assert "LINE: line-123" in message
+    assert "WeChat:" not in message
+    assert "Manual Review Reason: UNKNOWN_LOCATION" in message
+
+
+def test_telegram_review_keeps_phone_and_email_contacts() -> None:
+    estimate = type(
+        "Estimate",
+        (),
+        {"service_type": "AIRPORT_PICKUP", "airport_code": "LAX", "location_input": "Hotel June", "route_summary": "LAX → Hotel June", "service_date": "2026-09-15", "service_time": "08:30", "service_timezone": "America/Los_Angeles", "flight_number": None, "passenger_count": 1, "large_suitcase_count": 0, "child_seat_required": "NO", "oversized_items_present": False, "suggested_amount": Decimal("140"), "estimated_min_amount": Decimal("130"), "estimated_max_amount": Decimal("150"), "currency_code": "USD", "pricing_source": "development_mock", "status": "ESTIMATED", "manual_review_reason": None},
+    )()
+    message = _telegram_review_text(estimate=estimate, customer_name="Phone Email", source="WEBSITE", phone="6265550100", email="customer@example.com", wechat_id=None, line_id=None, preferred_contact_method="SMS")
+
+    assert "Preferred Contact: SMS" in message
+    assert "Phone: 6265550100" in message
+    assert "Email: customer@example.com" in message

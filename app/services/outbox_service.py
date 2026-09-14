@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from collections.abc import Mapping
+from typing import Any
 
 from sqlalchemy.orm import Session
 
@@ -22,6 +24,7 @@ def create_outbox_event(
     customer: Customer,
     quote_estimate: QuoteEstimate,
     source: str,
+    contact_information: Mapping[str, Any],
 ) -> OutboxEvent:
     """Store a pending quote-request event in the current transaction."""
 
@@ -37,13 +40,30 @@ def create_outbox_event(
             "estimate_id": str(quote_estimate.id),
             "route_summary": quote_estimate.route_summary,
             "service_type": quote_estimate.service_type,
+            "customer_name": customer.display_name,
+            "preferred_contact_method": contact_information.get("preferred_contact_method"),
+            "phone": contact_information.get("phone"),
+            "email": contact_information.get("email"),
+            "wechat_id": contact_information.get("wechat_id"),
+            "line_id": contact_information.get("line_id"),
             "source": source,
+            "airport_code": quote_estimate.airport_code,
+            "service_date": quote_estimate.service_date.isoformat(),
+            "service_time": quote_estimate.service_time.isoformat(timespec="minutes"),
+            "service_timezone": quote_estimate.service_timezone,
+            "flight_number": quote_estimate.flight_number,
+            "location_input": quote_estimate.location_input,
+            "passenger_count": quote_estimate.passenger_count,
+            "large_luggage_count": quote_estimate.large_suitcase_count,
+            "child_seat_required": quote_estimate.child_seat_required,
+            "oversized_items": quote_estimate.oversized_items_present,
             "suggested_amount": _amount_string(quote_estimate.suggested_amount),
             "estimated_min_amount": _amount_string(quote_estimate.estimated_min_amount),
             "estimated_max_amount": _amount_string(quote_estimate.estimated_max_amount),
             "currency_code": quote_estimate.currency_code,
             "pricing_source": quote_estimate.pricing_source,
             "pricing_status": quote_estimate.status,
+            "manual_review_reason": quote_estimate.manual_review_reason,
         },
         status="PENDING",
         attempt_count=0,

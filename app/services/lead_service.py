@@ -36,6 +36,9 @@ def create_lead_from_quote_request(
         next_action_owner="JASON",
         intake_method="STRUCTURED_QUOTE_V2",
         estimate_accepted_at=accepted_at,
+        # The stored route summary retains the customer's exact location text,
+        # so the existing dashboard can show it without a schema change.
+        route_summary=quote_estimate.route_summary,
     )
     db.add(lead)
     db.flush()

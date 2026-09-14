@@ -87,6 +87,8 @@ def test_quote_uses_preliminary_fare_wording_and_contact_fallback(client: TestCl
 
     assert response.status_code == 200
     assert "Estimated Fare Range" in response.text
+    assert "Fare Review Required" in response.text
+    assert "Street address, hotel, school, apartment, or place name" in response.text
     assert "This is a preliminary planning range." in response.text
     assert "before confirming the final fare" in response.text
     assert "Request Jason’s final confirmation" in response.text

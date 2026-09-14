@@ -3,7 +3,7 @@
 {% block title %}Airport Transportation Estimate | Jason Los Angeles{% endblock %}
 {% block description %}Build a private airport transportation estimate with Jason in one quick form.{% endblock %}
 
-{% block extra_css %}<link rel="stylesheet" href="/static/quote.css?v=20260805-5">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/quote.css?v=20260914-1">{% endblock %}
 
 {% block content %}
 <main class="quote-page">
@@ -44,7 +44,7 @@
           <label class="field"><span id="dateLabel">Flight Arrival Date</span><input id="serviceDate" name="serviceDate" type="date" required></label>
           <label class="field"><span id="timeLabel">Flight Arrival Time</span><select id="flight-arrival-time" name="flight_arrival_time" required><option value="">Select arrival time</option></select></label>
           <label class="field"><span>Flight Number <small>(optional)</small></span><input id="flightNumber" name="flight_number" type="text" maxlength="30" autocomplete="off" placeholder="e.g. UA123"></label>
-          <label class="field field--location"><span id="locationLabel">Destination ZIP Code or City</span><input id="locationInput" name="locationInput" type="text" maxlength="80" autocomplete="address-level2" placeholder="91748 or Rowland Heights" required></label>
+          <label class="field field--location"><span id="locationLabel">Drop-off location</span><input id="locationInput" name="locationInput" type="text" maxlength="240" autocomplete="street-address" placeholder="Street address, hotel, school, apartment, or place name" required></label>
         </div>
         <p class="field-hint" id="scheduleGuidance">Enter your scheduled flight arrival time. Los Angeles time zone.</p>
         <p class="field-error" data-error-for="schedule" role="alert"></p>
@@ -68,8 +68,8 @@
       <section class="estimate-panel" id="estimatePanel" aria-labelledby="estimate-heading" tabindex="-1" hidden>
         <div class="section-heading"><span>✓</span><h2 id="estimate-heading">Your estimated range</h2></div>
         <div class="estimate-card">
-          <p class="estimate-card__label">Estimated Fare Range</p><p class="estimate-card__price" id="estimateRange"></p>
-          <div class="manual-review" id="manualReview" hidden><strong>Jason will confirm final price shortly.</strong></div>
+          <p class="estimate-card__label" id="estimateLabel">Estimated Fare Range</p><p class="estimate-card__price" id="estimateRange"></p>
+          <div class="manual-review" id="manualReview" hidden><strong id="manualReviewTitle">Fare Review Required</strong><span id="manualReviewMessage">Jason needs the exact pickup/drop-off location to confirm the fare.</span></div>
           <div class="route-summary"><span>Route</span><strong id="estimateRoute"></strong></div>
           <dl class="estimate-summary" id="estimateSummary"></dl>
           <div class="estimate-notice" id="estimateNotices"><p>This is a preliminary planning range. Jason will review the exact route, pickup time, luggage, and availability before confirming the final fare.</p></div><p class="estimate-validity" id="estimateValidity"></p>
@@ -125,4 +125,4 @@
 </main>
 {% endblock %}
 
-{% block extra_js %}<script src="/static/quote.js?v=20260810-1" defer></script>{% endblock %}
+{% block extra_js %}<script src="/static/quote.js?v=20260914-1" defer></script>{% endblock %}

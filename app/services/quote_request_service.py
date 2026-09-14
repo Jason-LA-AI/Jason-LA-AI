@@ -108,6 +108,13 @@ def process_quote_request(
             customer=customer,
             quote_estimate=estimate,
             source=source,
+            contact_information={
+                "phone": phone,
+                "email": email,
+                "wechat_id": wechat_id,
+                "line_id": line_id,
+                "preferred_contact_method": contact_method.value,
+            },
         )
         result = QuoteRequestProcessed(
             customer_id=customer.id,
@@ -121,13 +128,16 @@ def process_quote_request(
         try:
             send_approval_notification(
                 str(approval.id),
-                "New website booking request\n"
-                f"Customer: {customer.display_name}\n"
-                f"Route: {estimate.route_summary}\n"
-                f"Service: {estimate.service_type}\n"
-                f"Source: {source}\n"
-                f"Phone: {phone or '-'}\nEmail: {email or '-'}\n\n"
-                + _pricing_recommendation_text(estimate),
+                _telegram_review_text(
+                    estimate=estimate,
+                    customer_name=customer.display_name,
+                    source=source,
+                    phone=phone,
+                    email=email,
+                    wechat_id=wechat_id,
+                    line_id=line_id,
+                    preferred_contact_method=contact_method.value,
+                ),
             )
         except Exception:
             # The booking is already safely committed; notification delivery must
@@ -215,19 +225,59 @@ def _pricing_recommendation_text(estimate: object) -> str:
     suggested = getattr(estimate, "suggested_amount", None)
     minimum = getattr(estimate, "estimated_min_amount", None)
     maximum = getattr(estimate, "estimated_max_amount", None)
-    if suggested is None or minimum is None or maximum is None:
-        return (
-            "Pricing Recommendation:\n"
-            "Manual Review Required\n"
-            f"Pricing Source: {source}\n"
-            f"Pricing Status: {status_value}"
-        )
     currency = getattr(estimate, "currency_code", None) or "USD"
-    return (
-        "Pricing Recommendation:\n"
-        f"Suggested Amount: {suggested}\n"
-        f"Range: {minimum} - {maximum}\n"
-        f"Currency: {currency}\n"
-        f"Pricing Source: {source}\n"
-        f"Pricing Status: {status_value}"
-    )
+    lines = ["Pricing Recommendation:"]
+    if suggested is None or minimum is None or maximum is None:
+        lines.append("Manual Review Required")
+    lines.extend((
+        f"Suggested Amount: {suggested if suggested is not None else 'Not available'}",
+        f"Range: {f'{minimum} - {maximum}' if minimum is not None and maximum is not None else 'Not available'}",
+        f"Currency: {currency}",
+        f"Pricing Source: {source}",
+        f"Pricing Status: {status_value}",
+    ))
+    reason = getattr(estimate, "manual_review_reason", None)
+    if reason:
+        lines.append(f"Manual Review Reason: {reason}")
+    return "\n".join(lines)
+
+
+def _telegram_review_text(
+    *,
+    estimate: object,
+    customer_name: str,
+    source: str,
+    phone: str | None,
+    email: str | None,
+    wechat_id: str | None,
+    line_id: str | None,
+    preferred_contact_method: str,
+) -> str:
+    """Render the real internal Telegram alert from persisted trip data."""
+
+    service_type = getattr(estimate, "service_type", "Not provided")
+    airport = getattr(estimate, "airport_code", "Not provided")
+    location = getattr(estimate, "location_input", "Not provided")
+    pickup, dropoff = (airport, location) if service_type == "AIRPORT_PICKUP" else (location, airport)
+    lines = [
+        "New website booking request",
+        f"Customer: {customer_name}",
+        f"Preferred Contact: {preferred_contact_method}",
+        *tuple(f"{label}: {contact}" for label, contact in (("Phone", phone), ("Email", email), ("WeChat", wechat_id), ("LINE", line_id)) if contact),
+        "",
+        f"Route: {getattr(estimate, 'route_summary', 'Not provided')}",
+        f"Pickup: {pickup}",
+        f"Drop-off: {dropoff}",
+        f"Airport: {airport}",
+        f"Date: {getattr(estimate, 'service_date', 'Not provided')}",
+        f"Time: {getattr(estimate, 'service_time', 'Not provided')} {getattr(estimate, 'service_timezone', '')}".rstrip(),
+        f"Passengers: {getattr(estimate, 'passenger_count', 'Not provided')}",
+        f"Large Luggage: {getattr(estimate, 'large_suitcase_count', 'Not provided')}",
+        f"Child Seat: {getattr(estimate, 'child_seat_required', 'Not provided')}",
+        f"Oversized Items: {getattr(estimate, 'oversized_items_present', 'Not provided')}",
+        f"Source: {source}",
+    ]
+    flight_number = getattr(estimate, "flight_number", None)
+    if flight_number:
+        lines.append(f"Flight Number: {flight_number}")
+    return "\n".join((*lines, "", _pricing_recommendation_text(estimate)))
