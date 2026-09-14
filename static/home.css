@@ -268,6 +268,11 @@ a { overflow-wrap: break-word; }
 .contact-id { overflow-wrap: anywhere; }
 .copy-contact-button { background: #fff; border: 1px solid #aeb7c4; color: #172033; font-size: .9rem; min-height: 44px; padding: 9px 14px; }
 .contact-channel-card--phone .home-actions { justify-content: center; }
+.xiaohongshu-section { border-top: 1px solid #dbe2ea; margin: 38px auto 0; max-width: 760px; padding-top: 34px; }
+.xiaohongshu-section > p { color: #475569; line-height: 1.65; }
+.xiaohongshu-account { font-size: 1.05rem; }
+.xiaohongshu-profile-card { margin: 24px auto 0; max-width: 640px; }
+.xiaohongshu-profile-card img { border: 1px solid #dbe2ea; border-radius: 14px; display: block; height: auto; max-width: 100%; width: 100%; }
 
 @media (max-width: 768px) {
     .navbar { align-items: center; flex-wrap: wrap; padding: 14px 18px; position: relative; }
@@ -286,6 +291,7 @@ a { overflow-wrap: break-word; }
     header h1 { font-size: 42px; }
     .trust-grid, .contact-methods, .contact-channel-grid { grid-template-columns: 1fr; }
     .contact-channel-card { padding: 20px 16px; }
+    .xiaohongshu-section { margin-top: 30px; padding-top: 28px; }
     .home-contact .home-actions { display: grid; grid-template-columns: 1fr; }
     .home-contact .home-button { min-width: 0; width: 100%; }
     .story-photo-grid { grid-template-columns: 1fr; }

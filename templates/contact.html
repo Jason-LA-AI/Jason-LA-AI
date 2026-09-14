@@ -339,7 +339,16 @@ San Diego County
 
 {% if email_address %}<p class="contact-email">Prefer email? <a href="mailto:{{ email_address }}">Email Jason at {{ email_address }}</a>.</p>{% endif %}
 
-{% if xiaohongshu_url or facebook_url or telegram_url %}<div class="social-actions" aria-label="Jason's social channels"><span>Service updates:</span>{% if xiaohongshu_url %}<a href="{{ xiaohongshu_url }}" target="_blank" rel="noopener noreferrer">Xiaohongshu 小红书</a>{% endif %}{% if facebook_url %}<a href="{{ facebook_url }}" target="_blank" rel="noopener noreferrer">Facebook</a>{% endif %}{% if telegram_url %}<a href="{{ telegram_url }}" target="_blank" rel="noopener noreferrer">Telegram</a>{% endif %}</div>{% endif %}
+<section class="xiaohongshu-section" aria-labelledby="xiaohongshu-heading">
+<h2 id="xiaohongshu-heading">Follow Jason on Xiaohongshu 小红书</h2>
+<p>查看真实接送记录、机场接送经验和洛杉矶出行分享。</p>
+<p class="xiaohongshu-account">小红书号：<strong>jasoninla</strong></p>
+<figure class="xiaohongshu-profile-card">
+<img src="/static/images/contact/xiaohongshu-jasoninla.webp" width="640" height="873" loading="lazy" decoding="async" alt="Jason-LA Xiaohongshu profile card with QR code for Los Angeles airport transportation and private car service">
+</figure>
+</section>
+
+{% if facebook_url or telegram_url %}<div class="social-actions" aria-label="Jason's social channels"><span>Service updates:</span>{% if facebook_url %}<a href="{{ facebook_url }}" target="_blank" rel="noopener noreferrer">Facebook</a>{% endif %}{% if telegram_url %}<a href="{{ telegram_url }}" target="_blank" rel="noopener noreferrer">Telegram</a>{% endif %}</div>{% endif %}
 </section>
 
 <section class="cta-section">

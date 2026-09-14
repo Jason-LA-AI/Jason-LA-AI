@@ -110,6 +110,7 @@ def test_social_links_are_hidden_until_configured(client: TestClient, monkeypatc
     confirmation = client.get("/quote/confirmation")
 
     assert "Xiaohongshu 小红书" not in home.text
+    assert "Follow Jason on Xiaohongshu 小红书" in contact.text
     assert "Facebook page" not in contact.text
     assert "See more real service updates" not in confirmation.text
 
@@ -126,7 +127,11 @@ def test_configured_social_links_render(client: TestClient, monkeypatch) -> None
         "https://example.com/facebook",
     )
 
-    for path in ("/", "/contact", "/quote/confirmation"):
+    for path in ("/", "/quote/confirmation"):
         response = client.get(path)
         assert 'href="https://example.com/xiaohongshu"' in response.text
         assert 'href="https://example.com/facebook"' in response.text
+
+    contact = client.get("/contact")
+    assert 'href="https://example.com/xiaohongshu"' not in contact.text
+    assert 'href="https://example.com/facebook"' in contact.text

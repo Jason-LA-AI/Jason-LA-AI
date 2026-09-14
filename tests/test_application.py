@@ -129,6 +129,12 @@ def test_contact_channels_and_public_images_render(
     assert "For travelers from Taiwan / 台湾旅客可通过 LINE 联系 Jason" in contact.text
     assert 'alt="WeChat QR code to contact Jason"' in contact.text
     assert 'alt="LINE QR code to contact Jason"' in contact.text
+    assert "Follow Jason on Xiaohongshu 小红书" in contact.text
+    assert "查看真实接送记录、机场接送经验和洛杉矶出行分享。" in contact.text
+    assert "小红书号：<strong>jasoninla</strong>" in contact.text
+    assert 'src="/static/images/contact/xiaohongshu-jasoninla.webp"' in contact.text
+    assert 'width="640" height="873" loading="lazy"' in contact.text
+    assert 'alt="Jason-LA Xiaohongshu profile card with QR code for Los Angeles airport transportation and private car service"' in contact.text
     assert 'href="tel:+16265550123"' in contact.text
     assert 'href="/quote">Get a Quote</a>' in contact.text
     assert 'loading="lazy"' in contact.text
@@ -144,6 +150,7 @@ def test_contact_channels_and_public_images_render(
         "/static/images/contact/wechat-qr.webp",
         "/static/images/contact/line-qr.png",
         "/static/images/contact/line-qr-800.webp",
+        "/static/images/contact/xiaohongshu-jasoninla.webp",
         "/static/images/service/costco-shopping-sunset-800.webp",
         "/static/images/service/sonesta-hotel-transfer-800.webp",
         "/static/images/service/ont-arrivals-rainbow-800.webp",
