@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     telegram_bot_token: str | None = Field(default=None, repr=False)
     telegram_chat_id: str | None = Field(default=None, repr=False)
     telegram_webhook_secret: str | None = Field(default=None, repr=False)
+    google_maps_api_key: str | None = Field(default=None, repr=False)
+    # Keep the exact home address private in the server environment.  The
+    # city-level default follows the pricing rule until it is configured.
+    jason_base_route_address: str = "Rowland Heights, CA"
     database_url: str = Field(
         default="postgresql+psycopg://postgres:postgres@localhost:5432/jason_la_ai",
         repr=False,

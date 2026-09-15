@@ -163,8 +163,8 @@
     const manual = estimate.status === "MANUAL_REVIEW_REQUIRED";
     const hasRange = estimate.estimated_min_amount != null && estimate.estimated_max_amount != null;
     const fareReviewRequired = !hasRange;
-    const insufficientLocation = Array.isArray(estimate.risk_flags) && estimate.risk_flags.includes("UNKNOWN_LOCATION");
-    const fareReviewMessage = insufficientLocation ? "Jason needs the exact pickup/drop-off location to confirm the fare." : "Jason will review the exact route, pickup time, luggage, and availability before confirming the fare.";
+    const fallbackFareReviewMessage = "Jason will review the exact route, pickup time, luggage, and availability before confirming the fare.";
+    const fareReviewMessage = !hasRange && Array.isArray(estimate.notices) && estimate.notices[0] ? estimate.notices[0] : fallbackFareReviewMessage;
     const range = document.getElementById("estimateRange"); range.textContent = hasRange ? `${formatUsd(estimate.estimated_min_amount)} - ${formatUsd(estimate.estimated_max_amount)}` : ""; range.hidden = !hasRange;
     document.getElementById("estimateLabel").textContent = fareReviewRequired ? "Fare Review Required" : "Estimated Fare Range";
     document.getElementById("estimate-heading").textContent = fareReviewRequired ? "Fare Review Required" : "Your estimated range";

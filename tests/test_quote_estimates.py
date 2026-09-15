@@ -1,6 +1,7 @@
 """Tests for structured airport quote estimates."""
 
 from datetime import datetime
+from decimal import Decimal
 from unittest.mock import MagicMock
 from uuid import uuid4
 from zoneinfo import ZoneInfo
@@ -10,9 +11,11 @@ import pytest
 from app.schemas.quote_estimate import QuoteEstimateCreate
 from app.services.location_normalizer import normalize_location
 from app.services.quote_estimate_service import (
+    ROUTE_MILEAGE_PRICING_SOURCE,
     create_quote_estimate,
     customer_numeric_fare_is_available,
 )
+from app.services.route_pricing import RouteMileage, RouteMileageUnavailable
 
 
 def _request(**overrides: object) -> QuoteEstimateCreate:
@@ -42,6 +45,18 @@ def _session() -> MagicMock:
     return session
 
 
+@pytest.fixture(autouse=True)
+def successful_road_mileage(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep quote tests offline while exercising the mapped-price path."""
+
+    monkeypatch.setattr(
+        "app.services.quote_estimate_service.get_round_trip_mileage",
+        lambda *_: RouteMileage(
+            total_miles=Decimal("100"), distance_meters=160934
+        ),
+    )
+
+
 def test_zip_91789_normalizes_to_walnut() -> None:
     location = normalize_location("91789")
 
@@ -50,22 +65,23 @@ def test_zip_91789_normalizes_to_walnut() -> None:
     assert location["pricing_zone"] == "WALNUT"
 
 
-def test_zip_only_location_requires_manual_review_and_hides_customer_price() -> None:
+def test_zip_only_location_receives_a_mileage_price() -> None:
     session = _session()
 
     response = create_quote_estimate(_request(), session)
 
-    assert response.status.value == "MANUAL_REVIEW_REQUIRED"
+    assert response.status.value == "ESTIMATED"
     assert response.route_summary == "Walnut → ONT"
-    assert response.estimated_min_amount is None
-    assert response.estimated_max_amount is None
+    assert response.estimated_min_amount == 100
+    assert response.estimated_max_amount == 150
     estimate = session.add.call_args.args[0]
     assert estimate.flight_number == "UA123"
-    assert estimate.estimated_min_amount == 100  # Jason retains the internal reference.
-    assert "UNKNOWN_LOCATION" in estimate.risk_flags
+    assert estimate.estimated_min_amount == 100
+    assert estimate.estimated_max_amount == 150
+    assert estimate.pricing_source == ROUTE_MILEAGE_PRICING_SOURCE
 
 
-def test_lax_to_90045_only_is_manual_review_without_customer_numeric_fare() -> None:
+def test_lax_to_zip_only_receives_a_mileage_price() -> None:
     session = _session()
 
     response = create_quote_estimate(
@@ -77,16 +93,16 @@ def test_lax_to_90045_only_is_manual_review_without_customer_numeric_fare() -> N
         session,
     )
 
-    assert response.status.value == "MANUAL_REVIEW_REQUIRED"
+    assert response.status.value == "ESTIMATED"
     assert response.route_summary == "LAX → 90045"
-    assert response.estimated_min_amount is None
-    assert response.estimated_max_amount is None
+    assert response.estimated_min_amount == 100
+    assert response.estimated_max_amount == 150
     estimate = session.add.call_args.args[0]
-    assert estimate.estimated_min_amount == 130
+    assert estimate.estimated_min_amount == 100
     assert estimate.estimated_max_amount == 150
 
 
-def test_development_mock_full_street_address_hides_customer_price_and_preserves_route() -> None:
+def test_street_address_receives_a_mileage_price_and_preserves_route() -> None:
     session = _session()
     response = create_quote_estimate(
         _request(location_input="123 Main Street, Los Angeles"),
@@ -94,15 +110,15 @@ def test_development_mock_full_street_address_hides_customer_price_and_preserves
     )
 
     assert response.status.value == "ESTIMATED"
-    assert response.estimated_min_amount is None
-    assert response.estimated_max_amount is None
+    assert response.estimated_min_amount == 100
+    assert response.estimated_max_amount == 150
     assert response.route_summary == "123 Main Street, Los Angeles → ONT"
     estimate = session.add.call_args.args[0]
     assert estimate.estimated_min_amount == 100
-    assert estimate.estimated_max_amount == 140
+    assert estimate.estimated_max_amount == 150
 
 
-def test_development_mock_hotel_hides_customer_price_and_preserves_route() -> None:
+def test_hotel_receives_a_mileage_price_and_preserves_route() -> None:
     session = _session()
     response = create_quote_estimate(
         _request(location_input="Hyatt Regency LAX"),
@@ -110,41 +126,43 @@ def test_development_mock_hotel_hides_customer_price_and_preserves_route() -> No
     )
 
     assert response.status.value == "ESTIMATED"
-    assert response.estimated_min_amount is None
-    assert response.estimated_max_amount is None
+    assert response.estimated_min_amount == 100
+    assert response.estimated_max_amount == 150
     assert response.route_summary == "Hyatt Regency LAX → ONT"
-    assert session.add.call_args.args[0].suggested_amount == 120
+    assert session.add.call_args.args[0].suggested_amount == 125
 
 
-@pytest.mark.parametrize(
-    "location",
-    ["San Diego", "San Jose, CA", "Santa Barbara", "Las Vegas, NV"],
-)
-def test_long_distance_routes_require_confirmation_without_price(location: str) -> None:
-    response = create_quote_estimate(
-        _request(location_input=location, service_type="AIRPORT_PICKUP"),
-        _session(),
+def test_unavailable_road_mileage_requires_manual_fare_review(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def unavailable(*_: object) -> RouteMileage:
+        raise RouteMileageUnavailable("not configured")
+
+    monkeypatch.setattr(
+        "app.services.quote_estimate_service.get_round_trip_mileage", unavailable
     )
 
+    response = create_quote_estimate(_request(), _session())
+
     assert response.status.value == "MANUAL_REVIEW_REQUIRED"
-    assert response.estimated_min_amount is None
-    assert response.estimated_max_amount is None
-    assert "LONG_DISTANCE_ROUTE" in response.risk_flags
+    assert response.estimated_min_amount == 100
+    assert response.estimated_max_amount == 140
+    assert "ROUTE_MILEAGE_UNAVAILABLE" in response.risk_flags
 
 
 @pytest.mark.parametrize(
     "location",
     ["Rowland Heights", "Walnut", "Arcadia", "Ontario", "Rancho Cucamonga"],
 )
-def test_city_only_routes_require_fare_review(location: str) -> None:
+def test_city_only_routes_receive_a_mileage_price(location: str) -> None:
     response = create_quote_estimate(
         _request(location_input=location, service_type="AIRPORT_PICKUP"),
         _session(),
     )
 
-    assert response.status.value == "MANUAL_REVIEW_REQUIRED"
-    assert response.estimated_min_amount is None
-    assert response.estimated_max_amount is None
+    assert response.status.value == "ESTIMATED"
+    assert response.estimated_min_amount == 100
+    assert response.estimated_max_amount == 150
 
 
 def test_quote_estimate_endpoint_returns_frontend_contract(
@@ -190,18 +208,18 @@ def test_quote_estimate_endpoint_returns_frontend_contract(
         "valid_until",
     }
     assert body["status"] == "ESTIMATED"
-    assert body["estimated_min_amount"] is None
-    assert body["estimated_max_amount"] is None
+    assert body["estimated_min_amount"] == "100"
+    assert body["estimated_max_amount"] == "150"
 
 
-def test_future_non_development_pricing_source_can_show_customer_fare() -> None:
+def test_only_road_mileage_pricing_can_show_customer_fare() -> None:
     assert customer_numeric_fare_is_available(
-        pricing_source="route_based_v1",
+        pricing_source=ROUTE_MILEAGE_PRICING_SOURCE,
         risk_flags=[],
     )
     assert not customer_numeric_fare_is_available(
-        pricing_source="route_based_v1",
-        risk_flags=["UNKNOWN_LOCATION"],
+        pricing_source=ROUTE_MILEAGE_PRICING_SOURCE,
+        risk_flags=["ROUTE_MILEAGE_UNAVAILABLE"],
     )
     assert not customer_numeric_fare_is_available(
         pricing_source="development_mock",

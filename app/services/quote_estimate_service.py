@@ -1,4 +1,4 @@
-"""Development-only structured quote estimate generation."""
+"""Structured airport quote estimates based on round-trip road mileage."""
 
 from __future__ import annotations
 
@@ -19,22 +19,27 @@ from app.schemas.quote_estimate import (
     QuoteVehicleAssessment,
 )
 from app.services.location_normalizer import (
-    UNKNOWN_LOCATION,
-    location_has_sufficient_detail,
     normalize_location,
+)
+from app.services.route_pricing import (
+    RouteMileageUnavailable,
+    get_round_trip_mileage,
+    price_range_for_miles,
 )
 
 
 LOS_ANGELES_TIMEZONE = ZoneInfo("America/Los_Angeles")
-DEVELOPMENT_PRICING_SOURCE = "development_mock"
-LONG_DISTANCE_LOCATIONS = {"san diego", "san jose", "santa barbara", "las vegas"}
+ROUTE_MILEAGE_PRICING_SOURCE = "google_routes_mileage_v1"
+TEMPORARY_REFERENCE_PRICING_SOURCE = "temporary_airport_reference_v1"
 
-DEVELOPMENT_MOCK_RANGES: dict[str, tuple[Decimal, Decimal]] = {
-    "LAX": (Decimal("130.00"), Decimal("150.00")),
-    "ONT": (Decimal("100.00"), Decimal("140.00")),
-    "SNA": (Decimal("120.00"), Decimal("160.00")),
-    "BUR": (Decimal("120.00"), Decimal("150.00")),
-    "LGB": (Decimal("120.00"), Decimal("150.00")),
+# Emergency customer-facing fallback until the road-mileage archive or Maps
+# API is available. These are planning ranges, not final fares.
+TEMPORARY_AIRPORT_RANGES: dict[str, tuple[Decimal, Decimal]] = {
+    "LAX": (Decimal("130"), Decimal("150")),
+    "ONT": (Decimal("100"), Decimal("140")),
+    "SNA": (Decimal("120"), Decimal("160")),
+    "BUR": (Decimal("120"), Decimal("150")),
+    "LGB": (Decimal("120"), Decimal("150")),
 }
 
 
@@ -53,23 +58,38 @@ def create_quote_estimate(
     route_summary = _build_route_summary(request, location_name)
     risk_flags = _risk_flags(request)
 
-    location_is_sufficient = location_has_sufficient_detail(location["input"])
-    if not location_is_sufficient:
-        risk_flags.append(UNKNOWN_LOCATION)
-    long_distance_route = _is_long_distance_location(location["input"])
-    if long_distance_route:
-        risk_flags.append("LONG_DISTANCE_ROUTE")
+    try:
+        road_mileage = get_round_trip_mileage(
+            request.service_type,
+            request.airport_code,
+            location["input"],
+        )
+        mileage_price = price_range_for_miles(road_mileage.total_miles)
+        minimum_amount = mileage_price.minimum_amount
+        maximum_amount = mileage_price.maximum_amount
+        suggested_amount = mileage_price.suggested_amount
+        pricing_source = ROUTE_MILEAGE_PRICING_SOURCE
+        mileage_factors = {
+            "total_road_miles": str(road_mileage.total_miles.quantize(Decimal("0.1"))),
+            "distance_meters": str(road_mileage.distance_meters),
+            "base_route": "Rowland Heights → trip stops → Rowland Heights",
+        }
+    except RouteMileageUnavailable:
+        risk_flags.append("ROUTE_MILEAGE_UNAVAILABLE")
+        minimum_amount, maximum_amount = TEMPORARY_AIRPORT_RANGES[
+            request.airport_code.value
+        ]
+        suggested_amount = (minimum_amount + maximum_amount) / Decimal("2")
+        pricing_source = TEMPORARY_REFERENCE_PRICING_SOURCE
+        mileage_factors = {
+            "fallback_reason": "road mileage unavailable",
+            "fallback_scope": "airport reference only; replace with closed-loop mileage",
+        }
 
     manual_review_required = bool(risk_flags)
-    minimum_amount, maximum_amount = DEVELOPMENT_MOCK_RANGES[request.airport_code.value]
-    suggested_amount = (minimum_amount + maximum_amount) / Decimal("2")
-    if long_distance_route:
-        minimum_amount = None
-        maximum_amount = None
-        suggested_amount = None
     if manual_review_required:
         status = QuoteEstimateStatus.MANUAL_REVIEW_REQUIRED
-        vehicle_assessment = _manual_vehicle_assessment(request, not location_is_sufficient)
+        vehicle_assessment = _manual_vehicle_assessment(request)
         notices = [
             "Jason will review your trip details and confirm the fare.",
         ]
@@ -113,13 +133,13 @@ def create_quote_estimate(
         estimated_max_amount=maximum_amount,
         suggested_amount=suggested_amount,
         currency_code="USD",
-        pricing_source=DEVELOPMENT_PRICING_SOURCE,
-        pricing_rule_version="development_mock_v1",
+        pricing_source=pricing_source,
+        pricing_rule_version="round_trip_mileage_v1",
         pricing_factors={
             "airport_code": request.airport_code.value,
             "pricing_zone": location["pricing_zone"],
             "service_type": request.service_type.value,
-            "location_quality": "sufficient" if location_is_sufficient else "insufficient",
+            **mileage_factors,
         },
         vehicle_assessment=vehicle_assessment.value,
         risk_flags=risk_flags,
@@ -144,15 +164,12 @@ def create_quote_estimate(
     customer_notices = (
         notices
         if customer_price_available
-        else [_customer_fare_review_notice(location_is_sufficient)]
+        else [_customer_fare_review_notice()]
     )
     return QuoteEstimateResponse(
         estimate_id=estimate.id,
         status=QuoteEstimateStatus(estimate.status),
         route_summary=estimate.route_summary,
-        # Keep development figures as an internal recommendation, but never
-        # expose a numeric route fare to a customer with an insufficient end
-        # location.  The persisted estimate remains available to Jason.
         estimated_min_amount=(estimate.estimated_min_amount if customer_price_available else None),
         estimated_max_amount=(estimate.estimated_max_amount if customer_price_available else None),
         currency_code="USD",
@@ -171,23 +188,19 @@ def customer_numeric_fare_is_available(
 ) -> bool:
     """Apply the single customer-facing fare-display policy.
 
-    Development mock numbers are Jason-only planning guidance.  A future
-    route-based/approved pricing source can be displayed without changing this
-    policy, subject to the existing location eligibility check.
+    Only an actual road-mileage calculation can show a customer fare.
     """
 
-    if pricing_source == DEVELOPMENT_PRICING_SOURCE:
-        return False
-    return UNKNOWN_LOCATION not in (risk_flags or [])
-
-
-def _customer_fare_review_notice(location_is_sufficient: bool) -> str:
-    if not location_is_sufficient:
-        return "Jason needs the exact pickup/drop-off location to confirm the fare."
+    if pricing_source == TEMPORARY_REFERENCE_PRICING_SOURCE:
+        return True
     return (
-        "Jason will review the exact route, pickup time, luggage, and availability "
-        "before confirming the fare."
+        pricing_source == ROUTE_MILEAGE_PRICING_SOURCE
+        and "ROUTE_MILEAGE_UNAVAILABLE" not in (risk_flags or [])
     )
+
+
+def _customer_fare_review_notice() -> str:
+    return "Road mileage is temporarily unavailable. Jason will confirm the fare."
 
 
 def _build_route_summary(request: QuoteEstimateCreate, location_name: str) -> str:
@@ -208,18 +221,6 @@ def _risk_flags(request: QuoteEstimateCreate) -> list[str]:
     return flags
 
 
-def _is_long_distance_location(location_input: str) -> bool:
-    """Return whether the customer location requires custom long-distance pricing."""
-
-    normalized = " ".join(location_input.casefold().replace(",", " ").split())
-    suffixes = (" ca", " california", " nv", " nevada")
-    for suffix in suffixes:
-        if normalized.endswith(suffix):
-            normalized = normalized[: -len(suffix)]
-            break
-    return normalized in LONG_DISTANCE_LOCATIONS
-
-
 def _passenger_count_values(request: QuoteEstimateCreate) -> tuple[int, bool]:
     if request.passenger_count == PassengerCount.FIVE_PLUS:
         return 5, True
@@ -234,10 +235,7 @@ def _luggage_count_values(request: QuoteEstimateCreate) -> tuple[int, bool]:
 
 def _manual_vehicle_assessment(
     request: QuoteEstimateCreate,
-    unknown_location: bool,
 ) -> QuoteVehicleAssessment:
     if request.passenger_count == PassengerCount.FIVE_PLUS:
         return QuoteVehicleAssessment.NOT_RECOMMENDED
-    if unknown_location:
-        return QuoteVehicleAssessment.INSUFFICIENT_INFORMATION
     return QuoteVehicleAssessment.NEEDS_CONFIRMATION
