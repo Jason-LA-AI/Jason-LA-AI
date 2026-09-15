@@ -1223,6 +1223,16 @@
         }
       }
     },
+    "rowlandheights": {
+      "destination": "Rowland Heights",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 76.2,
+          "airport_dropoff_miles": 76.2
+        }
+      }
+    },
     "lasvegas": {
       "destination": "Las Vegas",
       "category": "SPECIAL_DESTINATION",

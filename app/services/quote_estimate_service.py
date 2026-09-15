@@ -26,7 +26,7 @@ from app.services.route_pricing import (
     GOOGLE_ROUTES_PRICING_SOURCE,
     RouteMileageUnavailable,
     get_round_trip_mileage,
-    price_range_for_miles,
+    price_range_for_route,
 )
 
 
@@ -66,7 +66,11 @@ def create_quote_estimate(
             request.airport_code,
             location_name,
         )
-        mileage_price = price_range_for_miles(road_mileage.total_miles)
+        mileage_price = price_range_for_route(
+            road_mileage.total_miles,
+            request.airport_code.value,
+            road_mileage.reference_destination,
+        )
         minimum_amount = mileage_price.minimum_amount
         maximum_amount = mileage_price.maximum_amount
         suggested_amount = mileage_price.suggested_amount

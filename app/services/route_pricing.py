@@ -23,6 +23,15 @@ HIGH_RATE_PER_MILE = Decimal("1.50")
 CITY_MILEAGE_ARCHIVE_PRICING_SOURCE = "city_mileage_archive_v1"
 GOOGLE_ROUTES_PRICING_SOURCE = "google_routes_mileage_v1"
 
+# Jason's confirmed, closer-to-close planning ranges for the most common
+# long-distance LAX trips.  They deliberately replace the broad $1.00–$1.50
+# per-mile band only for these named LAX destinations.
+LAX_DESTINATION_PRICE_OVERRIDES: dict[str, tuple[Decimal, Decimal]] = {
+    "Las Vegas": (Decimal("450"), Decimal("600")),
+    "UC San Diego": (Decimal("240"), Decimal("300")),
+    "San Francisco": (Decimal("850"), Decimal("1000")),
+}
+
 AIRPORT_ADDRESSES = {
     "LAX": "Los Angeles International Airport, 1 World Way, Los Angeles, CA 90045",
     "ONT": "Ontario International Airport, Ontario, CA 91761",
@@ -143,6 +152,34 @@ def price_range_for_miles(total_miles: Decimal) -> MileagePriceRange:
     # A quote never rounds down below the mileage rule.
     minimum = minimum.quantize(Decimal("1"), rounding=ROUND_UP)
     maximum = maximum.quantize(Decimal("1"), rounding=ROUND_UP)
+    return MileagePriceRange(
+        minimum_amount=minimum,
+        maximum_amount=maximum,
+        suggested_amount=(minimum + maximum) / Decimal("2"),
+    )
+
+
+def price_range_for_route(
+    total_miles: Decimal,
+    airport_code: str,
+    reference_destination: str | None,
+) -> MileagePriceRange:
+    """Return a confirmed destination range or the standard mileage range.
+
+    The overrides are intentionally limited to archive-matched LAX reference
+    destinations.  Every other route retains Jason's $80 minimum and
+    $1.00–$1.50 closed-loop road-mile rule.
+    """
+
+    confirmed_range = (
+        LAX_DESTINATION_PRICE_OVERRIDES.get(reference_destination)
+        if airport_code == "LAX"
+        else None
+    )
+    if confirmed_range is None:
+        return price_range_for_miles(total_miles)
+
+    minimum, maximum = confirmed_range
     return MileagePriceRange(
         minimum_amount=minimum,
         maximum_amount=maximum,

@@ -53,6 +53,9 @@ LOS_ANGELES_COUNTY_CITIES = (
 # Public landmark/city reference points requested by Jason. These points are
 # deliberately venue/city centers, not customer street addresses.
 SPECIAL_DESTINATIONS = {
+    # Rowland Heights is the base and an unincorporated community, so it is
+    # explicitly included even though the main city list is incorporated only.
+    "Rowland Heights": (-117.9053, 33.9761),
     "Las Vegas": (-115.1728, 36.1147),
     "UC San Diego": (-117.2340, 32.8801),
     "San Francisco": (-122.4194, 37.7749),

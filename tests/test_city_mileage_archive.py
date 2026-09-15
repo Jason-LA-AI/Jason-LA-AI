@@ -23,6 +23,16 @@ def test_ucsd_alias_uses_the_requested_special_destination() -> None:
     assert result.total_miles == Decimal("247.0")
 
 
+def test_rowland_heights_uses_the_precomputed_lax_loop() -> None:
+    result = lookup_archived_mileage(
+        service_type="AIRPORT_PICKUP", airport_code="LAX", location="Rowland Heights"
+    )
+
+    assert result is not None
+    assert result.destination == "Rowland Heights"
+    assert result.total_miles == Decimal("76.2")
+
+
 def test_avalon_has_no_drivable_archive_route() -> None:
     assert lookup_archived_mileage(
         service_type="AIRPORT_PICKUP", airport_code="LAX", location="Avalon"
