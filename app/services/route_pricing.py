@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 import requests
 
 from app.config.settings import settings
+from app.services.city_mileage_archive import lookup_archived_mileage
 
 if TYPE_CHECKING:
     from app.schemas.quote_estimate import QuoteAirportCode, QuoteServiceType
@@ -19,6 +20,8 @@ METERS_PER_MILE = Decimal("1609.344")
 MINIMUM_FARE = Decimal("80")
 LOW_RATE_PER_MILE = Decimal("1.00")
 HIGH_RATE_PER_MILE = Decimal("1.50")
+CITY_MILEAGE_ARCHIVE_PRICING_SOURCE = "city_mileage_archive_v1"
+GOOGLE_ROUTES_PRICING_SOURCE = "google_routes_mileage_v1"
 
 AIRPORT_ADDRESSES = {
     "LAX": "Los Angeles International Airport, 1 World Way, Los Angeles, CA 90045",
@@ -39,6 +42,8 @@ class RouteMileage:
 
     total_miles: Decimal
     distance_meters: int
+    pricing_source: str = GOOGLE_ROUTES_PRICING_SOURCE
+    reference_destination: str | None = None
 
 
 @dataclass(frozen=True)
@@ -60,6 +65,19 @@ def get_round_trip_mileage(
     Airport pickup: base → airport → customer → base.
     Airport dropoff: base → customer → airport → base.
     """
+
+    archived_mileage = lookup_archived_mileage(
+        service_type=service_type.value,
+        airport_code=airport_code.value,
+        location=customer_location,
+    )
+    if archived_mileage is not None:
+        return RouteMileage(
+            total_miles=archived_mileage.total_miles,
+            distance_meters=int(archived_mileage.total_miles * METERS_PER_MILE),
+            pricing_source=CITY_MILEAGE_ARCHIVE_PRICING_SOURCE,
+            reference_destination=archived_mileage.destination,
+        )
 
     api_key = settings.google_maps_api_key
     if not api_key:
@@ -110,6 +128,7 @@ def get_round_trip_mileage(
     return RouteMileage(
         total_miles=Decimal(distance_meters) / METERS_PER_MILE,
         distance_meters=distance_meters,
+        pricing_source=GOOGLE_ROUTES_PRICING_SOURCE,
     )
 
 

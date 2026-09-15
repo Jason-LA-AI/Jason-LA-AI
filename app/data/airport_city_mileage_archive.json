@@ -1,0 +1,1276 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-09-15T00:10:12.228444+00:00",
+  "coverage": "Los Angeles County incorporated cities plus requested special destinations",
+  "reference_route": "Rowland Heights city center → airport → destination center → Rowland Heights city center",
+  "source": "Public city-center coordinates plus OpenStreetMap road routing. Refresh with Google Maps Routes before relying on a material fare change.",
+  "profiles": {
+    "agourahills": {
+      "destination": "Agoura Hills",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 133.2,
+          "airport_dropoff_miles": 134.5
+        },
+        "ONT": {
+          "airport_pickup_miles": 156.6,
+          "airport_dropoff_miles": 158.3
+        }
+      }
+    },
+    "alhambra": {
+      "destination": "Alhambra",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 84.8,
+          "airport_dropoff_miles": 80.4
+        },
+        "ONT": {
+          "airport_pickup_miles": 76.6,
+          "airport_dropoff_miles": 76.7
+        }
+      }
+    },
+    "arcadia": {
+      "destination": "Arcadia",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 94.4,
+          "airport_dropoff_miles": 90.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 73.9,
+          "airport_dropoff_miles": 73.3
+        }
+      }
+    },
+    "artesia": {
+      "destination": "Artesia",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.1,
+          "airport_dropoff_miles": 78.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 76.5,
+          "airport_dropoff_miles": 77.0
+        }
+      }
+    },
+    "azusa": {
+      "destination": "Azusa",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 91.8,
+          "airport_dropoff_miles": 91.3
+        },
+        "ONT": {
+          "airport_pickup_miles": 58.5,
+          "airport_dropoff_miles": 58.7
+        }
+      }
+    },
+    "baldwinpark": {
+      "destination": "Baldwin Park",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 87.5,
+          "airport_dropoff_miles": 86.8
+        },
+        "ONT": {
+          "airport_pickup_miles": 62.1,
+          "airport_dropoff_miles": 62.2
+        }
+      }
+    },
+    "bell": {
+      "destination": "Bell",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 81.7,
+          "airport_dropoff_miles": 80.9
+        },
+        "ONT": {
+          "airport_pickup_miles": 88.0,
+          "airport_dropoff_miles": 88.5
+        }
+      }
+    },
+    "bellgardens": {
+      "destination": "Bell Gardens",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.6,
+          "airport_dropoff_miles": 78.2
+        },
+        "ONT": {
+          "airport_pickup_miles": 85.3,
+          "airport_dropoff_miles": 85.7
+        }
+      }
+    },
+    "bellflower": {
+      "destination": "Bellflower",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 80.5,
+          "airport_dropoff_miles": 80.7
+        },
+        "ONT": {
+          "airport_pickup_miles": 85.8,
+          "airport_dropoff_miles": 86.3
+        }
+      }
+    },
+    "beverlyhills": {
+      "destination": "Beverly Hills",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 85.0,
+          "airport_dropoff_miles": 82.2
+        },
+        "ONT": {
+          "airport_pickup_miles": 107.9,
+          "airport_dropoff_miles": 108.3
+        }
+      }
+    },
+    "bradbury": {
+      "destination": "Bradbury",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 97.7,
+          "airport_dropoff_miles": 97.1
+        },
+        "ONT": {
+          "airport_pickup_miles": 71.5,
+          "airport_dropoff_miles": 71.4
+        }
+      }
+    },
+    "burbank": {
+      "destination": "Burbank",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 102.0,
+          "airport_dropoff_miles": 100.2
+        },
+        "ONT": {
+          "airport_pickup_miles": 105.9,
+          "airport_dropoff_miles": 106.1
+        }
+      }
+    },
+    "calabasas": {
+      "destination": "Calabasas",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 121.8,
+          "airport_dropoff_miles": 123.1
+        },
+        "ONT": {
+          "airport_pickup_miles": 145.3,
+          "airport_dropoff_miles": 147.0
+        }
+      }
+    },
+    "carson": {
+      "destination": "Carson",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 85.6,
+          "airport_dropoff_miles": 82.5
+        },
+        "ONT": {
+          "airport_pickup_miles": 108.8,
+          "airport_dropoff_miles": 104.2
+        }
+      }
+    },
+    "cerritos": {
+      "destination": "Cerritos",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.7,
+          "airport_dropoff_miles": 78.7
+        },
+        "ONT": {
+          "airport_pickup_miles": 76.5,
+          "airport_dropoff_miles": 76.7
+        }
+      }
+    },
+    "claremont": {
+      "destination": "Claremont",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 106.5,
+          "airport_dropoff_miles": 106.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 51.2,
+          "airport_dropoff_miles": 51.2
+        }
+      }
+    },
+    "commerce": {
+      "destination": "Commerce",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 79.3,
+          "airport_dropoff_miles": 78.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 79.2,
+          "airport_dropoff_miles": 79.7
+        }
+      }
+    },
+    "compton": {
+      "destination": "Compton",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 79.9,
+          "airport_dropoff_miles": 77.4
+        },
+        "ONT": {
+          "airport_pickup_miles": 99.7,
+          "airport_dropoff_miles": 95.0
+        }
+      }
+    },
+    "covina": {
+      "destination": "Covina",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 87.5,
+          "airport_dropoff_miles": 87.1
+        },
+        "ONT": {
+          "airport_pickup_miles": 55.4,
+          "airport_dropoff_miles": 55.5
+        }
+      }
+    },
+    "cudahy": {
+      "destination": "Cudahy",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 79.8,
+          "airport_dropoff_miles": 78.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 89.6,
+          "airport_dropoff_miles": 90.0
+        }
+      }
+    },
+    "culvercity": {
+      "destination": "Culver City",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 76.4,
+          "airport_dropoff_miles": 75.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 107.7,
+          "airport_dropoff_miles": 108.2
+        }
+      }
+    },
+    "diamondbar": {
+      "destination": "Diamond Bar",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 89.5,
+          "airport_dropoff_miles": 89.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 46.3,
+          "airport_dropoff_miles": 46.0
+        }
+      }
+    },
+    "downey": {
+      "destination": "Downey",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.1,
+          "airport_dropoff_miles": 77.2
+        },
+        "ONT": {
+          "airport_pickup_miles": 81.7,
+          "airport_dropoff_miles": 82.1
+        }
+      }
+    },
+    "duarte": {
+      "destination": "Duarte",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 96.3,
+          "airport_dropoff_miles": 95.7
+        },
+        "ONT": {
+          "airport_pickup_miles": 70.1,
+          "airport_dropoff_miles": 69.9
+        }
+      }
+    },
+    "elmonte": {
+      "destination": "El Monte",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 85.7,
+          "airport_dropoff_miles": 80.8
+        },
+        "ONT": {
+          "airport_pickup_miles": 66.3,
+          "airport_dropoff_miles": 65.4
+        }
+      }
+    },
+    "elsegundo": {
+      "destination": "El Segundo",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 79.6,
+          "airport_dropoff_miles": 80.3
+        },
+        "ONT": {
+          "airport_pickup_miles": 117.5,
+          "airport_dropoff_miles": 117.9
+        }
+      }
+    },
+    "gardena": {
+      "destination": "Gardena",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 80.8,
+          "airport_dropoff_miles": 81.2
+        },
+        "ONT": {
+          "airport_pickup_miles": 106.2,
+          "airport_dropoff_miles": 106.6
+        }
+      }
+    },
+    "glendale": {
+      "destination": "Glendale",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 99.4,
+          "airport_dropoff_miles": 95.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 103.3,
+          "airport_dropoff_miles": 103.5
+        }
+      }
+    },
+    "glendora": {
+      "destination": "Glendora",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 99.5,
+          "airport_dropoff_miles": 99.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 60.8,
+          "airport_dropoff_miles": 60.8
+        }
+      }
+    },
+    "hawaiiangardens": {
+      "destination": "Hawaiian Gardens",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 82.1,
+          "airport_dropoff_miles": 82.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 81.1,
+          "airport_dropoff_miles": 81.4
+        }
+      }
+    },
+    "hawthorne": {
+      "destination": "Hawthorne",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.6,
+          "airport_dropoff_miles": 77.8
+        },
+        "ONT": {
+          "airport_pickup_miles": 109.2,
+          "airport_dropoff_miles": 109.6
+        }
+      }
+    },
+    "hermosabeach": {
+      "destination": "Hermosa Beach",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 84.2,
+          "airport_dropoff_miles": 79.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 119.7,
+          "airport_dropoff_miles": 115.1
+        }
+      }
+    },
+    "hiddenhills": {
+      "destination": "Hidden Hills",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 118.7,
+          "airport_dropoff_miles": 120.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 142.1,
+          "airport_dropoff_miles": 143.8
+        }
+      }
+    },
+    "huntingtonpark": {
+      "destination": "Huntington Park",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.9,
+          "airport_dropoff_miles": 79.1
+        },
+        "ONT": {
+          "airport_pickup_miles": 89.4,
+          "airport_dropoff_miles": 89.9
+        }
+      }
+    },
+    "cityofindustry": {
+      "destination": "City of Industry",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.7,
+          "airport_dropoff_miles": 78.2
+        },
+        "ONT": {
+          "airport_pickup_miles": 53.2,
+          "airport_dropoff_miles": 53.7
+        }
+      }
+    },
+    "inglewood": {
+      "destination": "Inglewood",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 77.8,
+          "airport_dropoff_miles": 77.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 111.9,
+          "airport_dropoff_miles": 112.4
+        }
+      }
+    },
+    "irwindale": {
+      "destination": "Irwindale",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 88.5,
+          "airport_dropoff_miles": 88.8
+        },
+        "ONT": {
+          "airport_pickup_miles": 60.2,
+          "airport_dropoff_miles": 60.2
+        }
+      }
+    },
+    "lacanadaflintridge": {
+      "destination": "La Cañada Flintridge",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 104.7,
+          "airport_dropoff_miles": 95.1
+        },
+        "ONT": {
+          "airport_pickup_miles": 100.9,
+          "airport_dropoff_miles": 95.4
+        }
+      }
+    },
+    "lahabraheights": {
+      "destination": "La Habra Heights",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 71.9,
+          "airport_dropoff_miles": 71.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 50.8,
+          "airport_dropoff_miles": 50.8
+        }
+      }
+    },
+    "lamirada": {
+      "destination": "La Mirada",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 74.4,
+          "airport_dropoff_miles": 73.9
+        },
+        "ONT": {
+          "airport_pickup_miles": 63.5,
+          "airport_dropoff_miles": 63.5
+        }
+      }
+    },
+    "lapuente": {
+      "destination": "La Puente",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 80.7,
+          "airport_dropoff_miles": 80.5
+        },
+        "ONT": {
+          "airport_pickup_miles": 53.6,
+          "airport_dropoff_miles": 54.0
+        }
+      }
+    },
+    "laverne": {
+      "destination": "La Verne",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 104.7,
+          "airport_dropoff_miles": 104.1
+        },
+        "ONT": {
+          "airport_pickup_miles": 55.3,
+          "airport_dropoff_miles": 55.0
+        }
+      }
+    },
+    "lakewood": {
+      "destination": "Lakewood",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 86.0,
+          "airport_dropoff_miles": 80.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 91.5,
+          "airport_dropoff_miles": 86.8
+        }
+      }
+    },
+    "lancaster": {
+      "destination": "Lancaster",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 205.3,
+          "airport_dropoff_miles": 204.4
+        },
+        "ONT": {
+          "airport_pickup_miles": 196.1,
+          "airport_dropoff_miles": 195.9
+        }
+      }
+    },
+    "lawndale": {
+      "destination": "Lawndale",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 81.7,
+          "airport_dropoff_miles": 81.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 113.4,
+          "airport_dropoff_miles": 113.9
+        }
+      }
+    },
+    "lomita": {
+      "destination": "Lomita",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 93.0,
+          "airport_dropoff_miles": 87.7
+        },
+        "ONT": {
+          "airport_pickup_miles": 121.8,
+          "airport_dropoff_miles": 117.1
+        }
+      }
+    },
+    "longbeach": {
+      "destination": "Long Beach",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 94.0,
+          "airport_dropoff_miles": 90.2
+        },
+        "ONT": {
+          "airport_pickup_miles": 107.3,
+          "airport_dropoff_miles": 105.9
+        }
+      }
+    },
+    "losangeles": {
+      "destination": "Los Angeles",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.0,
+          "airport_dropoff_miles": 78.1
+        },
+        "ONT": {
+          "airport_pickup_miles": 93.4,
+          "airport_dropoff_miles": 93.8
+        }
+      }
+    },
+    "lynwood": {
+      "destination": "Lynwood",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 77.1,
+          "airport_dropoff_miles": 77.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 91.3,
+          "airport_dropoff_miles": 91.7
+        }
+      }
+    },
+    "malibu": {
+      "destination": "Malibu",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 111.9,
+          "airport_dropoff_miles": 111.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 142.8,
+          "airport_dropoff_miles": 143.3
+        }
+      }
+    },
+    "manhattanbeach": {
+      "destination": "Manhattan Beach",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 82.3,
+          "airport_dropoff_miles": 77.5
+        },
+        "ONT": {
+          "airport_pickup_miles": 119.9,
+          "airport_dropoff_miles": 115.2
+        }
+      }
+    },
+    "maywood": {
+      "destination": "Maywood",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.3,
+          "airport_dropoff_miles": 81.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 83.7,
+          "airport_dropoff_miles": 84.2
+        }
+      }
+    },
+    "monrovia": {
+      "destination": "Monrovia",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 99.2,
+          "airport_dropoff_miles": 98.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 73.0,
+          "airport_dropoff_miles": 72.9
+        }
+      }
+    },
+    "montebello": {
+      "destination": "Montebello",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.4,
+          "airport_dropoff_miles": 78.5
+        },
+        "ONT": {
+          "airport_pickup_miles": 72.6,
+          "airport_dropoff_miles": 73.0
+        }
+      }
+    },
+    "montereypark": {
+      "destination": "Monterey Park",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.6,
+          "airport_dropoff_miles": 77.7
+        },
+        "ONT": {
+          "airport_pickup_miles": 74.1,
+          "airport_dropoff_miles": 74.5
+        }
+      }
+    },
+    "norwalk": {
+      "destination": "Norwalk",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 74.3,
+          "airport_dropoff_miles": 72.5
+        },
+        "ONT": {
+          "airport_pickup_miles": 75.6,
+          "airport_dropoff_miles": 74.5
+        }
+      }
+    },
+    "palmdale": {
+      "destination": "Palmdale",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 190.0,
+          "airport_dropoff_miles": 189.1
+        },
+        "ONT": {
+          "airport_pickup_miles": 175.2,
+          "airport_dropoff_miles": 175.0
+        }
+      }
+    },
+    "palosverdesestates": {
+      "destination": "Palos Verdes Estates",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 92.5,
+          "airport_dropoff_miles": 87.8
+        },
+        "ONT": {
+          "airport_pickup_miles": 127.3,
+          "airport_dropoff_miles": 122.6
+        }
+      }
+    },
+    "paramount": {
+      "destination": "Paramount",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.3,
+          "airport_dropoff_miles": 78.4
+        },
+        "ONT": {
+          "airport_pickup_miles": 87.8,
+          "airport_dropoff_miles": 88.3
+        }
+      }
+    },
+    "pasadena": {
+      "destination": "Pasadena",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 95.6,
+          "airport_dropoff_miles": 85.8
+        },
+        "ONT": {
+          "airport_pickup_miles": 89.1,
+          "airport_dropoff_miles": 83.1
+        }
+      }
+    },
+    "picorivera": {
+      "destination": "Pico Rivera",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 76.6,
+          "airport_dropoff_miles": 77.8
+        },
+        "ONT": {
+          "airport_pickup_miles": 70.9,
+          "airport_dropoff_miles": 71.3
+        }
+      }
+    },
+    "pomona": {
+      "destination": "Pomona",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 99.6,
+          "airport_dropoff_miles": 99.1
+        },
+        "ONT": {
+          "airport_pickup_miles": 47.4,
+          "airport_dropoff_miles": 47.6
+        }
+      }
+    },
+    "ranchopalosverdes": {
+      "destination": "Rancho Palos Verdes",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 95.2,
+          "airport_dropoff_miles": 90.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 126.8,
+          "airport_dropoff_miles": 122.1
+        }
+      }
+    },
+    "redondobeach": {
+      "destination": "Redondo Beach",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 88.1,
+          "airport_dropoff_miles": 83.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 123.1,
+          "airport_dropoff_miles": 118.5
+        }
+      }
+    },
+    "rollinghills": {
+      "destination": "Rolling Hills",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 100.2,
+          "airport_dropoff_miles": 94.9
+        },
+        "ONT": {
+          "airport_pickup_miles": 130.1,
+          "airport_dropoff_miles": 125.5
+        }
+      }
+    },
+    "rollinghillsestates": {
+      "destination": "Rolling Hills Estates",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 96.0,
+          "airport_dropoff_miles": 91.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 127.8,
+          "airport_dropoff_miles": 123.2
+        }
+      }
+    },
+    "rosemead": {
+      "destination": "Rosemead",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 81.9,
+          "airport_dropoff_miles": 78.3
+        },
+        "ONT": {
+          "airport_pickup_miles": 69.0,
+          "airport_dropoff_miles": 68.5
+        }
+      }
+    },
+    "sandimas": {
+      "destination": "San Dimas",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 98.1,
+          "airport_dropoff_miles": 95.7
+        },
+        "ONT": {
+          "airport_pickup_miles": 53.0,
+          "airport_dropoff_miles": 52.4
+        }
+      }
+    },
+    "sanfernando": {
+      "destination": "San Fernando",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 112.2,
+          "airport_dropoff_miles": 111.4
+        },
+        "ONT": {
+          "airport_pickup_miles": 127.3,
+          "airport_dropoff_miles": 127.4
+        }
+      }
+    },
+    "sangabriel": {
+      "destination": "San Gabriel",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 87.6,
+          "airport_dropoff_miles": 83.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 74.1,
+          "airport_dropoff_miles": 74.1
+        }
+      }
+    },
+    "sanmarino": {
+      "destination": "San Marino",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 85.9,
+          "airport_dropoff_miles": 82.2
+        },
+        "ONT": {
+          "airport_pickup_miles": 76.8,
+          "airport_dropoff_miles": 76.8
+        }
+      }
+    },
+    "santaclarita": {
+      "destination": "Santa Clarita",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 143.0,
+          "airport_dropoff_miles": 142.1
+        },
+        "ONT": {
+          "airport_pickup_miles": 161.1,
+          "airport_dropoff_miles": 161.3
+        }
+      }
+    },
+    "santafesprings": {
+      "destination": "Santa Fe Springs",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 77.4,
+          "airport_dropoff_miles": 77.9
+        },
+        "ONT": {
+          "airport_pickup_miles": 75.2,
+          "airport_dropoff_miles": 75.6
+        }
+      }
+    },
+    "santamonica": {
+      "destination": "Santa Monica",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 84.4,
+          "airport_dropoff_miles": 83.5
+        },
+        "ONT": {
+          "airport_pickup_miles": 115.3,
+          "airport_dropoff_miles": 115.8
+        }
+      }
+    },
+    "sierramadre": {
+      "destination": "Sierra Madre",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 97.9,
+          "airport_dropoff_miles": 93.7
+        },
+        "ONT": {
+          "airport_pickup_miles": 80.6,
+          "airport_dropoff_miles": 80.5
+        }
+      }
+    },
+    "signalhill": {
+      "destination": "Signal Hill",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 89.4,
+          "airport_dropoff_miles": 89.3
+        },
+        "ONT": {
+          "airport_pickup_miles": 104.3,
+          "airport_dropoff_miles": 105.0
+        }
+      }
+    },
+    "southelmonte": {
+      "destination": "South El Monte",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 80.8,
+          "airport_dropoff_miles": 77.7
+        },
+        "ONT": {
+          "airport_pickup_miles": 64.8,
+          "airport_dropoff_miles": 64.2
+        }
+      }
+    },
+    "southgate": {
+      "destination": "South Gate",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 79.5,
+          "airport_dropoff_miles": 77.7
+        },
+        "ONT": {
+          "airport_pickup_miles": 92.2,
+          "airport_dropoff_miles": 92.6
+        }
+      }
+    },
+    "southpasadena": {
+      "destination": "South Pasadena",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 85.6,
+          "airport_dropoff_miles": 81.7
+        },
+        "ONT": {
+          "airport_pickup_miles": 81.9,
+          "airport_dropoff_miles": 82.0
+        }
+      }
+    },
+    "templecity": {
+      "destination": "Temple City",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 88.7,
+          "airport_dropoff_miles": 83.8
+        },
+        "ONT": {
+          "airport_pickup_miles": 72.0,
+          "airport_dropoff_miles": 70.8
+        }
+      }
+    },
+    "torrance": {
+      "destination": "Torrance",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 87.4,
+          "airport_dropoff_miles": 82.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 114.7,
+          "airport_dropoff_miles": 110.1
+        }
+      }
+    },
+    "vernon": {
+      "destination": "Vernon",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 79.3,
+          "airport_dropoff_miles": 79.7
+        },
+        "ONT": {
+          "airport_pickup_miles": 87.5,
+          "airport_dropoff_miles": 88.0
+        }
+      }
+    },
+    "walnut": {
+      "destination": "Walnut",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 85.1,
+          "airport_dropoff_miles": 84.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 46.7,
+          "airport_dropoff_miles": 47.5
+        }
+      }
+    },
+    "westcovina": {
+      "destination": "West Covina",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 82.9,
+          "airport_dropoff_miles": 82.8
+        },
+        "ONT": {
+          "airport_pickup_miles": 54.7,
+          "airport_dropoff_miles": 54.4
+        }
+      }
+    },
+    "westhollywood": {
+      "destination": "West Hollywood",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 82.4,
+          "airport_dropoff_miles": 81.5
+        },
+        "ONT": {
+          "airport_pickup_miles": 103.5,
+          "airport_dropoff_miles": 103.6
+        }
+      }
+    },
+    "westlakevillage": {
+      "destination": "Westlake Village",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 140.8,
+          "airport_dropoff_miles": 142.1
+        },
+        "ONT": {
+          "airport_pickup_miles": 164.3,
+          "airport_dropoff_miles": 166.0
+        }
+      }
+    },
+    "whittier": {
+      "destination": "Whittier",
+      "category": "LA_COUNTY_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 81.5,
+          "airport_dropoff_miles": 78.6
+        },
+        "ONT": {
+          "airport_pickup_miles": 71.9,
+          "airport_dropoff_miles": 68.2
+        }
+      }
+    },
+    "lasvegas": {
+      "destination": "Las Vegas",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 569.7,
+          "airport_dropoff_miles": 569.5
+        },
+        "ONT": {
+          "airport_pickup_miles": 499.3,
+          "airport_dropoff_miles": 499.4
+        }
+      }
+    },
+    "ucsandiego": {
+      "destination": "UC San Diego",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 247.5,
+          "airport_dropoff_miles": 247.0
+        },
+        "ONT": {
+          "airport_pickup_miles": 223.2,
+          "airport_dropoff_miles": 223.6
+        }
+      }
+    },
+    "sanfrancisco": {
+      "destination": "San Francisco",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 828.8,
+          "airport_dropoff_miles": 827.9
+        },
+        "ONT": {
+          "airport_pickup_miles": 846.8,
+          "airport_dropoff_miles": 847.1
+        }
+      }
+    },
+    "avalon": {
+      "destination": "Avalon",
+      "category": "LA_COUNTY_CITY",
+      "route_available": false,
+      "manual_review_reason": "No drivable road connection from the mainland.",
+      "airports": {}
+    }
+  }
+}

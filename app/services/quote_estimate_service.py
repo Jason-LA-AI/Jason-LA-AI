@@ -22,6 +22,8 @@ from app.services.location_normalizer import (
     normalize_location,
 )
 from app.services.route_pricing import (
+    CITY_MILEAGE_ARCHIVE_PRICING_SOURCE,
+    GOOGLE_ROUTES_PRICING_SOURCE,
     RouteMileageUnavailable,
     get_round_trip_mileage,
     price_range_for_miles,
@@ -29,7 +31,7 @@ from app.services.route_pricing import (
 
 
 LOS_ANGELES_TIMEZONE = ZoneInfo("America/Los_Angeles")
-ROUTE_MILEAGE_PRICING_SOURCE = "google_routes_mileage_v1"
+ROUTE_MILEAGE_PRICING_SOURCE = GOOGLE_ROUTES_PRICING_SOURCE
 TEMPORARY_REFERENCE_PRICING_SOURCE = "temporary_airport_reference_v1"
 
 # Emergency customer-facing fallback until the road-mileage archive or Maps
@@ -62,17 +64,18 @@ def create_quote_estimate(
         road_mileage = get_round_trip_mileage(
             request.service_type,
             request.airport_code,
-            location["input"],
+            location_name,
         )
         mileage_price = price_range_for_miles(road_mileage.total_miles)
         minimum_amount = mileage_price.minimum_amount
         maximum_amount = mileage_price.maximum_amount
         suggested_amount = mileage_price.suggested_amount
-        pricing_source = ROUTE_MILEAGE_PRICING_SOURCE
+        pricing_source = road_mileage.pricing_source
         mileage_factors = {
             "total_road_miles": str(road_mileage.total_miles.quantize(Decimal("0.1"))),
             "distance_meters": str(road_mileage.distance_meters),
             "base_route": "Rowland Heights → trip stops → Rowland Heights",
+            "reference_destination": road_mileage.reference_destination,
         }
     except RouteMileageUnavailable:
         risk_flags.append("ROUTE_MILEAGE_UNAVAILABLE")
@@ -96,10 +99,17 @@ def create_quote_estimate(
     else:
         status = QuoteEstimateStatus.ESTIMATED
         vehicle_assessment = QuoteVehicleAssessment.LIKELY_COMFORTABLE
-        notices = [
-            "This is an estimated range.",
-            "Final price requires Jason confirmation.",
-        ]
+        notices = (
+            [
+                "This range is based on a precomputed city-center road route.",
+                "Final price requires Jason confirmation.",
+            ]
+            if pricing_source == CITY_MILEAGE_ARCHIVE_PRICING_SOURCE
+            else [
+                "This is an estimated range.",
+                "Final price requires Jason confirmation.",
+            ]
+        )
 
     passenger_count, passenger_count_is_minimum = _passenger_count_values(request)
     large_suitcase_count, large_suitcase_count_is_minimum = _luggage_count_values(request)
@@ -194,7 +204,10 @@ def customer_numeric_fare_is_available(
     if pricing_source == TEMPORARY_REFERENCE_PRICING_SOURCE:
         return True
     return (
-        pricing_source == ROUTE_MILEAGE_PRICING_SOURCE
+        pricing_source in {
+            ROUTE_MILEAGE_PRICING_SOURCE,
+            CITY_MILEAGE_ARCHIVE_PRICING_SOURCE,
+        }
         and "ROUTE_MILEAGE_UNAVAILABLE" not in (risk_flags or [])
     )
 
