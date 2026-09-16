@@ -118,6 +118,12 @@ def test_all_zip_only_inputs_require_fare_review(location: str) -> None:
         "DTLA",
         "Downtown LA",
         "Downtown Los Angeles",
+        "Brea",
+        "La Habra",
+        "Laguna Hills",
+        "Mission Viejo",
+        "Tustin",
+        "Orange",
         "Disneyland",
         "UCLA",
         "USC",
@@ -168,6 +174,10 @@ def test_safe_suggestion_requires_explicit_canonical_reestimate(
         "123 Main Street, Riverside, CA 92501",
         "123 Main Street, Rowland Heights, CA 91748",
         "random nonexistent location",
+        "Thousand Oaks",
+        "Oxnard",
+        "Ventura",
+        "Santa Barbara",
     ],
 )
 def test_unverified_addresses_and_unknown_places_require_fare_review(location: str) -> None:

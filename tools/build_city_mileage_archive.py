@@ -59,6 +59,15 @@ REQUESTED_CALIFORNIA_CITIES = (
     "Redlands", "Upland", "Anaheim", "Fullerton", "Buena Park",
     "Garden Grove", "Irvine", "Costa Mesa", "Newport Beach", "Laguna Beach",
     "Lake Forest", "Aliso Viejo", "Santa Ana",
+    # Approved Batch 2 runtime coverage.  These remain separate municipalities
+    # and must never be normalized through neighboring city profiles.
+    "Brea", "La Habra", "Laguna Hills", "Mission Viejo", "Tustin", "Orange",
+)
+
+# These have verified audit mileage but intentionally remain outside the
+# customer-facing runtime archive until long-distance calibration is approved.
+BATCH2_AUDIT_ONLY_CITIES = (
+    "Thousand Oaks", "Oxnard", "Ventura", "Santa Barbara",
 )
 
 # Public landmark/city reference points requested by Jason. These points are
