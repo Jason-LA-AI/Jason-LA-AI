@@ -10,7 +10,7 @@ import pytest
 
 from app.schemas.quote_estimate import QuoteEstimateCreate
 from app.services.city_mileage_archive import lookup_archived_mileage, supported_destinations
-from app.services.location_normalizer import UNKNOWN_LOCATION, normalize_location
+from app.services.location_normalizer import UNKNOWN_LOCATION, normalize_location, suggest_location
 from app.services.quote_estimate_service import (
     create_quote_estimate,
     customer_numeric_fare_is_available,
@@ -84,22 +84,63 @@ def test_full_requested_destination_matrix_has_lax_and_ont_road_legs() -> None:
     ("raw", "canonical"),
     [
         ("San Bernardino", "San Bernardino"),
-        ("san bernardino", "San Bernardino"),
-        ("sen bernardino", "San Bernardino"),
-        ("san bernadino", "San Bernardino"),
         ("Rancho Cucamonga", "Rancho Cucamonga"),
-        ("rancho cucamonga", "Rancho Cucamonga"),
-        ("rencho cucamonga", "Rancho Cucamonga"),
         ("Moreno Valley", "Moreno Valley"),
-        ("moreno valley", "Moreno Valley"),
         ("Rowland Heights", "Rowland Heights"),
-        ("rowland heights", "Rowland Heights"),
         ("Koreatown", "Koreatown"),
-        ("koreatown", "Koreatown"),
     ],
 )
-def test_explicit_safe_city_aliases_normalize(raw: str, canonical: str) -> None:
+def test_canonical_archive_locations_normalize_directly(raw: str, canonical: str) -> None:
     assert normalize_location(raw)["normalized_city"] == canonical
+
+
+@pytest.mark.parametrize(
+    ("raw", "canonical"),
+    [
+        ("DTLA", "Downtown Los Angeles"),
+        ("Downtown LA", "Downtown Los Angeles"),
+        ("Downtown Los Angeles", "Downtown Los Angeles"),
+        ("San Bernardino", "San Bernardino"),
+        ("San Bernadino", "San Bernardino"),
+        ("sen bernardino", "San Bernardino"),
+        ("Rancho Cucamonga", "Rancho Cucamonga"),
+        ("rencho cucamonga", "Rancho Cucamonga"),
+    ],
+)
+def test_explicit_safe_aliases_normalize_directly(
+    raw: str, canonical: str
+) -> None:
+    normalized = normalize_location(raw)
+
+    assert normalized["normalized_city"] == canonical
+    assert suggest_location(raw) is None
+
+
+@pytest.mark.parametrize(
+    ("raw", "canonical"),
+    [
+        ("Downtown", "Downtown Los Angeles"),
+        ("Disney", "Disneyland"),
+        ("Ontario Airport", "ONT"),
+        ("LA Airport", "LAX"),
+    ],
+)
+def test_curated_ambiguous_inputs_offer_click_to_confirm_suggestions(
+    raw: str, canonical: str
+) -> None:
+    suggestion = suggest_location(raw)
+
+    assert normalize_location(raw)["normalized_city"] is None
+    assert suggestion is not None
+    assert suggestion["canonical_location"] == canonical
+
+
+@pytest.mark.parametrize(
+    "raw",
+    ["91748", "90045", "123 Main Street, Riverside, CA 92501", "random nonexistent location"],
+)
+def test_zip_address_and_unknown_inputs_never_receive_city_downgrade_suggestions(raw: str) -> None:
+    assert suggest_location(raw) is None
 
 
 def test_invalid_city_is_not_fuzzy_matched_and_requires_review() -> None:

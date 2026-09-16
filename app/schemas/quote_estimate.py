@@ -100,6 +100,13 @@ class QuoteEstimateCreate(BaseModel):
         return value
 
 
+class LocationSuggestionResponse(BaseModel):
+    """An optional click-to-confirm replacement for a reviewed location."""
+
+    canonical_location: str
+    display_name: str
+
+
 class QuoteEstimateResponse(BaseModel):
     """Public estimate result returned to the structured quote page."""
 
@@ -113,4 +120,5 @@ class QuoteEstimateResponse(BaseModel):
     requires_jason_review: bool
     risk_flags: list[str] = Field(default_factory=list)
     notices: list[str] = Field(default_factory=list)
+    location_suggestion: LocationSuggestionResponse | None = None
     valid_until: datetime

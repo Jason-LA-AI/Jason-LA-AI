@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const state = { serviceType:null, airportCode:null, passengerCount:null, luggageCount:null, childSeat:null, oversizedItems:null, contactMethod:null, estimateId:null };
+  const state = { serviceType:null, airportCode:null, passengerCount:null, luggageCount:null, childSeat:null, oversizedItems:null, contactMethod:null, estimateId:null, locationSuggestion:null };
   const form = document.getElementById("quoteForm");
   if (!form) return;
   const continueButton = document.getElementById("continueButton");
@@ -88,6 +88,8 @@
     contactDetails.scrollIntoView({ behavior:"smooth", block:"start" });
     contactDetails.focus({ preventScroll:true });
   });
+  document.getElementById("useLocationSuggestionButton").addEventListener("click", rerunSuggestedLocation);
+  document.getElementById("keepOriginalLocationButton").addEventListener("click", keepOriginalLocation);
   form.querySelectorAll("[data-copy-contact]").forEach((button) => button.addEventListener("click", async () => {
     const label = button.dataset.copyLabel || "Contact information";
     const original = button.textContent;
@@ -165,12 +167,25 @@
     const fareReviewRequired = !hasRange;
     const fallbackFareReviewMessage = "Jason will review the exact route and confirm the fare.";
     const fareReviewMessage = !hasRange && Array.isArray(estimate.notices) && estimate.notices[0] ? estimate.notices[0] : fallbackFareReviewMessage;
+    state.locationSuggestion = fareReviewRequired ? estimate.location_suggestion || null : null;
     const range = document.getElementById("estimateRange"); range.textContent = hasRange ? `${formatUsd(estimate.estimated_min_amount)}–${formatUsd(estimate.estimated_max_amount)}` : ""; range.hidden = !hasRange;
     document.getElementById("estimateLabel").textContent = fareReviewRequired ? "Fare Review Required" : "Preliminary Estimated Fare";
     document.getElementById("estimate-heading").textContent = fareReviewRequired ? "Fare Review Required" : "Preliminary Estimated Fare";
     document.getElementById("manualReview").hidden = !(manual || fareReviewRequired);
     document.getElementById("manualReviewTitle").textContent = fareReviewRequired ? "Fare Review Required" : "Jason will confirm final price shortly.";
     document.getElementById("manualReviewMessage").textContent = fareReviewRequired ? fareReviewMessage : "";
+    const locationReviewHelp = document.getElementById("locationReviewHelp");
+    const locationReviewMessage = document.getElementById("locationReviewMessage");
+    const locationSuggestionActions = document.getElementById("locationSuggestionActions");
+    locationReviewHelp.hidden = !fareReviewRequired;
+    locationReviewMessage.textContent = state.locationSuggestion
+      ? "We couldn’t automatically price this location."
+      : "We couldn’t automatically price this location. Try entering a city, airport, school, or landmark for a preliminary estimate, or keep this location for Jason to review.";
+    locationSuggestionActions.hidden = !state.locationSuggestion;
+    if (state.locationSuggestion) {
+      document.getElementById("locationSuggestionName").textContent = state.locationSuggestion.display_name;
+      document.getElementById("useLocationSuggestionButton").textContent = `Use ${state.locationSuggestion.canonical_location}`;
+    }
     document.getElementById("estimateRoute").textContent = estimate.route_summary;
     const summary = [["Passengers",trip.passengers],["Luggage",trip.luggage],["Child seat",trip.childSeat === "YES" ? "Requested" : "No"],["Vehicle",displayVehicle(estimate.vehicle_assessment)],["Date & time",`${trip.date} · ${formatTime(trip.time)}`]];
     document.getElementById("estimateSummary").innerHTML = summary.map(([k,v])=>`<div><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`).join("");
@@ -183,7 +198,32 @@
     document.getElementById("estimateNotices").innerHTML = notices.map((x)=>`<p>${escapeHtml(x)}</p>`).join("");
     document.getElementById("estimateValidity").textContent = formatValidity(estimate.valid_until);
   }
-  function invalidateEstimate() { state.estimateId=null; estimatePanel.hidden=true; }
+  async function rerunSuggestedLocation() {
+    const suggestion = state.locationSuggestion;
+    if (!suggestion) return;
+    document.getElementById("locationInput").value = suggestion.canonical_location;
+    invalidateEstimate();
+    if (!validateTrip()) return focusFirstError();
+    clearError("estimateRequest");
+    setLoading(true);
+    try {
+      const trip = collectTripData();
+      const estimate = await requestEstimate(trip);
+      state.estimateId = estimate.estimate_id;
+      renderEstimate(estimate, trip);
+      estimatePanel.hidden = false;
+      estimatePanel.focus();
+      estimatePanel.scrollIntoView({ behavior:"smooth", block:"start" });
+    } catch (error) {
+      setError("estimateRequest", error instanceof EstimateRequestError ? error.message : "Unable to get an estimate right now. Please try again.");
+    } finally { setLoading(false); }
+  }
+  function keepOriginalLocation() {
+    state.locationSuggestion = null;
+    document.getElementById("locationSuggestionActions").hidden = true;
+    document.getElementById("locationReviewMessage").textContent = "Keeping your original location. Jason will review the exact route and confirm the fare.";
+  }
+  function invalidateEstimate() { state.estimateId=null; state.locationSuggestion=null; estimatePanel.hidden=true; }
   function populateArrivalTimes() {
     const select = document.getElementById("flight-arrival-time");
     for (let minutes = 0; minutes < 24 * 60; minutes += 30) {

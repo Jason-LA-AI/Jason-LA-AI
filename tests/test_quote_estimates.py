@@ -111,11 +111,16 @@ def test_all_zip_only_inputs_require_fare_review(location: str) -> None:
         "Riverside",
         "Moreno Valley",
         "San Bernardino",
+        "San Bernadino",
         "sen bernardino",
-        "san bernadino",
+        "Rancho Cucamonga",
         "rencho cucamonga",
+        "DTLA",
+        "Downtown LA",
+        "Downtown Los Angeles",
         "Disneyland",
         "UCLA",
+        "USC",
         "UC Riverside",
     ],
 )
@@ -127,6 +132,34 @@ def test_verified_city_alias_and_landmark_inputs_receive_numeric_estimates(
     assert response.status.value == "ESTIMATED"
     assert response.estimated_min_amount is not None
     assert response.estimated_max_amount is not None
+    assert response.location_suggestion is None
+
+
+@pytest.mark.parametrize(
+    ("location", "canonical", "display_name"),
+    [
+        ("Downtown", "Downtown Los Angeles", "Downtown Los Angeles (DTLA)"),
+        ("Disney", "Disneyland", "Disneyland"),
+    ],
+)
+def test_safe_suggestion_requires_explicit_canonical_reestimate(
+    location: str,
+    canonical: str,
+    display_name: str,
+) -> None:
+    initial = create_quote_estimate(_request(location_input=location), _session())
+
+    assert initial.status.value == "MANUAL_REVIEW_REQUIRED"
+    assert initial.estimated_min_amount is None
+    assert initial.estimated_max_amount is None
+    assert initial.location_suggestion is not None
+    assert initial.location_suggestion.canonical_location == canonical
+    assert initial.location_suggestion.display_name == display_name
+
+    confirmed = create_quote_estimate(_request(location_input=canonical), _session())
+    assert confirmed.status.value == "ESTIMATED"
+    assert confirmed.estimated_min_amount is not None
+    assert confirmed.estimated_max_amount is not None
 
 
 @pytest.mark.parametrize(
@@ -143,6 +176,7 @@ def test_unverified_addresses_and_unknown_places_require_fare_review(location: s
     assert response.status.value == "MANUAL_REVIEW_REQUIRED"
     assert response.estimated_min_amount is None
     assert response.estimated_max_amount is None
+    assert response.location_suggestion is None
 
 
 def test_unverified_street_address_requires_fare_review_and_preserves_route() -> None:
@@ -250,11 +284,13 @@ def test_quote_estimate_endpoint_returns_frontend_contract(
         "requires_jason_review",
         "risk_flags",
         "notices",
+        "location_suggestion",
         "valid_until",
     }
     assert body["status"] == "MANUAL_REVIEW_REQUIRED"
     assert body["estimated_min_amount"] is None
     assert body["estimated_max_amount"] is None
+    assert body["location_suggestion"] is None
 
 
 def test_only_road_mileage_pricing_can_show_customer_fare() -> None:

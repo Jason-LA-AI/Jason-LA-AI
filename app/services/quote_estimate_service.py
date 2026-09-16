@@ -21,6 +21,7 @@ from app.schemas.quote_estimate import (
 from app.services.location_normalizer import (
     UNKNOWN_LOCATION,
     normalize_location,
+    suggest_location,
 )
 from app.services.route_pricing import (
     CITY_MILEAGE_ARCHIVE_PRICING_SOURCE,
@@ -199,6 +200,11 @@ def create_quote_estimate(
         requires_jason_review=estimate.requires_jason_review,
         risk_flags=estimate.risk_flags or [],
         notices=customer_notices,
+        location_suggestion=(
+            suggest_location(request.location_input)
+            if not customer_price_available
+            else None
+        ),
         valid_until=estimate.expires_at,
     )
 

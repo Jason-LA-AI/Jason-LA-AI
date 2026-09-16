@@ -5,7 +5,11 @@ from __future__ import annotations
 import re
 from typing import Literal, TypedDict
 
-from app.services.city_mileage_archive import canonical_archive_key, supported_destinations
+from app.services.city_mileage_archive import (
+    canonical_archive_key,
+    canonical_location_key,
+    supported_destinations,
+)
 
 
 UNKNOWN_LOCATION = "UNKNOWN_LOCATION"
@@ -31,6 +35,13 @@ class NormalizedLocation(TypedDict):
     pricing_zone: str
 
 
+class LocationSuggestion(TypedDict):
+    """A click-to-confirm replacement; never a pricing authorization."""
+
+    canonical_location: str
+    display_name: str
+
+
 def _pricing_zone(name: str) -> str:
     return re.sub(r"[^A-Z0-9]+", "_", name.upper()).strip("_")
 
@@ -41,6 +52,22 @@ def _pricing_zone(name: str) -> str:
 CITY_LOCATIONS: dict[str, tuple[str, str]] = {
     key: (name, _pricing_zone(name))
     for key, name in supported_destinations().items()
+}
+
+# These are deliberately explicit, finite mappings.  They supplement the
+# maintained aliases in city_mileage_archive and are not edit-distance or AI
+# guesses.  Airport suggestions clarify the user's wording, but are not archive
+# locations and therefore still require a new estimate to prove eligibility.
+CURATED_SUGGESTION_KEYS = {
+    "downtown": "downtownlosangeles",
+    "disney": "disneyland",
+    "ontarioairport": "ONT",
+    "laairport": "LAX",
+}
+SUGGESTION_DISPLAY_NAMES = {
+    "downtown": "Downtown Los Angeles (DTLA)",
+    "ontarioairport": "ONT",
+    "laairport": "LAX",
 }
 
 
@@ -63,6 +90,8 @@ def normalize_location(location_input: str) -> NormalizedLocation:
             "pricing_zone": UNKNOWN_LOCATION,
         }
 
+    # Explicit aliases maintained by the mileage archive remain eligible for
+    # direct pricing because they are known, unambiguous customer inputs.
     matched_city = CITY_LOCATIONS.get(canonical_archive_key(cleaned_input))
     if matched_city:
         city, pricing_zone = matched_city
@@ -81,6 +110,51 @@ def normalize_location(location_input: str) -> NormalizedLocation:
         "postal_code": None,
         "pricing_zone": UNKNOWN_LOCATION,
     }
+
+
+def suggest_location(location_input: str) -> LocationSuggestion | None:
+    """Return an explicit, safe replacement for a non-canonical place name.
+
+    Suggestions are presentation-only: callers must re-submit the returned
+    canonical_location before pricing it.  ZIP-only and street-address inputs
+    are categorically excluded so they cannot be downgraded to a city center.
+    """
+
+    cleaned_input = " ".join(location_input.strip().split())
+    if (
+        not cleaned_input
+        or ZIP_PATTERN.fullmatch(cleaned_input)
+        or STREET_ADDRESS_PATTERN.match(cleaned_input)
+        or STREET_SUFFIX_PATTERN.search(cleaned_input)
+    ):
+        return None
+
+    raw_key = canonical_location_key(cleaned_input)
+    if canonical_archive_key(cleaned_input) in CITY_LOCATIONS:
+        # Canonical archive locations and explicit safe aliases price normally.
+        return None
+
+    target_key = CURATED_SUGGESTION_KEYS.get(raw_key)
+    if target_key is None:
+        return None
+
+    matched_city = CITY_LOCATIONS.get(target_key)
+    if matched_city:
+        canonical_location = matched_city[0]
+        return {
+            "canonical_location": canonical_location,
+            "display_name": SUGGESTION_DISPLAY_NAMES.get(raw_key, canonical_location),
+        }
+
+    # ONT and LAX are intentionally offered only as explicit airport labels.
+    # They are not archive destinations, so accepting either still cannot
+    # produce a city-center numeric fare.
+    if target_key in {"ONT", "LAX"}:
+        return {
+            "canonical_location": target_key,
+            "display_name": SUGGESTION_DISPLAY_NAMES[raw_key],
+        }
+    return None
 
 
 def location_has_sufficient_detail(location_input: str) -> bool:

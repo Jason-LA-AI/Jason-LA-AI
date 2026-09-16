@@ -90,6 +90,7 @@ def test_quote_uses_preliminary_fare_wording_and_contact_fallback(client: TestCl
     assert response.status_code == 200
     assert "Preliminary Estimated Fare" in response.text
     assert "Fare Review Required" in response.text
+    assert "Keep my original location" in response.text
     assert "city or landmark" in response.text
     assert "Jason will review the exact route and confirm the fare." in response.text
     assert "before confirming the final fare" in response.text
@@ -111,6 +112,9 @@ def test_quote_client_uses_a_customer_readable_en_dash_for_fare_ranges() -> None
     )
 
     assert "estimated_min_amount)}–${formatUsd(estimate.estimated_max_amount)" in quote_script
+    assert "rerunSuggestedLocation" in quote_script
+    assert "location_suggestion" in quote_script
+    assert "We couldn’t automatically price this location." in quote_script
 
 
 def test_service_pages_offer_quote_and_contact(client: TestClient) -> None:

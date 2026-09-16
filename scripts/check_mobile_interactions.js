@@ -99,10 +99,61 @@ async function main() {
   for (const width of [375, 390, 412, 430]) {
     await command(socket, "Emulation.setDeviceMetricsOverride", { width, height: 900, deviceScaleFactor: 1, mobile: false });
     await navigate(socket, `${baseUrl}/quote`);
+    const suggestionRerun = await evaluate(socket, `(async () => {
+      const response = (body) => ({ ok: true, json: async () => body });
+      const originalFetch = window.fetch;
+      window.fetch = async (_url, options) => {
+        const payload = JSON.parse(options.body);
+        if (payload.location_input === 'Downtown') return response({
+          estimate_id: '00000000-0000-0000-0000-000000000001',
+          status: 'MANUAL_REVIEW_REQUIRED', route_summary: 'LAX → Downtown',
+          estimated_min_amount: null, estimated_max_amount: null, currency_code: 'USD',
+          vehicle_assessment: 'NEEDS_CONFIRMATION', requires_jason_review: true,
+          risk_flags: ['UNKNOWN_LOCATION'], notices: ['Jason will review the exact route and confirm the fare.'],
+          location_suggestion: { canonical_location: 'Downtown Los Angeles', display_name: 'Downtown Los Angeles (DTLA)' },
+          valid_until: '2026-09-18T12:00:00-07:00'
+        });
+        return response({
+          estimate_id: '00000000-0000-0000-0000-000000000002',
+          status: 'ESTIMATED', route_summary: 'LAX → Downtown Los Angeles',
+          estimated_min_amount: '100', estimated_max_amount: '120', currency_code: 'USD',
+          vehicle_assessment: 'LIKELY_COMFORTABLE', requires_jason_review: true,
+          risk_flags: [], notices: ['Estimate is based on the selected city or landmark area.', 'This is a preliminary estimate based on the route and trip details provided. Jason will review the exact pickup/drop-off location, time, luggage, and availability before confirming the final fare.'],
+          location_suggestion: null, valid_until: '2026-09-18T12:00:00-07:00'
+        });
+      };
+      const choose = (group, choice) => document.querySelector('[data-choice-group="' + group + '"] [data-value="' + choice + '"]').click();
+      choose('serviceType', 'AIRPORT_PICKUP'); choose('airportCode', 'LAX');
+      choose('passengerCount', '2'); choose('luggageCount', '1'); choose('childSeat', 'NO'); choose('oversizedItems', 'NO');
+      const date = document.querySelector('#serviceDate'); date.value = '2026-09-17'; date.dispatchEvent(new Event('input', { bubbles: true }));
+      const time = document.querySelector('#flight-arrival-time'); time.value = '08:30'; time.dispatchEvent(new Event('change', { bubbles: true }));
+      const location = document.querySelector('#locationInput'); location.value = 'Downtown'; location.dispatchEvent(new Event('input', { bubbles: true }));
+      document.querySelector('#continueButton').click(); await new Promise((resolve) => setTimeout(resolve, 0));
+      const beforeClick = {
+        fareReview: document.querySelector('#estimate-heading').textContent.trim() === 'Fare Review Required',
+        numericFare: document.querySelector('#estimateRange').textContent.trim(),
+        suggestion: document.querySelector('#locationSuggestionName').textContent.trim(),
+      };
+      document.querySelector('#useLocationSuggestionButton').click(); await new Promise((resolve) => setTimeout(resolve, 0));
+      const afterClick = {
+        location: location.value,
+        preliminaryFare: document.querySelector('#estimate-heading').textContent.trim() === 'Preliminary Estimated Fare',
+        numericFare: document.querySelector('#estimateRange').textContent.trim(),
+      };
+      window.fetch = originalFetch;
+      return { beforeClick, afterClick };
+    })()`);
     quote.push(await evaluate(socket, `(() => {
       const panel = document.querySelector('#estimatePanel');
       panel.hidden = false;
       document.querySelector('#estimateRange').textContent = '$000–$000';
+      const reviewHelp = document.querySelector('#locationReviewHelp');
+      const suggestionActions = document.querySelector('#locationSuggestionActions');
+      reviewHelp.hidden = false;
+      document.querySelector('#locationReviewMessage').textContent = 'We couldn’t automatically price this location.';
+      suggestionActions.hidden = false;
+      document.querySelector('#locationSuggestionName').textContent = 'Downtown Los Angeles (DTLA)';
+      document.querySelector('#useLocationSuggestionButton').textContent = 'Use Downtown Los Angeles';
       const requestConfirmationButton = document.querySelector('#requestConfirmationButton');
       const contactDetails = document.querySelector('#contactDetails');
       requestConfirmationButton.click();
@@ -118,7 +169,7 @@ async function main() {
       const error = document.querySelector('[data-error-for="estimateRequest"]');
       error.textContent = 'We could not load an estimate. Please try again.';
       document.querySelector('#estimateErrorContact').hidden = false;
-      const selectors = '.choice-grid--airports button, #passengers, #luggage, .next-button, .estimate-card, #requestConfirmationButton, #contactDetails, #customerWechat, #customerLine, #submitRequestButton, [data-error-for="estimateRequest"], #estimateErrorContact, .quote-contact-cta';
+      const selectors = '.choice-grid--airports button, #passengers, #luggage, .next-button, .estimate-card, #locationReviewHelp, #locationSuggestionActions, #useLocationSuggestionButton, #keepOriginalLocationButton, #requestConfirmationButton, #contactDetails, #customerWechat, #customerLine, #submitRequestButton, [data-error-for="estimateRequest"], #estimateErrorContact, .quote-contact-cta';
       const inspected = [...document.querySelectorAll(selectors)];
       const clipped = inspected.filter((element) => {
         const rect = element.getBoundingClientRect();
@@ -132,12 +183,18 @@ async function main() {
         airportOptions: document.querySelectorAll('.choice-grid--airports button').length,
         clipped,
         confirmationCta,
+        suggestionRerun: ${JSON.stringify(suggestionRerun)},
+        suggestion: {
+          visible: reviewHelp.getBoundingClientRect().width > 0,
+          useButtonVisible: document.querySelector('#useLocationSuggestionButton').getBoundingClientRect().width > 0,
+          keepButtonVisible: document.querySelector('#keepOriginalLocationButton').getBoundingClientRect().width > 0,
+        },
         wechatFieldVisible,
         lineFieldVisible,
         finalSubmitVisible: document.querySelector('#submitRequestButton').getBoundingClientRect().width > 0,
         directFallbackVisible: document.querySelector('.quote-contact-cta--compact a[href="/contact"]')?.getBoundingClientRect().width > 0,
-        fareWording: document.querySelector('.estimate-card__label')?.textContent.trim() === 'Estimated Fare Range',
-        disclaimer: text.includes('This is a preliminary planning range. Jason will review the exact route, pickup time, luggage, and availability before confirming the final fare.'),
+        fareWording: document.querySelector('.estimate-card__label')?.textContent.trim() === 'Preliminary Estimated Fare',
+        disclaimer: text.includes('This is a preliminary estimate based on the route and trip details provided.'),
         forbiddenTerms: ['development_mock', 'development-only', 'development only'].filter((term) => text.toLowerCase().includes(term)),
         errorFallbackVisible: document.querySelector('#estimateErrorContact a')?.getBoundingClientRect().width > 0
       };

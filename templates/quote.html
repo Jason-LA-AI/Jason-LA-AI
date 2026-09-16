@@ -70,6 +70,14 @@
         <div class="estimate-card">
           <p class="estimate-card__label" id="estimateLabel">Preliminary Estimated Fare</p><p class="estimate-card__price" id="estimateRange"></p>
           <div class="manual-review" id="manualReview" hidden><strong id="manualReviewTitle">Fare Review Required</strong><span id="manualReviewMessage">Jason will review the exact route and confirm the fare.</span></div>
+          <div class="location-review-help" id="locationReviewHelp" hidden>
+            <p id="locationReviewMessage"></p>
+            <div class="location-suggestion-actions" id="locationSuggestionActions" hidden>
+              <p>Did you mean: <strong id="locationSuggestionName"></strong></p>
+              <button class="primary-button" id="useLocationSuggestionButton" type="button"></button>
+              <button class="secondary-button" id="keepOriginalLocationButton" type="button">Keep my original location</button>
+            </div>
+          </div>
           <div class="route-summary"><span>Route</span><strong id="estimateRoute"></strong></div>
           <dl class="estimate-summary" id="estimateSummary"></dl>
           <div class="estimate-notice" id="estimateNotices"><p>This is a preliminary estimate based on the route and trip details provided. Jason will review the exact pickup/drop-off location, time, luggage, and availability before confirming the final fare.</p></div><p class="estimate-validity" id="estimateValidity"></p>
@@ -125,4 +133,4 @@
 </main>
 {% endblock %}
 
-{% block extra_js %}<script src="/static/quote.js?v=20260916-1" defer></script>{% endblock %}
+{% block extra_js %}<script src="/static/quote.js?v=20260916-2" defer></script>{% endblock %}
