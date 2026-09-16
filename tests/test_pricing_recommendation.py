@@ -3,13 +3,13 @@
 from datetime import datetime, timezone
 from decimal import Decimal
 
-from app.api.dashboard import _build_inquiry_view
+from app.api.dashboard import _build_inquiry_view, _pricing_details
 from app.models.customer import Customer
 from app.models.lead import Lead
 from app.models.notification import Notification
 from app.models.quote import Quote
 from app.services.quote_request_service import _pricing_recommendation_text, _telegram_review_text
-from app.services.telegram_adapter import _render_quote_request_review
+from app.services.telegram_adapter import _pricing_recommendation_lines, _render_quote_request_review
 
 
 def _lead_and_customer() -> tuple[Lead, Customer]:
@@ -134,6 +134,78 @@ def test_direct_approval_notification_uses_persisted_estimate_values() -> None:
     assert "Suggested Amount: 140.00" in message
     assert "Range: 130.00 - 150.00" in message
     assert "Pricing Source: development_mock" in message
+
+
+def test_long_distance_internal_text_uses_diagnostic_not_recommendation_wording() -> None:
+    estimate = type(
+        "Estimate",
+        (),
+        {
+            "suggested_amount": None,
+            "estimated_min_amount": None,
+            "estimated_max_amount": None,
+            "currency_code": "USD",
+            "pricing_source": "city_mileage_pricing_v1",
+            "status": "MANUAL_REVIEW_REQUIRED",
+            "manual_review_reason": "LONG_DISTANCE_REVIEW_REQUIRED",
+            "pricing_factors": {
+                "not_for_quoting": True,
+                "total_road_miles": "569.7",
+                "raw_model_min": "295",
+                "raw_model_max": "365",
+            },
+        },
+    )()
+
+    message = _pricing_recommendation_text(estimate)
+
+    assert "LONG_DISTANCE_REVIEW_REQUIRED" in message
+    assert "Closed-loop mileage: 569.7 mi" in message
+    assert "Pricing V1 diagnostic only: $295–$365" in message
+    assert "Do not use automatic fare." in message
+    assert "Suggested Amount" not in message
+
+
+def test_long_distance_telegram_uses_diagnostic_not_recommendation_wording() -> None:
+    lines = _pricing_recommendation_lines(
+        {
+            "pricing_status": "MANUAL_REVIEW_REQUIRED",
+            "manual_review_reason": "LONG_DISTANCE_REVIEW_REQUIRED",
+            "pricing_factors": {
+                "not_for_quoting": True,
+                "total_road_miles": "828.8",
+                "raw_model_min": "390",
+                "raw_model_max": "480",
+            },
+        }
+    )
+
+    message = "\n".join(lines)
+    assert "LONG_DISTANCE_REVIEW_REQUIRED" in message
+    assert "Pricing V1 diagnostic only: $390–$480" in message
+    assert "Suggested Amount" not in message
+
+
+def test_dashboard_long_distance_uses_diagnostic_not_recommendation_wording() -> None:
+    quote = Quote(
+        currency_code="USD",
+        pricing_source="city_mileage_pricing_v1",
+        additional_fee_factors={
+            "not_for_quoting": True,
+            "total_road_miles": "828.8",
+            "raw_model_min": "390",
+            "raw_model_max": "480",
+        },
+    )
+
+    details = _pricing_details(quote)
+
+    assert "LONG_DISTANCE_REVIEW_REQUIRED" in details
+    assert "Closed-loop mileage: 828.8 mi" in details
+    assert "Pricing V1 diagnostic only: $390–$480" in details
+    assert "Do not use automatic fare." in details
+    assert "Jason must review manually." in details
+    assert "Suggested" not in details
 
 
 def test_telegram_review_includes_wechat_contact_and_exact_trip_details() -> None:

@@ -114,6 +114,17 @@ def _pricing_recommendation_lines(payload: dict[str, Any]) -> tuple[str, ...]:
     maximum = payload.get("estimated_max_amount")
     source = payload.get("pricing_source") or "Not provided"
     status = payload.get("pricing_status") or "MANUAL_REVIEW_REQUIRED"
+    factors = payload.get("pricing_factors")
+    if isinstance(factors, dict) and factors.get("not_for_quoting"):
+        return (
+            "LONG_DISTANCE_REVIEW_REQUIRED",
+            f"Closed-loop mileage: {factors.get('total_road_miles', 'Not available')} mi",
+            "Pricing V1 diagnostic only: "
+            f"${factors.get('raw_model_min', 'Not available')}–${factors.get('raw_model_max', 'Not available')}",
+            "Do not use automatic fare.",
+            "Jason must review manually.",
+            f"Manual Review Reason: {payload.get('manual_review_reason') or 'LONG_DISTANCE_REVIEW_REQUIRED'}",
+        )
     lines = [
         "Pricing Recommendation:",
         f"Suggested Amount: {suggested if suggested is not None else 'Not available'}",
@@ -126,7 +137,7 @@ def _pricing_recommendation_lines(payload: dict[str, Any]) -> tuple[str, ...]:
         lines.insert(1, "Manual Review Required")
     if payload.get("manual_review_reason"):
         lines.append(f"Manual Review Reason: {payload['manual_review_reason']}")
-    lines.extend(_pricing_diagnostic_lines(payload.get("pricing_factors")))
+    lines.extend(_pricing_diagnostic_lines(factors))
     return tuple(lines)
 
 

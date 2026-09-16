@@ -12,10 +12,16 @@ from app.schemas.quote_estimate import QuoteEstimateCreate
 from app.services.city_mileage_archive import lookup_archived_mileage, supported_destinations
 from app.services.location_normalizer import UNKNOWN_LOCATION, normalize_location, suggest_location
 from app.services.quote_estimate_service import (
+    LONG_DISTANCE_REVIEW_REQUIRED,
+    auto_quote_closed_loop_mileage_is_eligible,
     create_quote_estimate,
     customer_numeric_fare_is_available,
 )
-from app.services.route_pricing import get_archived_round_trip_mileage, price_range_for_miles
+from app.services.route_pricing import (
+    RouteMileage,
+    get_archived_round_trip_mileage,
+    price_range_for_miles,
+)
 from app.services.quote_request_service import _pricing_recommendation_text
 
 
@@ -220,6 +226,99 @@ def test_lax_problem_destinations_use_distinct_archive_miles_and_v1_ranges() -> 
         actual[destination] = (response.estimated_min_amount, response.estimated_max_amount)
 
     assert len(set(actual.values())) == len(actual)
+
+
+@pytest.mark.parametrize(
+    ("miles", "eligible"),
+    [
+        (Decimal("299.9"), True),
+        (Decimal("300.0"), True),
+        (Decimal("300.1"), False),
+    ],
+)
+def test_auto_quote_mileage_domain_has_an_inclusive_300_mile_boundary(
+    miles: Decimal, eligible: bool
+) -> None:
+    assert auto_quote_closed_loop_mileage_is_eligible(miles) is eligible
+
+
+@pytest.mark.parametrize(
+    ("miles", "is_numeric"),
+    [(Decimal("300.0"), True), (Decimal("300.1"), False)],
+)
+def test_boundary_mileage_controls_persisted_internal_pricing_semantics(
+    miles: Decimal,
+    is_numeric: bool,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "app.services.quote_estimate_service.get_archived_round_trip_mileage",
+        lambda *_: RouteMileage(
+            total_miles=miles,
+            distance_meters=int(miles * Decimal("1609.344")),
+            reference_destination="Chino",
+            leg_1_miles=Decimal("100.0"),
+            leg_2_miles=Decimal("100.0"),
+            leg_3_miles=miles - Decimal("200.0"),
+        ),
+    )
+    session = _session()
+    response = create_quote_estimate(_request("Chino"), session)
+    stored = session.add.call_args.args[0]
+
+    if is_numeric:
+        assert response.status.value == "ESTIMATED"
+        assert stored.suggested_amount is not None
+        assert not stored.pricing_factors.get("not_for_quoting")
+    else:
+        assert response.status.value == "MANUAL_REVIEW_REQUIRED"
+        assert stored.suggested_amount is None
+        assert stored.pricing_factors["not_for_quoting"] is True
+        assert stored.pricing_factors["raw_model_midpoint"]
+
+
+@pytest.mark.parametrize("destination", ["Las Vegas", "San Francisco"])
+def test_archived_long_distance_routes_are_internal_only(destination: str) -> None:
+    session = _session()
+    response = create_quote_estimate(_request(destination), session)
+    stored = session.add.call_args.args[0]
+
+    assert response.status.value == "MANUAL_REVIEW_REQUIRED"
+    assert response.estimated_min_amount is None
+    assert response.estimated_max_amount is None
+    assert LONG_DISTANCE_REVIEW_REQUIRED in response.risk_flags
+    assert stored.pricing_factors["total_road_miles"]
+    assert stored.suggested_amount is None
+    assert stored.estimated_min_amount is None
+    assert stored.estimated_max_amount is None
+    assert stored.pricing_factors["not_for_quoting"] is True
+    assert stored.pricing_factors["raw_model_midpoint"]
+    assert stored.pricing_factors["raw_model_min"]
+    assert stored.pricing_factors["raw_model_max"]
+
+
+def test_uc_san_diego_remains_within_the_numeric_auto_quote_domain() -> None:
+    session = _session()
+    response = create_quote_estimate(_request("UC San Diego"), session)
+    stored = session.add.call_args.args[0]
+
+    assert response.status.value == "ESTIMATED"
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (
+        Decimal("185"), Decimal("225"),
+    )
+    assert stored.suggested_amount is not None
+    assert not stored.pricing_factors.get("not_for_quoting")
+
+
+@pytest.mark.parametrize("destination", ["Chino", "Riverside", "Laguna Hills"])
+def test_regional_auto_quotes_keep_internal_suggested_amount(destination: str) -> None:
+    session = _session()
+    response = create_quote_estimate(_request(destination), session)
+    stored = session.add.call_args.args[0]
+
+    assert response.status.value == "ESTIMATED"
+    assert stored.suggested_amount is not None
+    assert not stored.pricing_factors.get("not_for_quoting")
 
 
 def test_quote_estimate_uses_the_service_direction_archive_legs() -> None:

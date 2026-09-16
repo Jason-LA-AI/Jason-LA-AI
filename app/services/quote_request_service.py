@@ -226,6 +226,20 @@ def _pricing_recommendation_text(estimate: object) -> str:
     minimum = getattr(estimate, "estimated_min_amount", None)
     maximum = getattr(estimate, "estimated_max_amount", None)
     currency = getattr(estimate, "currency_code", None) or "USD"
+    factors = getattr(estimate, "pricing_factors", None)
+    if isinstance(factors, dict) and factors.get("not_for_quoting"):
+        lines = [
+            "LONG_DISTANCE_REVIEW_REQUIRED",
+            f"Closed-loop mileage: {factors.get('total_road_miles', 'Not available')} mi",
+            "Pricing V1 diagnostic only: "
+            f"${factors.get('raw_model_min', 'Not available')}–${factors.get('raw_model_max', 'Not available')}",
+            "Do not use automatic fare.",
+            "Jason must review manually.",
+        ]
+        reason = getattr(estimate, "manual_review_reason", None)
+        if reason:
+            lines.append(f"Manual Review Reason: {reason}")
+        return "\n".join(lines)
     lines = ["Pricing Recommendation:"]
     if suggested is None or minimum is None or maximum is None:
         lines.append("Manual Review Required")
@@ -239,7 +253,7 @@ def _pricing_recommendation_text(estimate: object) -> str:
     reason = getattr(estimate, "manual_review_reason", None)
     if reason:
         lines.append(f"Manual Review Reason: {reason}")
-    lines.extend(_pricing_diagnostic_lines(getattr(estimate, "pricing_factors", None)))
+    lines.extend(_pricing_diagnostic_lines(factors))
     return "\n".join(lines)
 
 

@@ -34,6 +34,11 @@ from app.services.route_pricing import (
 LOS_ANGELES_TIMEZONE = ZoneInfo("America/Los_Angeles")
 ROUTE_MILEAGE_PRICING_SOURCE = CITY_MILEAGE_ARCHIVE_PRICING_SOURCE
 ROUTE_MILEAGE_UNAVAILABLE_PRICING_SOURCE = "route_mileage_unavailable"
+# Pricing V1's long-distance band is calibrated for the established regional
+# operating area.  Archive mileage beyond this closed-loop distance remains
+# useful internally, but it must not produce a customer-facing auto-quote.
+MAX_AUTO_QUOTE_CLOSED_LOOP_MILES = Decimal("300")
+LONG_DISTANCE_REVIEW_REQUIRED = "LONG_DISTANCE_REVIEW_REQUIRED"
 
 
 def create_quote_estimate(
@@ -92,6 +97,23 @@ def create_quote_estimate(
             "leg_2_road_miles": str(road_mileage.leg_2_miles.quantize(Decimal("0.1"))) if road_mileage.leg_2_miles is not None else None,
             "leg_3_road_miles": str(road_mileage.leg_3_miles.quantize(Decimal("0.1"))) if road_mileage.leg_3_miles is not None else None,
         }
+        if not auto_quote_closed_loop_mileage_is_eligible(road_mileage.total_miles):
+            # Retain the formula output only as an internal diagnostic.  It is
+            # outside Pricing V1's validation domain and is never a suggested
+            # or recommended fare.
+            mileage_factors.update(
+                {
+                    "raw_model_midpoint": str(mileage_price.rounded_midpoint),
+                    "raw_model_min": str(mileage_price.minimum_amount),
+                    "raw_model_max": str(mileage_price.maximum_amount),
+                    "not_for_quoting": True,
+                }
+            )
+            mileage_factors.pop("customer_range", None)
+            minimum_amount = None
+            maximum_amount = None
+            suggested_amount = None
+            risk_flags.append(LONG_DISTANCE_REVIEW_REQUIRED)
     except RouteMileageUnavailable as exc:
         if "ROUTE_MILEAGE_UNAVAILABLE" not in risk_flags:
             risk_flags.append("ROUTE_MILEAGE_UNAVAILABLE")
@@ -223,6 +245,12 @@ def customer_numeric_fare_is_available(
         pricing_source == CITY_MILEAGE_ARCHIVE_PRICING_SOURCE
         and not (risk_flags or [])
     )
+
+
+def auto_quote_closed_loop_mileage_is_eligible(total_miles: Decimal) -> bool:
+    """Return whether verified mileage is within Pricing V1's auto-quote domain."""
+
+    return total_miles <= MAX_AUTO_QUOTE_CLOSED_LOOP_MILES
 
 
 def _customer_fare_review_notice() -> str:

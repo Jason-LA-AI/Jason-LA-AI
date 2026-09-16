@@ -614,6 +614,18 @@ def _pricing_details(quote: Quote | None) -> str:
     if quote is None or not isinstance(quote.additional_fee_factors, dict):
         return "Not available"
     factors = quote.additional_fee_factors
+    if factors.get("not_for_quoting"):
+        return " · ".join(
+            (
+                "LONG_DISTANCE_REVIEW_REQUIRED",
+                f"Closed-loop mileage: {factors.get('total_road_miles', 'Not available')} mi",
+                "Pricing V1 diagnostic only: "
+                f"${factors.get('raw_model_min', 'Not available')}–"
+                f"${factors.get('raw_model_max', 'Not available')}",
+                "Do not use automatic fare.",
+                "Jason must review manually.",
+            )
+        )
     values = (
         ("Miles", factors.get("total_road_miles")),
         ("Raw midpoint", factors.get("raw_midpoint")),

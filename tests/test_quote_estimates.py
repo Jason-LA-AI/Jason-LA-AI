@@ -9,13 +9,22 @@ from zoneinfo import ZoneInfo
 import pytest
 
 from app.schemas.quote_estimate import QuoteEstimateCreate
+from app.schemas.quote_request import QuoteRequestCreate
+from app.models.outbox_event import OutboxEvent
+from app.models.quote import Quote
+from app.models.quote_estimate import QuoteEstimate
 from app.services.location_normalizer import normalize_location
 from app.services.quote_estimate_service import (
     ROUTE_MILEAGE_PRICING_SOURCE,
     create_quote_estimate,
     customer_numeric_fare_is_available,
 )
+from app.services.quote_request_service import (
+    _pricing_recommendation_text,
+    process_quote_request,
+)
 from app.services.route_pricing import RouteMileageUnavailable
+from app.api.dashboard import _pricing_details
 
 
 def _request(**overrides: object) -> QuoteEstimateCreate:
@@ -43,6 +52,59 @@ def _session() -> MagicMock:
 
     session.refresh.side_effect = refresh
     return session
+
+
+class _RequestFlowSession:
+    """Small in-memory Session double for the complete request orchestration."""
+
+    def __init__(self) -> None:
+        self.added: list[object] = []
+        self.commits = 0
+        self.rollbacks = 0
+
+    def add(self, value: object) -> None:
+        if getattr(value, "id", None) is None:
+            value.id = uuid4()
+        self.added.append(value)
+
+    def flush(self) -> None:
+        pass
+
+    def refresh(self, value: object) -> None:
+        if getattr(value, "id", None) is None:
+            value.id = uuid4()
+
+    def commit(self) -> None:
+        self.commits += 1
+
+    def rollback(self) -> None:
+        self.rollbacks += 1
+
+    def scalar(self, *_: object) -> None:
+        return None
+
+    def get(self, model: object, identifier: object) -> QuoteEstimate | None:
+        if model is not QuoteEstimate:
+            return None
+        return next(
+            (
+                value
+                for value in self.added
+                if isinstance(value, QuoteEstimate) and value.id == identifier
+            ),
+            None,
+        )
+
+
+def _request_confirmation(estimate_id: object) -> QuoteRequestCreate:
+    return QuoteRequestCreate.model_validate(
+        {
+            "estimate_id": estimate_id,
+            "customer_name": "Local Validation Customer",
+            "email": "local-validation@example.com",
+            "estimate_acceptance": True,
+        }
+    )
 
 
 def test_zip_only_location_is_not_mapped_to_a_city_center() -> None:
@@ -178,6 +240,9 @@ def test_safe_suggestion_requires_explicit_canonical_reestimate(
         "Oxnard",
         "Ventura",
         "Santa Barbara",
+        "San Diego",
+        "San Jose",
+        "Joshua Tree",
     ],
 )
 def test_unverified_addresses_and_unknown_places_require_fare_review(location: str) -> None:
@@ -341,6 +406,59 @@ def test_manual_vehicle_review_withholds_customer_numeric_estimate() -> None:
     assert response.estimated_min_amount is None
     assert response.estimated_max_amount is None
     assert response.notices == ["Jason will review the exact route and confirm the fare."]
+
+
+@pytest.mark.parametrize(
+    ("location", "expects_customer_fare"),
+    [
+        ("Chino", True),
+        ("Las Vegas", False),
+        ("San Francisco", False),
+        ("123 Main Street, Riverside, CA 92501", False),
+    ],
+)
+def test_quote_request_submission_handles_numeric_and_manual_review_estimates(
+    location: str,
+    expects_customer_fare: bool,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Confirmation submission persists every estimate type without null errors."""
+
+    session = _RequestFlowSession()
+    monkeypatch.setattr(
+        "app.services.quote_request_service.send_approval_notification",
+        lambda *_: None,
+    )
+    estimate_response = create_quote_estimate(
+        _request(
+            service_type="AIRPORT_PICKUP",
+            airport_code="LAX",
+            location_input=location,
+        ),
+        session,
+    )
+    estimate = next(value for value in session.added if isinstance(value, QuoteEstimate))
+
+    result = process_quote_request(session, _request_confirmation(estimate_response.estimate_id))
+    quote = next(value for value in session.added if isinstance(value, Quote))
+    outbox = next(value for value in session.added if isinstance(value, OutboxEvent))
+
+    assert result.estimate_id == estimate.id
+    assert session.rollbacks == 0
+    assert quote.suggested_amount is not None if expects_customer_fare else quote.suggested_amount is None
+    assert outbox.payload["suggested_amount"] is not None if expects_customer_fare else outbox.payload["suggested_amount"] is None
+
+    if location in {"Las Vegas", "San Francisco"}:
+        assert "LONG_DISTANCE_REVIEW_REQUIRED" in (estimate.manual_review_reason or "")
+        assert estimate.pricing_factors["not_for_quoting"] is True
+        assert "Suggested Amount" not in _pricing_recommendation_text(estimate)
+        dashboard_details = _pricing_details(quote)
+        assert "LONG_DISTANCE_REVIEW_REQUIRED" in dashboard_details
+        assert "Closed-loop mileage:" in dashboard_details
+        assert "Pricing V1 diagnostic only:" in dashboard_details
+        assert "Do not use automatic fare." in dashboard_details
+        assert "Jason must review manually." in dashboard_details
+        assert "Suggested" not in dashboard_details
 
 
 def test_api_paths_are_not_canonical_redirected(client) -> None:
