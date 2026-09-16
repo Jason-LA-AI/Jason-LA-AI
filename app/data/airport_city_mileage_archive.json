@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "generated_at": "2026-09-15T00:10:12.228444+00:00",
-  "coverage": "Los Angeles County incorporated cities plus requested special destinations",
+  "generated_at": "2026-09-15T16:12:48.694859+00:00",
+  "coverage": "Los Angeles County cities, requested Southern California cities, and requested special destinations",
   "reference_route": "Rowland Heights city center → airport → destination center → Rowland Heights city center",
   "source": "Public city-center coordinates plus OpenStreetMap road routing. Refresh with Google Maps Routes before relying on a material fare change.",
   "profiles": {
@@ -11,11 +11,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 133.2,
-          "airport_dropoff_miles": 134.5
+          "airport_dropoff_miles": 134.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            36.5,
+            58.1
+          ],
+          "airport_dropoff_legs_miles": [
+            60.3,
+            36.6,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 156.6,
-          "airport_dropoff_miles": 158.3
+          "airport_dropoff_miles": 158.3,
+          "airport_pickup_legs_miles": [
+            22.1,
+            76.5,
+            58.1
+          ],
+          "airport_dropoff_legs_miles": [
+            60.3,
+            75.9,
+            22.1
+          ]
         }
       }
     },
@@ -25,11 +45,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 84.8,
-          "airport_dropoff_miles": 80.4
+          "airport_dropoff_miles": 80.4,
+          "airport_pickup_legs_miles": [
+            38.7,
+            27.2,
+            18.9
+          ],
+          "airport_dropoff_legs_miles": [
+            18.6,
+            24.3,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 76.6,
-          "airport_dropoff_miles": 76.7
+          "airport_dropoff_miles": 76.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            35.6,
+            18.9
+          ],
+          "airport_dropoff_legs_miles": [
+            18.6,
+            36.0,
+            22.1
+          ]
         }
       }
     },
@@ -39,11 +79,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 94.4,
-          "airport_dropoff_miles": 90.6
+          "airport_dropoff_miles": 90.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            36.0,
+            19.7
+          ],
+          "airport_dropoff_legs_miles": [
+            19.4,
+            33.6,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 73.9,
-          "airport_dropoff_miles": 73.3
+          "airport_dropoff_miles": 73.3,
+          "airport_pickup_legs_miles": [
+            22.1,
+            32.1,
+            19.7
+          ],
+          "airport_dropoff_legs_miles": [
+            19.4,
+            31.8,
+            22.1
+          ]
         }
       }
     },
@@ -53,11 +113,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.1,
-          "airport_dropoff_miles": 78.0
+          "airport_dropoff_miles": 78.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            24.3,
+            15.1
+          ],
+          "airport_dropoff_legs_miles": [
+            15.1,
+            25.3,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 76.5,
-          "airport_dropoff_miles": 77.0
+          "airport_dropoff_miles": 77.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            39.4,
+            15.1
+          ],
+          "airport_dropoff_legs_miles": [
+            15.1,
+            39.8,
+            22.1
+          ]
         }
       }
     },
@@ -67,11 +147,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 91.8,
-          "airport_dropoff_miles": 91.3
+          "airport_dropoff_miles": 91.3,
+          "airport_pickup_legs_miles": [
+            38.7,
+            40.7,
+            12.4
+          ],
+          "airport_dropoff_legs_miles": [
+            12.4,
+            41.3,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 58.5,
-          "airport_dropoff_miles": 58.7
+          "airport_dropoff_miles": 58.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            24.0,
+            12.4
+          ],
+          "airport_dropoff_legs_miles": [
+            12.4,
+            24.2,
+            22.1
+          ]
         }
       }
     },
@@ -81,11 +181,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 87.5,
-          "airport_dropoff_miles": 86.8
+          "airport_dropoff_miles": 86.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            34.1,
+            14.7
+          ],
+          "airport_dropoff_legs_miles": [
+            14.7,
+            34.6,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 62.1,
-          "airport_dropoff_miles": 62.2
+          "airport_dropoff_miles": 62.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            25.3,
+            14.7
+          ],
+          "airport_dropoff_legs_miles": [
+            14.7,
+            25.4,
+            22.1
+          ]
         }
       }
     },
@@ -95,11 +215,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 81.7,
-          "airport_dropoff_miles": 80.9
+          "airport_dropoff_miles": 80.9,
+          "airport_pickup_legs_miles": [
+            38.7,
+            19.6,
+            23.4
+          ],
+          "airport_dropoff_legs_miles": [
+            23.5,
+            19.8,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 88.0,
-          "airport_dropoff_miles": 88.5
+          "airport_dropoff_miles": 88.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            42.5,
+            23.4
+          ],
+          "airport_dropoff_legs_miles": [
+            23.5,
+            42.9,
+            22.1
+          ]
         }
       }
     },
@@ -109,11 +249,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.6,
-          "airport_dropoff_miles": 78.2
+          "airport_dropoff_miles": 78.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            18.1,
+            21.9
+          ],
+          "airport_dropoff_legs_miles": [
+            22.2,
+            18.4,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 85.3,
-          "airport_dropoff_miles": 85.7
+          "airport_dropoff_miles": 85.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            41.3,
+            21.9
+          ],
+          "airport_dropoff_legs_miles": [
+            22.2,
+            41.4,
+            22.1
+          ]
         }
       }
     },
@@ -123,11 +283,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 80.5,
-          "airport_dropoff_miles": 80.7
+          "airport_dropoff_miles": 80.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            19.7,
+            22.1
+          ],
+          "airport_dropoff_legs_miles": [
+            22.6,
+            20.6,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 85.8,
-          "airport_dropoff_miles": 86.3
+          "airport_dropoff_miles": 86.3,
+          "airport_pickup_legs_miles": [
+            22.1,
+            41.6,
+            22.1
+          ],
+          "airport_dropoff_legs_miles": [
+            22.6,
+            41.6,
+            22.1
+          ]
         }
       }
     },
@@ -137,11 +317,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 85.0,
-          "airport_dropoff_miles": 82.2
+          "airport_dropoff_miles": 82.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            12.8,
+            33.5
+          ],
+          "airport_dropoff_legs_miles": [
+            33.2,
+            11.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 107.9,
-          "airport_dropoff_miles": 108.3
+          "airport_dropoff_miles": 108.3,
+          "airport_pickup_legs_miles": [
+            22.1,
+            52.3,
+            33.5
+          ],
+          "airport_dropoff_legs_miles": [
+            33.2,
+            53.0,
+            22.1
+          ]
         }
       }
     },
@@ -151,11 +351,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 97.7,
-          "airport_dropoff_miles": 97.1
+          "airport_dropoff_miles": 97.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            39.2,
+            19.9
+          ],
+          "airport_dropoff_legs_miles": [
+            19.7,
+            39.7,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 71.5,
-          "airport_dropoff_miles": 71.4
+          "airport_dropoff_miles": 71.4,
+          "airport_pickup_legs_miles": [
+            22.1,
+            29.6,
+            19.9
+          ],
+          "airport_dropoff_legs_miles": [
+            19.7,
+            29.6,
+            22.1
+          ]
         }
       }
     },
@@ -165,11 +385,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 102.0,
-          "airport_dropoff_miles": 100.2
+          "airport_dropoff_miles": 100.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            29.5,
+            33.8
+          ],
+          "airport_dropoff_legs_miles": [
+            33.8,
+            28.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 105.9,
-          "airport_dropoff_miles": 106.1
+          "airport_dropoff_miles": 106.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            50.0,
+            33.8
+          ],
+          "airport_dropoff_legs_miles": [
+            33.8,
+            50.2,
+            22.1
+          ]
         }
       }
     },
@@ -179,11 +419,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 121.8,
-          "airport_dropoff_miles": 123.1
+          "airport_dropoff_miles": 123.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            30.8,
+            52.4
+          ],
+          "airport_dropoff_legs_miles": [
+            54.6,
+            30.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 145.3,
-          "airport_dropoff_miles": 147.0
+          "airport_dropoff_miles": 147.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            70.9,
+            52.4
+          ],
+          "airport_dropoff_legs_miles": [
+            54.6,
+            70.2,
+            22.1
+          ]
         }
       }
     },
@@ -193,11 +453,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 85.6,
-          "airport_dropoff_miles": 82.5
+          "airport_dropoff_miles": 82.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            14.3,
+            32.7
+          ],
+          "airport_dropoff_legs_miles": [
+            29.9,
+            15.0,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 108.8,
-          "airport_dropoff_miles": 104.2
+          "airport_dropoff_miles": 104.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            54.1,
+            32.7
+          ],
+          "airport_dropoff_legs_miles": [
+            29.9,
+            52.1,
+            22.1
+          ]
         }
       }
     },
@@ -207,11 +487,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.7,
-          "airport_dropoff_miles": 78.7
+          "airport_dropoff_miles": 78.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            24.6,
+            15.4
+          ],
+          "airport_dropoff_legs_miles": [
+            15.3,
+            25.8,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 76.5,
-          "airport_dropoff_miles": 76.7
+          "airport_dropoff_miles": 76.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            39.0,
+            15.4
+          ],
+          "airport_dropoff_legs_miles": [
+            15.3,
+            39.2,
+            22.1
+          ]
         }
       }
     },
@@ -221,11 +521,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 106.5,
-          "airport_dropoff_miles": 106.0
+          "airport_dropoff_miles": 106.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            49.9,
+            18.0
+          ],
+          "airport_dropoff_legs_miles": [
+            17.7,
+            50.7,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 51.2,
-          "airport_dropoff_miles": 51.2
+          "airport_dropoff_miles": 51.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            11.2,
+            18.0
+          ],
+          "airport_dropoff_legs_miles": [
+            17.7,
+            11.4,
+            22.1
+          ]
         }
       }
     },
@@ -235,11 +555,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 79.3,
-          "airport_dropoff_miles": 78.6
+          "airport_dropoff_miles": 78.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            21.8,
+            18.8
+          ],
+          "airport_dropoff_legs_miles": [
+            19.3,
+            21.7,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 79.2,
-          "airport_dropoff_miles": 79.7
+          "airport_dropoff_miles": 79.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            38.3,
+            18.8
+          ],
+          "airport_dropoff_legs_miles": [
+            19.3,
+            38.3,
+            22.1
+          ]
         }
       }
     },
@@ -249,11 +589,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 79.9,
-          "airport_dropoff_miles": 77.4
+          "airport_dropoff_miles": 77.4,
+          "airport_pickup_legs_miles": [
+            38.7,
+            13.5,
+            27.8
+          ],
+          "airport_dropoff_legs_miles": [
+            25.6,
+            14.2,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 99.7,
-          "airport_dropoff_miles": 95.0
+          "airport_dropoff_miles": 95.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            49.8,
+            27.8
+          ],
+          "airport_dropoff_legs_miles": [
+            25.6,
+            47.3,
+            22.1
+          ]
         }
       }
     },
@@ -263,11 +623,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 87.5,
-          "airport_dropoff_miles": 87.1
+          "airport_dropoff_miles": 87.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            38.5,
+            10.3
+          ],
+          "airport_dropoff_legs_miles": [
+            10.3,
+            39.2,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 55.4,
-          "airport_dropoff_miles": 55.5
+          "airport_dropoff_miles": 55.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            23.0,
+            10.3
+          ],
+          "airport_dropoff_legs_miles": [
+            10.3,
+            23.0,
+            22.1
+          ]
         }
       }
     },
@@ -277,11 +657,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 79.8,
-          "airport_dropoff_miles": 78.6
+          "airport_dropoff_miles": 78.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            16.8,
+            24.4
+          ],
+          "airport_dropoff_legs_miles": [
+            24.0,
+            16.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 89.6,
-          "airport_dropoff_miles": 90.0
+          "airport_dropoff_miles": 90.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            43.1,
+            24.4
+          ],
+          "airport_dropoff_legs_miles": [
+            24.0,
+            43.9,
+            22.1
+          ]
         }
       }
     },
@@ -291,11 +691,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 76.4,
-          "airport_dropoff_miles": 75.6
+          "airport_dropoff_miles": 75.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            4.6,
+            33.1
+          ],
+          "airport_dropoff_legs_miles": [
+            33.5,
+            4.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 107.7,
-          "airport_dropoff_miles": 108.2
+          "airport_dropoff_miles": 108.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            52.5,
+            33.1
+          ],
+          "airport_dropoff_legs_miles": [
+            33.5,
+            52.6,
+            22.1
+          ]
         }
       }
     },
@@ -305,11 +725,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 89.5,
-          "airport_dropoff_miles": 89.0
+          "airport_dropoff_miles": 89.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            42.6,
+            8.2
+          ],
+          "airport_dropoff_legs_miles": [
+            7.6,
+            43.8,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 46.3,
-          "airport_dropoff_miles": 46.0
+          "airport_dropoff_miles": 46.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            15.9,
+            8.2
+          ],
+          "airport_dropoff_legs_miles": [
+            7.6,
+            16.3,
+            22.1
+          ]
         }
       }
     },
@@ -319,11 +759,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.1,
-          "airport_dropoff_miles": 77.2
+          "airport_dropoff_miles": 77.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            19.3,
+            20.1
+          ],
+          "airport_dropoff_legs_miles": [
+            20.4,
+            19.2,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 81.7,
-          "airport_dropoff_miles": 82.1
+          "airport_dropoff_miles": 82.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            39.5,
+            20.1
+          ],
+          "airport_dropoff_legs_miles": [
+            20.4,
+            39.6,
+            22.1
+          ]
         }
       }
     },
@@ -333,11 +793,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 96.3,
-          "airport_dropoff_miles": 95.7
+          "airport_dropoff_miles": 95.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            38.4,
+            19.2
+          ],
+          "airport_dropoff_legs_miles": [
+            19.0,
+            39.1,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 70.1,
-          "airport_dropoff_miles": 69.9
+          "airport_dropoff_miles": 69.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            28.8,
+            19.2
+          ],
+          "airport_dropoff_legs_miles": [
+            19.0,
+            28.8,
+            22.1
+          ]
         }
       }
     },
@@ -347,11 +827,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 85.7,
-          "airport_dropoff_miles": 80.8
+          "airport_dropoff_miles": 80.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            32.1,
+            14.9
+          ],
+          "airport_dropoff_legs_miles": [
+            13.9,
+            29.3,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 66.3,
-          "airport_dropoff_miles": 65.4
+          "airport_dropoff_miles": 65.4,
+          "airport_pickup_legs_miles": [
+            22.1,
+            29.3,
+            14.9
+          ],
+          "airport_dropoff_legs_miles": [
+            13.9,
+            29.3,
+            22.1
+          ]
         }
       }
     },
@@ -361,11 +861,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 79.6,
-          "airport_dropoff_miles": 80.3
+          "airport_dropoff_miles": 80.3,
+          "airport_pickup_legs_miles": [
+            38.7,
+            3.0,
+            38.0
+          ],
+          "airport_dropoff_legs_miles": [
+            38.4,
+            4.3,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 117.5,
-          "airport_dropoff_miles": 117.9
+          "airport_dropoff_miles": 117.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            57.4,
+            38.0
+          ],
+          "airport_dropoff_legs_miles": [
+            38.4,
+            57.4,
+            22.1
+          ]
         }
       }
     },
@@ -375,11 +895,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 80.8,
-          "airport_dropoff_miles": 81.2
+          "airport_dropoff_miles": 81.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            9.7,
+            32.3
+          ],
+          "airport_dropoff_legs_miles": [
+            32.7,
+            10.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 106.2,
-          "airport_dropoff_miles": 106.6
+          "airport_dropoff_miles": 106.6,
+          "airport_pickup_legs_miles": [
+            22.1,
+            51.7,
+            32.3
+          ],
+          "airport_dropoff_legs_miles": [
+            32.7,
+            51.8,
+            22.1
+          ]
         }
       }
     },
@@ -389,11 +929,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 99.4,
-          "airport_dropoff_miles": 95.6
+          "airport_dropoff_miles": 95.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            28.2,
+            32.5
+          ],
+          "airport_dropoff_legs_miles": [
+            32.5,
+            25.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 103.3,
-          "airport_dropoff_miles": 103.5
+          "airport_dropoff_miles": 103.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            48.7,
+            32.5
+          ],
+          "airport_dropoff_legs_miles": [
+            32.5,
+            48.9,
+            22.1
+          ]
         }
       }
     },
@@ -403,11 +963,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 99.5,
-          "airport_dropoff_miles": 99.0
+          "airport_dropoff_miles": 99.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            43.8,
+            17.0
+          ],
+          "airport_dropoff_legs_miles": [
+            17.1,
+            44.3,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 60.8,
-          "airport_dropoff_miles": 60.8
+          "airport_dropoff_miles": 60.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            21.8,
+            17.0
+          ],
+          "airport_dropoff_legs_miles": [
+            17.1,
+            21.5,
+            22.1
+          ]
         }
       }
     },
@@ -417,11 +997,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 82.1,
-          "airport_dropoff_miles": 82.0
+          "airport_dropoff_miles": 82.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            25.6,
+            17.8
+          ],
+          "airport_dropoff_legs_miles": [
+            17.9,
+            26.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 81.1,
-          "airport_dropoff_miles": 81.4
+          "airport_dropoff_miles": 81.4,
+          "airport_pickup_legs_miles": [
+            22.1,
+            41.3,
+            17.8
+          ],
+          "airport_dropoff_legs_miles": [
+            17.9,
+            41.4,
+            22.1
+          ]
         }
       }
     },
@@ -431,11 +1031,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.6,
-          "airport_dropoff_miles": 77.8
+          "airport_dropoff_miles": 77.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            6.2,
+            33.7
+          ],
+          "airport_dropoff_legs_miles": [
+            34.3,
+            5.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 109.2,
-          "airport_dropoff_miles": 109.6
+          "airport_dropoff_miles": 109.6,
+          "airport_pickup_legs_miles": [
+            22.1,
+            53.3,
+            33.7
+          ],
+          "airport_dropoff_legs_miles": [
+            34.3,
+            53.2,
+            22.1
+          ]
         }
       }
     },
@@ -445,11 +1065,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 84.2,
-          "airport_dropoff_miles": 79.0
+          "airport_dropoff_miles": 79.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            6.3,
+            39.2
+          ],
+          "airport_dropoff_legs_miles": [
+            34.3,
+            7.1,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 119.7,
-          "airport_dropoff_miles": 115.1
+          "airport_dropoff_miles": 115.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            58.5,
+            39.2
+          ],
+          "airport_dropoff_legs_miles": [
+            34.3,
+            58.7,
+            22.1
+          ]
         }
       }
     },
@@ -459,11 +1099,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 118.7,
-          "airport_dropoff_miles": 120.0
+          "airport_dropoff_miles": 120.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            29.2,
+            50.8
+          ],
+          "airport_dropoff_legs_miles": [
+            53.0,
+            29.4,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 142.1,
-          "airport_dropoff_miles": 143.8
+          "airport_dropoff_miles": 143.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            69.2,
+            50.8
+          ],
+          "airport_dropoff_legs_miles": [
+            53.0,
+            68.7,
+            22.1
+          ]
         }
       }
     },
@@ -473,11 +1133,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.9,
-          "airport_dropoff_miles": 79.1
+          "airport_dropoff_miles": 79.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            16.1,
+            24.1
+          ],
+          "airport_dropoff_legs_miles": [
+            24.2,
+            17.4,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 89.4,
-          "airport_dropoff_miles": 89.9
+          "airport_dropoff_miles": 89.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            43.2,
+            24.1
+          ],
+          "airport_dropoff_legs_miles": [
+            24.2,
+            43.6,
+            22.1
+          ]
         }
       }
     },
@@ -487,11 +1167,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.7,
-          "airport_dropoff_miles": 78.2
+          "airport_dropoff_miles": 78.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            34.0,
+            6.0
+          ],
+          "airport_dropoff_legs_miles": [
+            6.1,
+            34.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 53.2,
-          "airport_dropoff_miles": 53.7
+          "airport_dropoff_miles": 53.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            25.2,
+            6.0
+          ],
+          "airport_dropoff_legs_miles": [
+            6.1,
+            25.5,
+            22.1
+          ]
         }
       }
     },
@@ -501,11 +1201,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 77.8,
-          "airport_dropoff_miles": 77.0
+          "airport_dropoff_miles": 77.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            3.8,
+            35.3
+          ],
+          "airport_dropoff_legs_miles": [
+            35.5,
+            3.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 111.9,
-          "airport_dropoff_miles": 112.4
+          "airport_dropoff_miles": 112.4,
+          "airport_pickup_legs_miles": [
+            22.1,
+            54.5,
+            35.3
+          ],
+          "airport_dropoff_legs_miles": [
+            35.5,
+            54.8,
+            22.1
+          ]
         }
       }
     },
@@ -515,11 +1235,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 88.5,
-          "airport_dropoff_miles": 88.8
+          "airport_dropoff_miles": 88.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            37.3,
+            12.5
+          ],
+          "airport_dropoff_legs_miles": [
+            12.9,
+            38.3,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 60.2,
-          "airport_dropoff_miles": 60.2
+          "airport_dropoff_miles": 60.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            25.7,
+            12.5
+          ],
+          "airport_dropoff_legs_miles": [
+            12.9,
+            25.2,
+            22.1
+          ]
         }
       }
     },
@@ -529,11 +1269,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 104.7,
-          "airport_dropoff_miles": 95.1
+          "airport_dropoff_miles": 95.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            31.4,
+            34.6
+          ],
+          "airport_dropoff_legs_miles": [
+            28.9,
+            28.6,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 100.9,
-          "airport_dropoff_miles": 95.4
+          "airport_dropoff_miles": 95.4,
+          "airport_pickup_legs_miles": [
+            22.1,
+            44.1,
+            34.6
+          ],
+          "airport_dropoff_legs_miles": [
+            28.9,
+            44.3,
+            22.1
+          ]
         }
       }
     },
@@ -543,11 +1303,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 71.9,
-          "airport_dropoff_miles": 71.6
+          "airport_dropoff_miles": 71.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            29.8,
+            3.5
+          ],
+          "airport_dropoff_legs_miles": [
+            3.5,
+            30.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 50.8,
-          "airport_dropoff_miles": 50.8
+          "airport_dropoff_miles": 50.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            25.2,
+            3.5
+          ],
+          "airport_dropoff_legs_miles": [
+            3.5,
+            25.2,
+            22.1
+          ]
         }
       }
     },
@@ -557,11 +1337,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 74.4,
-          "airport_dropoff_miles": 73.9
+          "airport_dropoff_miles": 73.9,
+          "airport_pickup_legs_miles": [
+            38.7,
+            25.9,
+            9.8
+          ],
+          "airport_dropoff_legs_miles": [
+            9.9,
+            26.4,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 63.5,
-          "airport_dropoff_miles": 63.5
+          "airport_dropoff_miles": 63.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            31.6,
+            9.8
+          ],
+          "airport_dropoff_legs_miles": [
+            9.9,
+            31.5,
+            22.1
+          ]
         }
       }
     },
@@ -571,11 +1371,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 80.7,
-          "airport_dropoff_miles": 80.5
+          "airport_dropoff_miles": 80.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            35.9,
+            6.2
+          ],
+          "airport_dropoff_legs_miles": [
+            6.2,
+            36.7,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 53.6,
-          "airport_dropoff_miles": 54.0
+          "airport_dropoff_miles": 54.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            25.3,
+            6.2
+          ],
+          "airport_dropoff_legs_miles": [
+            6.2,
+            25.7,
+            22.1
+          ]
         }
       }
     },
@@ -585,11 +1405,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 104.7,
-          "airport_dropoff_miles": 104.1
+          "airport_dropoff_miles": 104.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            48.1,
+            18.0
+          ],
+          "airport_dropoff_legs_miles": [
+            17.6,
+            49.0,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 55.3,
-          "airport_dropoff_miles": 55.0
+          "airport_dropoff_miles": 55.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            15.3,
+            18.0
+          ],
+          "airport_dropoff_legs_miles": [
+            17.6,
+            15.2,
+            22.1
+          ]
         }
       }
     },
@@ -599,11 +1439,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 86.0,
-          "airport_dropoff_miles": 80.0
+          "airport_dropoff_miles": 80.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            22.2,
+            25.1
+          ],
+          "airport_dropoff_legs_miles": [
+            20.1,
+            22.3,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 91.5,
-          "airport_dropoff_miles": 86.8
+          "airport_dropoff_miles": 86.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            44.3,
+            25.1
+          ],
+          "airport_dropoff_legs_miles": [
+            20.1,
+            44.6,
+            22.1
+          ]
         }
       }
     },
@@ -613,11 +1473,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 205.3,
-          "airport_dropoff_miles": 204.4
+          "airport_dropoff_miles": 204.4,
+          "airport_pickup_legs_miles": [
+            38.7,
+            74.0,
+            92.7
+          ],
+          "airport_dropoff_legs_miles": [
+            92.7,
+            74.2,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 196.1,
-          "airport_dropoff_miles": 195.9
+          "airport_dropoff_miles": 195.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            81.3,
+            92.7
+          ],
+          "airport_dropoff_legs_miles": [
+            92.7,
+            81.1,
+            22.1
+          ]
         }
       }
     },
@@ -627,11 +1507,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 81.7,
-          "airport_dropoff_miles": 81.6
+          "airport_dropoff_miles": 81.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            7.1,
+            35.9
+          ],
+          "airport_dropoff_legs_miles": [
+            36.4,
+            7.6,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 113.4,
-          "airport_dropoff_miles": 113.9
+          "airport_dropoff_miles": 113.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            55.4,
+            35.9
+          ],
+          "airport_dropoff_legs_miles": [
+            36.4,
+            55.4,
+            22.1
+          ]
         }
       }
     },
@@ -641,11 +1541,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 93.0,
-          "airport_dropoff_miles": 87.7
+          "airport_dropoff_miles": 87.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            14.0,
+            40.3
+          ],
+          "airport_dropoff_legs_miles": [
+            35.3,
+            14.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 121.8,
-          "airport_dropoff_miles": 117.1
+          "airport_dropoff_miles": 117.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            59.4,
+            40.3
+          ],
+          "airport_dropoff_legs_miles": [
+            35.3,
+            59.7,
+            22.1
+          ]
         }
       }
     },
@@ -655,11 +1575,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 94.0,
-          "airport_dropoff_miles": 90.2
+          "airport_dropoff_miles": 90.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            21.4,
+            33.9
+          ],
+          "airport_dropoff_legs_miles": [
+            30.3,
+            22.2,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 107.3,
-          "airport_dropoff_miles": 105.9
+          "airport_dropoff_miles": 105.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            51.3,
+            33.9
+          ],
+          "airport_dropoff_legs_miles": [
+            30.3,
+            53.4,
+            22.1
+          ]
         }
       }
     },
@@ -669,11 +1609,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.0,
-          "airport_dropoff_miles": 78.1
+          "airport_dropoff_miles": 78.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            13.4,
+            26.0
+          ],
+          "airport_dropoff_legs_miles": [
+            26.3,
+            14.2,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 93.4,
-          "airport_dropoff_miles": 93.8
+          "airport_dropoff_miles": 93.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            45.3,
+            26.0
+          ],
+          "airport_dropoff_legs_miles": [
+            26.3,
+            45.5,
+            22.1
+          ]
         }
       }
     },
@@ -683,11 +1643,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 77.1,
-          "airport_dropoff_miles": 77.0
+          "airport_dropoff_miles": 77.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            13.4,
+            25.0
+          ],
+          "airport_dropoff_legs_miles": [
+            25.1,
+            14.3,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 91.3,
-          "airport_dropoff_miles": 91.7
+          "airport_dropoff_miles": 91.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            44.2,
+            25.0
+          ],
+          "airport_dropoff_legs_miles": [
+            25.1,
+            44.5,
+            22.1
+          ]
         }
       }
     },
@@ -697,11 +1677,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 111.9,
-          "airport_dropoff_miles": 111.0
+          "airport_dropoff_miles": 111.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            22.6,
+            50.7
+          ],
+          "airport_dropoff_legs_miles": [
+            51.0,
+            22.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 142.8,
-          "airport_dropoff_miles": 143.3
+          "airport_dropoff_miles": 143.3,
+          "airport_pickup_legs_miles": [
+            22.1,
+            70.0,
+            50.7
+          ],
+          "airport_dropoff_legs_miles": [
+            51.0,
+            70.2,
+            22.1
+          ]
         }
       }
     },
@@ -711,11 +1711,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 82.3,
-          "airport_dropoff_miles": 77.5
+          "airport_dropoff_miles": 77.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            4.6,
+            39.1
+          ],
+          "airport_dropoff_legs_miles": [
+            34.5,
+            5.4,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 119.9,
-          "airport_dropoff_miles": 115.2
+          "airport_dropoff_miles": 115.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            58.7,
+            39.1
+          ],
+          "airport_dropoff_legs_miles": [
+            34.5,
+            58.6,
+            22.1
+          ]
         }
       }
     },
@@ -725,11 +1745,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.3,
-          "airport_dropoff_miles": 81.0
+          "airport_dropoff_miles": 81.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            18.5,
+            21.1
+          ],
+          "airport_dropoff_legs_miles": [
+            21.4,
+            22.0,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 83.7,
-          "airport_dropoff_miles": 84.2
+          "airport_dropoff_miles": 84.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            40.5,
+            21.1
+          ],
+          "airport_dropoff_legs_miles": [
+            21.4,
+            40.6,
+            22.1
+          ]
         }
       }
     },
@@ -739,11 +1779,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 99.2,
-          "airport_dropoff_miles": 98.6
+          "airport_dropoff_miles": 98.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            39.9,
+            20.6
+          ],
+          "airport_dropoff_legs_miles": [
+            20.5,
+            40.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 73.0,
-          "airport_dropoff_miles": 72.9
+          "airport_dropoff_miles": 72.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            30.3,
+            20.6
+          ],
+          "airport_dropoff_legs_miles": [
+            20.5,
+            30.3,
+            22.1
+          ]
         }
       }
     },
@@ -753,11 +1813,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.4,
-          "airport_dropoff_miles": 78.5
+          "airport_dropoff_miles": 78.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            24.2,
+            15.6
+          ],
+          "airport_dropoff_legs_miles": [
+            15.9,
+            25.1,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 72.6,
-          "airport_dropoff_miles": 73.0
+          "airport_dropoff_miles": 73.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            34.9,
+            15.6
+          ],
+          "airport_dropoff_legs_miles": [
+            15.9,
+            35.0,
+            22.1
+          ]
         }
       }
     },
@@ -767,11 +1847,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.6,
-          "airport_dropoff_miles": 77.7
+          "airport_dropoff_miles": 77.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            23.6,
+            16.3
+          ],
+          "airport_dropoff_legs_miles": [
+            16.6,
+            23.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 74.1,
-          "airport_dropoff_miles": 74.5
+          "airport_dropoff_miles": 74.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            35.7,
+            16.3
+          ],
+          "airport_dropoff_legs_miles": [
+            16.6,
+            35.8,
+            22.1
+          ]
         }
       }
     },
@@ -781,11 +1881,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 74.3,
-          "airport_dropoff_miles": 72.5
+          "airport_dropoff_miles": 72.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            21.3,
+            14.3
+          ],
+          "airport_dropoff_legs_miles": [
+            13.2,
+            21.7,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 75.6,
-          "airport_dropoff_miles": 74.5
+          "airport_dropoff_miles": 74.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            39.2,
+            14.3
+          ],
+          "airport_dropoff_legs_miles": [
+            13.2,
+            39.2,
+            22.1
+          ]
         }
       }
     },
@@ -795,11 +1915,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 190.0,
-          "airport_dropoff_miles": 189.1
+          "airport_dropoff_miles": 189.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            66.4,
+            85.0
+          ],
+          "airport_dropoff_legs_miles": [
+            85.0,
+            66.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 175.2,
-          "airport_dropoff_miles": 175.0
+          "airport_dropoff_miles": 175.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            68.1,
+            85.0
+          ],
+          "airport_dropoff_legs_miles": [
+            85.0,
+            67.9,
+            22.1
+          ]
         }
       }
     },
@@ -809,11 +1949,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 92.5,
-          "airport_dropoff_miles": 87.8
+          "airport_dropoff_miles": 87.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            11.1,
+            42.8
+          ],
+          "airport_dropoff_legs_miles": [
+            38.2,
+            11.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 127.3,
-          "airport_dropoff_miles": 122.6
+          "airport_dropoff_miles": 122.6,
+          "airport_pickup_legs_miles": [
+            22.1,
+            62.4,
+            42.8
+          ],
+          "airport_dropoff_legs_miles": [
+            38.2,
+            62.2,
+            22.1
+          ]
         }
       }
     },
@@ -823,11 +1983,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 78.3,
-          "airport_dropoff_miles": 78.4
+          "airport_dropoff_miles": 78.4,
+          "airport_pickup_legs_miles": [
+            38.7,
+            16.6,
+            23.1
+          ],
+          "airport_dropoff_legs_miles": [
+            23.5,
+            17.3,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 87.8,
-          "airport_dropoff_miles": 88.3
+          "airport_dropoff_miles": 88.3,
+          "airport_pickup_legs_miles": [
+            22.1,
+            42.6,
+            23.1
+          ],
+          "airport_dropoff_legs_miles": [
+            23.5,
+            42.6,
+            22.1
+          ]
         }
       }
     },
@@ -837,11 +2017,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 95.6,
-          "airport_dropoff_miles": 85.8
+          "airport_dropoff_miles": 85.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            28.4,
+            28.6
+          ],
+          "airport_dropoff_legs_miles": [
+            22.7,
+            25.6,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 89.1,
-          "airport_dropoff_miles": 83.1
+          "airport_dropoff_miles": 83.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            38.4,
+            28.6
+          ],
+          "airport_dropoff_legs_miles": [
+            22.7,
+            38.3,
+            22.1
+          ]
         }
       }
     },
@@ -851,11 +2051,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 76.6,
-          "airport_dropoff_miles": 77.8
+          "airport_dropoff_miles": 77.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            23.1,
+            14.8
+          ],
+          "airport_dropoff_legs_miles": [
+            14.9,
+            25.3,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 70.9,
-          "airport_dropoff_miles": 71.3
+          "airport_dropoff_miles": 71.3,
+          "airport_pickup_legs_miles": [
+            22.1,
+            34.0,
+            14.8
+          ],
+          "airport_dropoff_legs_miles": [
+            14.9,
+            34.3,
+            22.1
+          ]
         }
       }
     },
@@ -865,11 +2085,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 99.6,
-          "airport_dropoff_miles": 99.1
+          "airport_dropoff_miles": 99.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            48.1,
+            12.8
+          ],
+          "airport_dropoff_legs_miles": [
+            13.1,
+            48.4,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 47.4,
-          "airport_dropoff_miles": 47.6
+          "airport_dropoff_miles": 47.6,
+          "airport_pickup_legs_miles": [
+            22.1,
+            12.5,
+            12.8
+          ],
+          "airport_dropoff_legs_miles": [
+            13.1,
+            12.4,
+            22.1
+          ]
         }
       }
     },
@@ -879,11 +2119,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 95.2,
-          "airport_dropoff_miles": 90.0
+          "airport_dropoff_miles": 90.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            13.8,
+            42.8
+          ],
+          "airport_dropoff_legs_miles": [
+            37.8,
+            14.6,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 126.8,
-          "airport_dropoff_miles": 122.1
+          "airport_dropoff_miles": 122.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            61.9,
+            42.8
+          ],
+          "airport_dropoff_legs_miles": [
+            37.8,
+            62.3,
+            22.1
+          ]
         }
       }
     },
@@ -893,11 +2153,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 88.1,
-          "airport_dropoff_miles": 83.0
+          "airport_dropoff_miles": 83.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            8.6,
+            40.9
+          ],
+          "airport_dropoff_legs_miles": [
+            36.0,
+            9.4,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 123.1,
-          "airport_dropoff_miles": 118.5
+          "airport_dropoff_miles": 118.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            60.2,
+            40.9
+          ],
+          "airport_dropoff_legs_miles": [
+            36.0,
+            60.4,
+            22.1
+          ]
         }
       }
     },
@@ -907,11 +2187,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 100.2,
-          "airport_dropoff_miles": 94.9
+          "airport_dropoff_miles": 94.9,
+          "airport_pickup_legs_miles": [
+            38.7,
+            17.1,
+            44.4
+          ],
+          "airport_dropoff_legs_miles": [
+            39.4,
+            17.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 130.1,
-          "airport_dropoff_miles": 125.5
+          "airport_dropoff_miles": 125.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            63.6,
+            44.4
+          ],
+          "airport_dropoff_legs_miles": [
+            39.4,
+            63.9,
+            22.1
+          ]
         }
       }
     },
@@ -921,11 +2221,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 96.0,
-          "airport_dropoff_miles": 91.6
+          "airport_dropoff_miles": 91.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            15.4,
+            41.9
+          ],
+          "airport_dropoff_legs_miles": [
+            39.6,
+            14.4,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 127.8,
-          "airport_dropoff_miles": 123.2
+          "airport_dropoff_miles": 123.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            63.8,
+            41.9
+          ],
+          "airport_dropoff_legs_miles": [
+            39.6,
+            61.4,
+            22.1
+          ]
         }
       }
     },
@@ -935,11 +2255,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 81.9,
-          "airport_dropoff_miles": 78.3
+          "airport_dropoff_miles": 78.3,
+          "airport_pickup_legs_miles": [
+            38.7,
+            28.7,
+            14.5
+          ],
+          "airport_dropoff_legs_miles": [
+            14.5,
+            26.2,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 69.0,
-          "airport_dropoff_miles": 68.5
+          "airport_dropoff_miles": 68.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            32.4,
+            14.5
+          ],
+          "airport_dropoff_legs_miles": [
+            14.5,
+            31.9,
+            22.1
+          ]
         }
       }
     },
@@ -949,11 +2289,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 98.1,
-          "airport_dropoff_miles": 95.7
+          "airport_dropoff_miles": 95.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            44.9,
+            14.6
+          ],
+          "airport_dropoff_legs_miles": [
+            13.9,
+            44.2,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 53.0,
-          "airport_dropoff_miles": 52.4
+          "airport_dropoff_miles": 52.4,
+          "airport_pickup_legs_miles": [
+            22.1,
+            16.3,
+            14.6
+          ],
+          "airport_dropoff_legs_miles": [
+            13.9,
+            16.3,
+            22.1
+          ]
         }
       }
     },
@@ -963,11 +2323,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 112.2,
-          "airport_dropoff_miles": 111.4
+          "airport_dropoff_miles": 111.4,
+          "airport_pickup_legs_miles": [
+            38.7,
+            28.4,
+            45.2
+          ],
+          "airport_dropoff_legs_miles": [
+            45.3,
+            28.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 127.3,
-          "airport_dropoff_miles": 127.4
+          "airport_dropoff_miles": 127.4,
+          "airport_pickup_legs_miles": [
+            22.1,
+            60.0,
+            45.2
+          ],
+          "airport_dropoff_legs_miles": [
+            45.3,
+            60.0,
+            22.1
+          ]
         }
       }
     },
@@ -977,11 +2357,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 87.6,
-          "airport_dropoff_miles": 83.6
+          "airport_dropoff_miles": 83.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            31.6,
+            17.4
+          ],
+          "airport_dropoff_legs_miles": [
+            17.4,
+            28.6,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 74.1,
-          "airport_dropoff_miles": 74.1
+          "airport_dropoff_miles": 74.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            34.6,
+            17.4
+          ],
+          "airport_dropoff_legs_miles": [
+            17.4,
+            34.6,
+            22.1
+          ]
         }
       }
     },
@@ -991,11 +2391,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 85.9,
-          "airport_dropoff_miles": 82.2
+          "airport_dropoff_miles": 82.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            28.5,
+            18.7
+          ],
+          "airport_dropoff_legs_miles": [
+            18.6,
+            26.0,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 76.8,
-          "airport_dropoff_miles": 76.8
+          "airport_dropoff_miles": 76.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            36.0,
+            18.7
+          ],
+          "airport_dropoff_legs_miles": [
+            18.6,
+            36.1,
+            22.1
+          ]
         }
       }
     },
@@ -1005,11 +2425,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 143.0,
-          "airport_dropoff_miles": 142.1
+          "airport_dropoff_miles": 142.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            43.0,
+            61.4
+          ],
+          "airport_dropoff_legs_miles": [
+            61.6,
+            42.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 161.1,
-          "airport_dropoff_miles": 161.3
+          "airport_dropoff_miles": 161.3,
+          "airport_pickup_legs_miles": [
+            22.1,
+            77.6,
+            61.4
+          ],
+          "airport_dropoff_legs_miles": [
+            61.6,
+            77.6,
+            22.1
+          ]
         }
       }
     },
@@ -1019,11 +2459,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 77.4,
-          "airport_dropoff_miles": 77.9
+          "airport_dropoff_miles": 77.9,
+          "airport_pickup_legs_miles": [
+            38.7,
+            21.9,
+            16.8
+          ],
+          "airport_dropoff_legs_miles": [
+            17.2,
+            23.1,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 75.2,
-          "airport_dropoff_miles": 75.6
+          "airport_dropoff_miles": 75.6,
+          "airport_pickup_legs_miles": [
+            22.1,
+            36.3,
+            16.8
+          ],
+          "airport_dropoff_legs_miles": [
+            17.2,
+            36.3,
+            22.1
+          ]
         }
       }
     },
@@ -1033,11 +2493,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 84.4,
-          "airport_dropoff_miles": 83.5
+          "airport_dropoff_miles": 83.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            8.8,
+            36.9
+          ],
+          "airport_dropoff_legs_miles": [
+            37.2,
+            8.7,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 115.3,
-          "airport_dropoff_miles": 115.8
+          "airport_dropoff_miles": 115.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            56.3,
+            36.9
+          ],
+          "airport_dropoff_legs_miles": [
+            37.2,
+            56.4,
+            22.1
+          ]
         }
       }
     },
@@ -1047,11 +2527,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 97.9,
-          "airport_dropoff_miles": 93.7
+          "airport_dropoff_miles": 93.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            34.8,
+            24.4
+          ],
+          "airport_dropoff_legs_miles": [
+            24.3,
+            31.8,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 80.6,
-          "airport_dropoff_miles": 80.5
+          "airport_dropoff_miles": 80.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            34.1,
+            24.4
+          ],
+          "airport_dropoff_legs_miles": [
+            24.3,
+            34.1,
+            22.1
+          ]
         }
       }
     },
@@ -1061,11 +2561,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 89.4,
-          "airport_dropoff_miles": 89.3
+          "airport_dropoff_miles": 89.3,
+          "airport_pickup_legs_miles": [
+            38.7,
+            19.8,
+            30.9
+          ],
+          "airport_dropoff_legs_miles": [
+            31.0,
+            20.8,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 104.3,
-          "airport_dropoff_miles": 105.0
+          "airport_dropoff_miles": 105.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            51.3,
+            30.9
+          ],
+          "airport_dropoff_legs_miles": [
+            31.0,
+            51.9,
+            22.1
+          ]
         }
       }
     },
@@ -1075,11 +2595,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 80.8,
-          "airport_dropoff_miles": 77.7
+          "airport_dropoff_miles": 77.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            30.6,
+            11.6
+          ],
+          "airport_dropoff_legs_miles": [
+            12.1,
+            28.1,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 64.8,
-          "airport_dropoff_miles": 64.2
+          "airport_dropoff_miles": 64.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            31.1,
+            11.6
+          ],
+          "airport_dropoff_legs_miles": [
+            12.1,
+            30.0,
+            22.1
+          ]
         }
       }
     },
@@ -1089,11 +2629,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 79.5,
-          "airport_dropoff_miles": 77.7
+          "airport_dropoff_miles": 77.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            14.8,
+            26.1
+          ],
+          "airport_dropoff_legs_miles": [
+            25.0,
+            15.1,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 92.2,
-          "airport_dropoff_miles": 92.6
+          "airport_dropoff_miles": 92.6,
+          "airport_pickup_legs_miles": [
+            22.1,
+            44.1,
+            26.1
+          ],
+          "airport_dropoff_legs_miles": [
+            25.0,
+            45.5,
+            22.1
+          ]
         }
       }
     },
@@ -1103,11 +2663,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 85.6,
-          "airport_dropoff_miles": 81.7
+          "airport_dropoff_miles": 81.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            25.5,
+            21.4
+          ],
+          "airport_dropoff_legs_miles": [
+            21.5,
+            22.7,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 81.9,
-          "airport_dropoff_miles": 82.0
+          "airport_dropoff_miles": 82.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            38.5,
+            21.4
+          ],
+          "airport_dropoff_legs_miles": [
+            21.5,
+            38.4,
+            22.1
+          ]
         }
       }
     },
@@ -1117,11 +2697,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 88.7,
-          "airport_dropoff_miles": 83.8
+          "airport_dropoff_miles": 83.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            32.6,
+            17.5
+          ],
+          "airport_dropoff_legs_miles": [
+            16.8,
+            29.4,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 72.0,
-          "airport_dropoff_miles": 70.8
+          "airport_dropoff_miles": 70.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            32.4,
+            17.5
+          ],
+          "airport_dropoff_legs_miles": [
+            16.8,
+            31.9,
+            22.1
+          ]
         }
       }
     },
@@ -1131,11 +2731,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 87.4,
-          "airport_dropoff_miles": 82.6
+          "airport_dropoff_miles": 82.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            12.2,
+            36.6
+          ],
+          "airport_dropoff_legs_miles": [
+            31.9,
+            13.1,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 114.7,
-          "airport_dropoff_miles": 110.1
+          "airport_dropoff_miles": 110.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            56.1,
+            36.6
+          ],
+          "airport_dropoff_legs_miles": [
+            31.9,
+            56.1,
+            22.1
+          ]
         }
       }
     },
@@ -1145,11 +2765,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 79.3,
-          "airport_dropoff_miles": 79.7
+          "airport_dropoff_miles": 79.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            17.5,
+            23.2
+          ],
+          "airport_dropoff_legs_miles": [
+            23.2,
+            18.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 87.5,
-          "airport_dropoff_miles": 88.0
+          "airport_dropoff_miles": 88.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            42.3,
+            23.2
+          ],
+          "airport_dropoff_legs_miles": [
+            23.2,
+            42.7,
+            22.1
+          ]
         }
       }
     },
@@ -1159,11 +2799,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 85.1,
-          "airport_dropoff_miles": 84.6
+          "airport_dropoff_miles": 84.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            40.9,
+            5.6
+          ],
+          "airport_dropoff_legs_miles": [
+            5.9,
+            41.2,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 46.7,
-          "airport_dropoff_miles": 47.5
+          "airport_dropoff_miles": 47.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            19.1,
+            5.6
+          ],
+          "airport_dropoff_legs_miles": [
+            5.9,
+            19.5,
+            22.1
+          ]
         }
       }
     },
@@ -1173,11 +2833,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 82.9,
-          "airport_dropoff_miles": 82.8
+          "airport_dropoff_miles": 82.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            35.2,
+            9.1
+          ],
+          "airport_dropoff_legs_miles": [
+            9.2,
+            36.0,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 54.7,
-          "airport_dropoff_miles": 54.4
+          "airport_dropoff_miles": 54.4,
+          "airport_pickup_legs_miles": [
+            22.1,
+            23.5,
+            9.1
+          ],
+          "airport_dropoff_legs_miles": [
+            9.2,
+            23.1,
+            22.1
+          ]
         }
       }
     },
@@ -1187,11 +2867,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 82.4,
-          "airport_dropoff_miles": 81.5
+          "airport_dropoff_miles": 81.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            12.0,
+            31.7
+          ],
+          "airport_dropoff_legs_miles": [
+            32.0,
+            11.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 103.5,
-          "airport_dropoff_miles": 103.6
+          "airport_dropoff_miles": 103.6,
+          "airport_pickup_legs_miles": [
+            22.1,
+            49.8,
+            31.7
+          ],
+          "airport_dropoff_legs_miles": [
+            32.0,
+            49.5,
+            22.1
+          ]
         }
       }
     },
@@ -1201,11 +2901,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 140.8,
-          "airport_dropoff_miles": 142.1
+          "airport_dropoff_miles": 142.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            40.3,
+            61.9
+          ],
+          "airport_dropoff_legs_miles": [
+            64.1,
+            40.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 164.3,
-          "airport_dropoff_miles": 166.0
+          "airport_dropoff_miles": 166.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            80.3,
+            61.9
+          ],
+          "airport_dropoff_legs_miles": [
+            64.1,
+            79.8,
+            22.1
+          ]
         }
       }
     },
@@ -1215,11 +2935,813 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 81.5,
-          "airport_dropoff_miles": 78.6
+          "airport_dropoff_miles": 78.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            27.8,
+            15.0
+          ],
+          "airport_dropoff_legs_miles": [
+            11.6,
+            29.5,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 71.9,
-          "airport_dropoff_miles": 68.2
+          "airport_dropoff_miles": 68.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            34.8,
+            15.0
+          ],
+          "airport_dropoff_legs_miles": [
+            11.6,
+            34.5,
+            22.1
+          ]
+        }
+      }
+    },
+    "chino": {
+      "destination": "Chino",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 104.0,
+          "airport_dropoff_miles": 103.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            50.0,
+            15.3
+          ],
+          "airport_dropoff_legs_miles": [
+            15.0,
+            50.9,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 46.0,
+          "airport_dropoff_miles": 45.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            8.6,
+            15.3
+          ],
+          "airport_dropoff_legs_miles": [
+            15.0,
+            8.6,
+            22.1
+          ]
+        }
+      }
+    },
+    "chinohills": {
+      "destination": "Chino Hills",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 99.7,
+          "airport_dropoff_miles": 99.3,
+          "airport_pickup_legs_miles": [
+            38.7,
+            47.7,
+            13.4
+          ],
+          "airport_dropoff_legs_miles": [
+            12.7,
+            49.0,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 49.6,
+          "airport_dropoff_miles": 49.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            14.1,
+            13.4
+          ],
+          "airport_dropoff_legs_miles": [
+            12.7,
+            14.4,
+            22.1
+          ]
+        }
+      }
+    },
+    "ontario": {
+      "destination": "Ontario",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 116.0,
+          "airport_dropoff_miles": 115.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            55.4,
+            22.0
+          ],
+          "airport_dropoff_legs_miles": [
+            21.0,
+            56.7,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 47.4,
+          "airport_dropoff_miles": 47.4,
+          "airport_pickup_legs_miles": [
+            22.1,
+            3.3,
+            22.0
+          ],
+          "airport_dropoff_legs_miles": [
+            21.0,
+            4.3,
+            22.1
+          ]
+        }
+      }
+    },
+    "ranchocucamonga": {
+      "destination": "Rancho Cucamonga",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 126.4,
+          "airport_dropoff_miles": 125.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            59.0,
+            28.8
+          ],
+          "airport_dropoff_legs_miles": [
+            28.5,
+            59.7,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 59.7,
+          "airport_dropoff_miles": 59.5,
+          "airport_pickup_legs_miles": [
+            22.1,
+            8.9,
+            28.8
+          ],
+          "airport_dropoff_legs_miles": [
+            28.5,
+            8.8,
+            22.1
+          ]
+        }
+      }
+    },
+    "fontana": {
+      "destination": "Fontana",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 137.5,
+          "airport_dropoff_miles": 137.4,
+          "airport_pickup_legs_miles": [
+            38.7,
+            65.3,
+            33.5
+          ],
+          "airport_dropoff_legs_miles": [
+            33.2,
+            66.7,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 67.2,
+          "airport_dropoff_miles": 65.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            11.6,
+            33.5
+          ],
+          "airport_dropoff_legs_miles": [
+            33.2,
+            10.6,
+            22.1
+          ]
+        }
+      }
+    },
+    "riverside": {
+      "destination": "Riverside",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 141.5,
+          "airport_dropoff_miles": 141.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            68.7,
+            34.1
+          ],
+          "airport_dropoff_legs_miles": [
+            33.8,
+            69.7,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 71.4,
+          "airport_dropoff_miles": 71.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            15.2,
+            34.1
+          ],
+          "airport_dropoff_legs_miles": [
+            33.8,
+            15.3,
+            22.1
+          ]
+        }
+      }
+    },
+    "morenovalley": {
+      "destination": "Moreno Valley",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 168.5,
+          "airport_dropoff_miles": 168.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            82.4,
+            47.4
+          ],
+          "airport_dropoff_legs_miles": [
+            47.4,
+            83.0,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 98.4,
+          "airport_dropoff_miles": 98.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            28.9,
+            47.4
+          ],
+          "airport_dropoff_legs_miles": [
+            47.4,
+            28.6,
+            22.1
+          ]
+        }
+      }
+    },
+    "sanbernardino": {
+      "destination": "San Bernardino",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 159.7,
+          "airport_dropoff_miles": 159.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            76.7,
+            44.4
+          ],
+          "airport_dropoff_legs_miles": [
+            44.5,
+            77.4,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 89.4,
+          "airport_dropoff_miles": 89.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            22.9,
+            44.4
+          ],
+          "airport_dropoff_legs_miles": [
+            44.5,
+            23.1,
+            22.1
+          ]
+        }
+      }
+    },
+    "eastvale": {
+      "destination": "Eastvale",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 127.3,
+          "airport_dropoff_miles": 125.3,
+          "airport_pickup_legs_miles": [
+            38.7,
+            61.7,
+            27.0
+          ],
+          "airport_dropoff_legs_miles": [
+            26.7,
+            61.0,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 57.2,
+          "airport_dropoff_miles": 57.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            8.1,
+            27.0
+          ],
+          "airport_dropoff_legs_miles": [
+            26.7,
+            8.2,
+            22.1
+          ]
+        }
+      }
+    },
+    "corona": {
+      "destination": "Corona",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 114.3,
+          "airport_dropoff_miles": 113.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            50.6,
+            25.1
+          ],
+          "airport_dropoff_legs_miles": [
+            25.0,
+            51.2,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 61.3,
+          "airport_dropoff_miles": 61.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            14.1,
+            25.1
+          ],
+          "airport_dropoff_legs_miles": [
+            25.0,
+            14.1,
+            22.1
+          ]
+        }
+      }
+    },
+    "redlands": {
+      "destination": "Redlands",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 168.0,
+          "airport_dropoff_miles": 167.4,
+          "airport_pickup_legs_miles": [
+            38.7,
+            80.6,
+            48.7
+          ],
+          "airport_dropoff_legs_miles": [
+            48.4,
+            81.5,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 97.6,
+          "airport_dropoff_miles": 97.6,
+          "airport_pickup_legs_miles": [
+            22.1,
+            26.9,
+            48.7
+          ],
+          "airport_dropoff_legs_miles": [
+            48.4,
+            27.1,
+            22.1
+          ]
+        }
+      }
+    },
+    "upland": {
+      "destination": "Upland",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 116.7,
+          "airport_dropoff_miles": 118.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            55.2,
+            22.9
+          ],
+          "airport_dropoff_legs_miles": [
+            24.7,
+            55.9,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 54.8,
+          "airport_dropoff_miles": 56.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            9.9,
+            22.9
+          ],
+          "airport_dropoff_legs_miles": [
+            24.7,
+            9.9,
+            22.1
+          ]
+        }
+      }
+    },
+    "anaheim": {
+      "destination": "Anaheim",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 81.3,
+          "airport_dropoff_miles": 79.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            31.1,
+            11.6
+          ],
+          "airport_dropoff_legs_miles": [
+            11.9,
+            30.2,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 67.5,
+          "airport_dropoff_miles": 67.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            33.8,
+            11.6
+          ],
+          "airport_dropoff_legs_miles": [
+            11.9,
+            33.7,
+            22.1
+          ]
+        }
+      }
+    },
+    "fullerton": {
+      "destination": "Fullerton",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 82.6,
+          "airport_dropoff_miles": 82.3,
+          "airport_pickup_legs_miles": [
+            38.7,
+            34.4,
+            9.6
+          ],
+          "airport_dropoff_legs_miles": [
+            9.6,
+            35.1,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 58.4,
+          "airport_dropoff_miles": 58.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            26.8,
+            9.6
+          ],
+          "airport_dropoff_legs_miles": [
+            9.6,
+            27.2,
+            22.1
+          ]
+        }
+      }
+    },
+    "buenapark": {
+      "destination": "Buena Park",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 80.6,
+          "airport_dropoff_miles": 80.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            28.3,
+            13.7
+          ],
+          "airport_dropoff_legs_miles": [
+            13.5,
+            29.5,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 72.7,
+          "airport_dropoff_miles": 72.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            37.0,
+            13.7
+          ],
+          "airport_dropoff_legs_miles": [
+            13.5,
+            37.2,
+            22.1
+          ]
+        }
+      }
+    },
+    "gardengrove": {
+      "destination": "Garden Grove",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 89.1,
+          "airport_dropoff_miles": 88.9,
+          "airport_pickup_legs_miles": [
+            38.7,
+            35.4,
+            15.1
+          ],
+          "airport_dropoff_legs_miles": [
+            15.1,
+            36.2,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 72.8,
+          "airport_dropoff_miles": 73.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            35.7,
+            15.1
+          ],
+          "airport_dropoff_legs_miles": [
+            15.1,
+            36.0,
+            22.1
+          ]
+        }
+      }
+    },
+    "irvine": {
+      "destination": "Irvine",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 112.2,
+          "airport_dropoff_miles": 111.9,
+          "airport_pickup_legs_miles": [
+            38.7,
+            45.6,
+            27.9
+          ],
+          "airport_dropoff_legs_miles": [
+            28.0,
+            46.2,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 81.1,
+          "airport_dropoff_miles": 80.7,
+          "airport_pickup_legs_miles": [
+            22.1,
+            31.1,
+            27.9
+          ],
+          "airport_dropoff_legs_miles": [
+            28.0,
+            30.5,
+            22.1
+          ]
+        }
+      }
+    },
+    "costamesa": {
+      "destination": "Costa Mesa",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 106.1,
+          "airport_dropoff_miles": 105.3,
+          "airport_pickup_legs_miles": [
+            38.7,
+            38.2,
+            29.3
+          ],
+          "airport_dropoff_legs_miles": [
+            28.8,
+            38.9,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 95.1,
+          "airport_dropoff_miles": 95.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            43.8,
+            29.3
+          ],
+          "airport_dropoff_legs_miles": [
+            28.8,
+            44.3,
+            22.1
+          ]
+        }
+      }
+    },
+    "newportbeach": {
+      "destination": "Newport Beach",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 111.9,
+          "airport_dropoff_miles": 111.3,
+          "airport_pickup_legs_miles": [
+            38.7,
+            42.5,
+            30.8
+          ],
+          "airport_dropoff_legs_miles": [
+            30.7,
+            43.0,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 93.0,
+          "airport_dropoff_miles": 92.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            40.1,
+            30.8
+          ],
+          "airport_dropoff_legs_miles": [
+            30.7,
+            39.3,
+            22.1
+          ]
+        }
+      }
+    },
+    "lagunabeach": {
+      "destination": "Laguna Beach",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 131.2,
+          "airport_dropoff_miles": 130.9,
+          "airport_pickup_legs_miles": [
+            38.7,
+            53.4,
+            39.1
+          ],
+          "airport_dropoff_legs_miles": [
+            39.0,
+            54.3,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 107.5,
+          "airport_dropoff_miles": 106.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            46.3,
+            39.1
+          ],
+          "airport_dropoff_legs_miles": [
+            39.0,
+            45.7,
+            22.1
+          ]
+        }
+      }
+    },
+    "lakeforest": {
+      "destination": "Lake Forest",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 125.1,
+          "airport_dropoff_miles": 124.1,
+          "airport_pickup_legs_miles": [
+            38.7,
+            52.1,
+            34.4
+          ],
+          "airport_dropoff_legs_miles": [
+            34.4,
+            52.1,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 96.0,
+          "airport_dropoff_miles": 95.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            39.5,
+            34.4
+          ],
+          "airport_dropoff_legs_miles": [
+            34.4,
+            38.7,
+            22.1
+          ]
+        }
+      }
+    },
+    "alisoviejo": {
+      "destination": "Aliso Viejo",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 129.3,
+          "airport_dropoff_miles": 129.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            53.0,
+            37.7
+          ],
+          "airport_dropoff_legs_miles": [
+            37.4,
+            54.0,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 104.4,
+          "airport_dropoff_miles": 103.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            44.7,
+            37.7
+          ],
+          "airport_dropoff_legs_miles": [
+            37.4,
+            44.3,
+            22.1
+          ]
+        }
+      }
+    },
+    "santaana": {
+      "destination": "Santa Ana",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 98.3,
+          "airport_dropoff_miles": 98.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            38.4,
+            21.2
+          ],
+          "airport_dropoff_legs_miles": [
+            20.8,
+            39.6,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 79.1,
+          "airport_dropoff_miles": 79.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            35.8,
+            21.2
+          ],
+          "airport_dropoff_legs_miles": [
+            20.8,
+            36.2,
+            22.1
+          ]
         }
       }
     },
@@ -1229,7 +3751,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 76.2,
-          "airport_dropoff_miles": 76.2
+          "airport_dropoff_miles": 76.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            37.6,
+            0.0
+          ],
+          "airport_dropoff_legs_miles": [
+            0.0,
+            38.7,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 44.2,
+          "airport_dropoff_miles": 44.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            22.1,
+            0.0
+          ],
+          "airport_dropoff_legs_miles": [
+            0.0,
+            22.1,
+            22.1
+          ]
         }
       }
     },
@@ -1239,11 +3785,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 569.7,
-          "airport_dropoff_miles": 569.5
+          "airport_dropoff_miles": 569.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            281.5,
+            249.6
+          ],
+          "airport_dropoff_legs_miles": [
+            249.1,
+            282.8,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 499.3,
-          "airport_dropoff_miles": 499.4
+          "airport_dropoff_miles": 499.4,
+          "airport_pickup_legs_miles": [
+            22.1,
+            227.7,
+            249.6
+          ],
+          "airport_dropoff_legs_miles": [
+            249.1,
+            228.2,
+            22.1
+          ]
         }
       }
     },
@@ -1253,11 +3819,31 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 247.5,
-          "airport_dropoff_miles": 247.0
+          "airport_dropoff_miles": 247.0,
+          "airport_pickup_legs_miles": [
+            38.7,
+            112.3,
+            96.6
+          ],
+          "airport_dropoff_legs_miles": [
+            96.5,
+            112.9,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 223.2,
-          "airport_dropoff_miles": 223.6
+          "airport_dropoff_miles": 223.6,
+          "airport_pickup_legs_miles": [
+            22.1,
+            104.6,
+            96.6
+          ],
+          "airport_dropoff_legs_miles": [
+            96.5,
+            105.0,
+            22.1
+          ]
         }
       }
     },
@@ -1267,11 +3853,507 @@
       "airports": {
         "LAX": {
           "airport_pickup_miles": 828.8,
-          "airport_dropoff_miles": 827.9
+          "airport_dropoff_miles": 827.9,
+          "airport_pickup_legs_miles": [
+            38.7,
+            386.3,
+            403.9
+          ],
+          "airport_dropoff_legs_miles": [
+            404.9,
+            385.4,
+            37.6
+          ]
         },
         "ONT": {
           "airport_pickup_miles": 846.8,
-          "airport_dropoff_miles": 847.1
+          "airport_dropoff_miles": 847.1,
+          "airport_pickup_legs_miles": [
+            22.1,
+            420.9,
+            403.9
+          ],
+          "airport_dropoff_legs_miles": [
+            404.9,
+            420.0,
+            22.1
+          ]
+        }
+      }
+    },
+    "downtownlosangeles": {
+      "destination": "Downtown Los Angeles",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 77.1,
+          "airport_dropoff_miles": 76.3,
+          "airport_pickup_legs_miles": [
+            38.7,
+            15.6,
+            22.9
+          ],
+          "airport_dropoff_legs_miles": [
+            23.2,
+            15.5,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 87.3,
+          "airport_dropoff_miles": 87.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            42.3,
+            22.9
+          ],
+          "airport_dropoff_legs_miles": [
+            23.2,
+            42.4,
+            22.1
+          ]
+        }
+      }
+    },
+    "koreatown": {
+      "destination": "Koreatown",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 78.9,
+          "airport_dropoff_miles": 77.9,
+          "airport_pickup_legs_miles": [
+            38.7,
+            12.9,
+            27.4
+          ],
+          "airport_dropoff_legs_miles": [
+            27.6,
+            12.7,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 96.1,
+          "airport_dropoff_miles": 96.6,
+          "airport_pickup_legs_miles": [
+            22.1,
+            46.7,
+            27.4
+          ],
+          "airport_dropoff_legs_miles": [
+            27.6,
+            46.9,
+            22.1
+          ]
+        }
+      }
+    },
+    "hollywood": {
+      "destination": "Hollywood",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 81.2,
+          "airport_dropoff_miles": 80.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            13.5,
+            29.0
+          ],
+          "airport_dropoff_legs_miles": [
+            29.2,
+            13.8,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 98.1,
+          "airport_dropoff_miles": 98.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            47.0,
+            29.0
+          ],
+          "airport_dropoff_legs_miles": [
+            29.2,
+            46.9,
+            22.1
+          ]
+        }
+      }
+    },
+    "venice": {
+      "destination": "Venice",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 82.5,
+          "airport_dropoff_miles": 81.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            7.2,
+            36.6
+          ],
+          "airport_dropoff_legs_miles": [
+            36.8,
+            7.1,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 114.6,
+          "airport_dropoff_miles": 115.0,
+          "airport_pickup_legs_miles": [
+            22.1,
+            55.9,
+            36.6
+          ],
+          "airport_dropoff_legs_miles": [
+            36.8,
+            56.1,
+            22.1
+          ]
+        }
+      }
+    },
+    "westchester": {
+      "destination": "Westchester",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 76.0,
+          "airport_dropoff_miles": 75.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            2.0,
+            35.4
+          ],
+          "airport_dropoff_legs_miles": [
+            35.8,
+            1.9,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 112.3,
+          "airport_dropoff_miles": 112.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            54.8,
+            35.4
+          ],
+          "airport_dropoff_legs_miles": [
+            35.8,
+            54.9,
+            22.1
+          ]
+        }
+      }
+    },
+    "haciendaheights": {
+      "destination": "Hacienda Heights",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 77.9,
+          "airport_dropoff_miles": 78.4,
+          "airport_pickup_legs_miles": [
+            38.7,
+            33.6,
+            5.7
+          ],
+          "airport_dropoff_legs_miles": [
+            6.1,
+            34.7,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 52.9,
+          "airport_dropoff_miles": 53.4,
+          "airport_pickup_legs_miles": [
+            22.1,
+            25.2,
+            5.7
+          ],
+          "airport_dropoff_legs_miles": [
+            6.1,
+            25.2,
+            22.1
+          ]
+        }
+      }
+    },
+    "disneyland": {
+      "destination": "Disneyland",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 84.7,
+          "airport_dropoff_miles": 84.6,
+          "airport_pickup_legs_miles": [
+            38.7,
+            33.0,
+            13.0
+          ],
+          "airport_dropoff_legs_miles": [
+            12.8,
+            34.2,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 68.3,
+          "airport_dropoff_miles": 68.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            33.3,
+            13.0
+          ],
+          "airport_dropoff_legs_miles": [
+            12.8,
+            33.9,
+            22.1
+          ]
+        }
+      }
+    },
+    "ucla": {
+      "destination": "UCLA",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 86.5,
+          "airport_dropoff_miles": 85.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            10.9,
+            37.0
+          ],
+          "airport_dropoff_legs_miles": [
+            36.7,
+            11.5,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 114.8,
+          "airport_dropoff_miles": 115.2,
+          "airport_pickup_legs_miles": [
+            22.1,
+            55.7,
+            37.0
+          ],
+          "airport_dropoff_legs_miles": [
+            36.7,
+            56.5,
+            22.1
+          ]
+        }
+      }
+    },
+    "usc": {
+      "destination": "USC",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 75.9,
+          "airport_dropoff_miles": 79.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            11.8,
+            25.4
+          ],
+          "airport_dropoff_legs_miles": [
+            26.2,
+            15.9,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 92.8,
+          "airport_dropoff_miles": 93.3,
+          "airport_pickup_legs_miles": [
+            22.1,
+            45.3,
+            25.4
+          ],
+          "airport_dropoff_legs_miles": [
+            26.2,
+            44.9,
+            22.1
+          ]
+        }
+      }
+    },
+    "ucirvine": {
+      "destination": "UC Irvine",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 114.2,
+          "airport_dropoff_miles": 113.3,
+          "airport_pickup_legs_miles": [
+            38.7,
+            43.6,
+            31.9
+          ],
+          "airport_dropoff_legs_miles": [
+            31.5,
+            44.2,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 93.9,
+          "airport_dropoff_miles": 92.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            39.9,
+            31.9
+          ],
+          "airport_dropoff_legs_miles": [
+            31.5,
+            39.2,
+            22.1
+          ]
+        }
+      }
+    },
+    "ucriverside": {
+      "destination": "UC Riverside",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 148.2,
+          "airport_dropoff_miles": 147.8,
+          "airport_pickup_legs_miles": [
+            38.7,
+            72.2,
+            37.4
+          ],
+          "airport_dropoff_legs_miles": [
+            37.2,
+            73.0,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 78.1,
+          "airport_dropoff_miles": 77.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            18.7,
+            37.4
+          ],
+          "airport_dropoff_legs_miles": [
+            37.2,
+            18.6,
+            22.1
+          ]
+        }
+      }
+    },
+    "callutheran": {
+      "destination": "Cal Lutheran",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 156.2,
+          "airport_dropoff_miles": 157.5,
+          "airport_pickup_legs_miles": [
+            38.7,
+            48.1,
+            69.5
+          ],
+          "airport_dropoff_legs_miles": [
+            71.9,
+            48.0,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 179.7,
+          "airport_dropoff_miles": 181.3,
+          "airport_pickup_legs_miles": [
+            22.1,
+            88.1,
+            69.5
+          ],
+          "airport_dropoff_legs_miles": [
+            71.9,
+            87.3,
+            22.1
+          ]
+        }
+      }
+    },
+    "santamonicacollege": {
+      "destination": "Santa Monica College",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 83.5,
+          "airport_dropoff_miles": 82.7,
+          "airport_pickup_legs_miles": [
+            38.7,
+            8.9,
+            36.0
+          ],
+          "airport_dropoff_legs_miles": [
+            36.4,
+            8.8,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 113.5,
+          "airport_dropoff_miles": 113.9,
+          "airport_pickup_legs_miles": [
+            22.1,
+            55.4,
+            36.0
+          ],
+          "airport_dropoff_legs_miles": [
+            36.4,
+            55.4,
+            22.1
+          ]
+        }
+      }
+    },
+    "laxarea": {
+      "destination": "LAX Area",
+      "category": "SPECIAL_DESTINATION",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 76.2,
+          "airport_dropoff_miles": 76.2,
+          "airport_pickup_legs_miles": [
+            38.7,
+            0.0,
+            37.6
+          ],
+          "airport_dropoff_legs_miles": [
+            38.7,
+            0.0,
+            37.6
+          ]
+        },
+        "ONT": {
+          "airport_pickup_miles": 117.4,
+          "airport_dropoff_miles": 117.8,
+          "airport_pickup_legs_miles": [
+            22.1,
+            57.7,
+            37.6
+          ],
+          "airport_dropoff_legs_miles": [
+            38.7,
+            57.1,
+            22.1
+          ]
         }
       }
     },

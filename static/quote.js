@@ -163,18 +163,23 @@
     const manual = estimate.status === "MANUAL_REVIEW_REQUIRED";
     const hasRange = estimate.estimated_min_amount != null && estimate.estimated_max_amount != null;
     const fareReviewRequired = !hasRange;
-    const fallbackFareReviewMessage = "Jason will review the exact route, pickup time, luggage, and availability before confirming the fare.";
+    const fallbackFareReviewMessage = "Jason will review the exact route and confirm the fare.";
     const fareReviewMessage = !hasRange && Array.isArray(estimate.notices) && estimate.notices[0] ? estimate.notices[0] : fallbackFareReviewMessage;
-    const range = document.getElementById("estimateRange"); range.textContent = hasRange ? `${formatUsd(estimate.estimated_min_amount)} - ${formatUsd(estimate.estimated_max_amount)}` : ""; range.hidden = !hasRange;
-    document.getElementById("estimateLabel").textContent = fareReviewRequired ? "Fare Review Required" : "Estimated Fare Range";
-    document.getElementById("estimate-heading").textContent = fareReviewRequired ? "Fare Review Required" : "Your estimated range";
+    const range = document.getElementById("estimateRange"); range.textContent = hasRange ? `${formatUsd(estimate.estimated_min_amount)}–${formatUsd(estimate.estimated_max_amount)}` : ""; range.hidden = !hasRange;
+    document.getElementById("estimateLabel").textContent = fareReviewRequired ? "Fare Review Required" : "Preliminary Estimated Fare";
+    document.getElementById("estimate-heading").textContent = fareReviewRequired ? "Fare Review Required" : "Preliminary Estimated Fare";
     document.getElementById("manualReview").hidden = !(manual || fareReviewRequired);
     document.getElementById("manualReviewTitle").textContent = fareReviewRequired ? "Fare Review Required" : "Jason will confirm final price shortly.";
     document.getElementById("manualReviewMessage").textContent = fareReviewRequired ? fareReviewMessage : "";
     document.getElementById("estimateRoute").textContent = estimate.route_summary;
     const summary = [["Passengers",trip.passengers],["Luggage",trip.luggage],["Child seat",trip.childSeat === "YES" ? "Requested" : "No"],["Vehicle",displayVehicle(estimate.vehicle_assessment)],["Date & time",`${trip.date} · ${formatTime(trip.time)}`]];
     document.getElementById("estimateSummary").innerHTML = summary.map(([k,v])=>`<div><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`).join("");
-    const notices = [fareReviewRequired ? fareReviewMessage : "This is a preliminary planning range. Jason will review the exact route, pickup time, luggage, and availability before confirming the final fare."]; if (trip.childSeat === "YES") notices.push("Child seat availability will be confirmed with your trip.");
+    const notices = fareReviewRequired
+      ? [fareReviewMessage]
+      : (Array.isArray(estimate.notices) && estimate.notices.length
+        ? estimate.notices
+        : ["This is a preliminary estimate based on the route and trip details provided. Jason will review the exact pickup/drop-off location, time, luggage, and availability before confirming the final fare."]);
+    if (trip.childSeat === "YES") notices.push("Child seat availability will be confirmed with your trip.");
     document.getElementById("estimateNotices").innerHTML = notices.map((x)=>`<p>${escapeHtml(x)}</p>`).join("");
     document.getElementById("estimateValidity").textContent = formatValidity(estimate.valid_until);
   }
@@ -190,7 +195,7 @@
     }
   }
   function setLoading(on) { continueButton.disabled=on; continueButton.textContent=on ? "Getting estimate…" : "Next: Get Estimate"; form.setAttribute("aria-busy",String(on)); }
-  function updateLabels() { const drop=state.serviceType === "AIRPORT_DROPOFF"; document.getElementById("locationLabel").textContent=drop?"Pickup location":"Drop-off location"; document.getElementById("dateLabel").textContent=drop?"Pickup Date":"Flight Arrival Date"; document.getElementById("timeLabel").textContent=drop?"Pickup Time":"Flight Arrival Time"; document.getElementById("scheduleGuidance").textContent=drop?"Enter your full pickup location (street address, hotel, school, apartment, or place name). Los Angeles time zone.":"Enter your full drop-off location (street address, hotel, school, apartment, or place name). Los Angeles time zone."; }
+  function updateLabels() { const drop=state.serviceType === "AIRPORT_DROPOFF"; document.getElementById("locationLabel").textContent=drop?"Pickup city or landmark":"Drop-off city or landmark"; document.getElementById("dateLabel").textContent=drop?"Pickup Date":"Flight Arrival Date"; document.getElementById("timeLabel").textContent=drop?"Pickup Time":"Flight Arrival Time"; document.getElementById("scheduleGuidance").textContent=drop?"Select a pickup city or landmark for a preliminary estimate. Exact street addresses require Jason’s route review. Los Angeles time zone.":"Select a drop-off city or landmark for a preliminary estimate. Exact street addresses require Jason’s route review. Los Angeles time zone."; }
   function focusFirstError(){ const target=form.querySelector('[aria-invalid="true"], .field-error:not(:empty)'); if(target){ target.focus?.(); target.scrollIntoView({behavior:"smooth",block:"center"}); } }
   function setError(key,msg){ const el=form.querySelector(`[data-error-for="${key}"]`); if(el) el.textContent=msg; if(key === "estimateRequest") document.getElementById("estimateErrorContact").hidden = !msg; } function clearError(key){setError(key,"");} function value(id){return document.getElementById(id).value;}
   function formatUsd(v){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(Number(v));}

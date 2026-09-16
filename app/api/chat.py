@@ -149,12 +149,17 @@ def chat(
 
 
         # 普通机场接送
-        if extracted.airport and extracted.destination:
+        if (
+            analysis.inquiry_type.value == "airport pickup"
+            and extracted.airport
+            and extracted.destination
+        ):
 
             price = calculate_price(
                 extracted.airport,
                 extracted.destination,
                 extracted.pickup_time,
+                "AIRPORT_PICKUP",
             )
 
 

@@ -64,6 +64,7 @@ def create_outbox_event(
             "pricing_source": quote_estimate.pricing_source,
             "pricing_status": quote_estimate.status,
             "manual_review_reason": quote_estimate.manual_review_reason,
+            "pricing_factors": quote_estimate.pricing_factors or {},
         },
         status="PENDING",
         attempt_count=0,

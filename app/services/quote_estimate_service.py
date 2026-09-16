@@ -19,30 +19,20 @@ from app.schemas.quote_estimate import (
     QuoteVehicleAssessment,
 )
 from app.services.location_normalizer import (
+    UNKNOWN_LOCATION,
     normalize_location,
 )
 from app.services.route_pricing import (
     CITY_MILEAGE_ARCHIVE_PRICING_SOURCE,
-    GOOGLE_ROUTES_PRICING_SOURCE,
     RouteMileageUnavailable,
-    get_round_trip_mileage,
-    price_range_for_route,
+    get_archived_round_trip_mileage,
+    price_range_for_miles,
 )
 
 
 LOS_ANGELES_TIMEZONE = ZoneInfo("America/Los_Angeles")
-ROUTE_MILEAGE_PRICING_SOURCE = GOOGLE_ROUTES_PRICING_SOURCE
-TEMPORARY_REFERENCE_PRICING_SOURCE = "temporary_airport_reference_v1"
-
-# Emergency customer-facing fallback until the road-mileage archive or Maps
-# API is available. These are planning ranges, not final fares.
-TEMPORARY_AIRPORT_RANGES: dict[str, tuple[Decimal, Decimal]] = {
-    "LAX": (Decimal("130"), Decimal("150")),
-    "ONT": (Decimal("100"), Decimal("140")),
-    "SNA": (Decimal("120"), Decimal("160")),
-    "BUR": (Decimal("120"), Decimal("150")),
-    "LGB": (Decimal("120"), Decimal("150")),
-}
+ROUTE_MILEAGE_PRICING_SOURCE = CITY_MILEAGE_ARCHIVE_PRICING_SOURCE
+ROUTE_MILEAGE_UNAVAILABLE_PRICING_SOURCE = "route_mileage_unavailable"
 
 
 def create_quote_estimate(
@@ -60,17 +50,25 @@ def create_quote_estimate(
     route_summary = _build_route_summary(request, location_name)
     risk_flags = _risk_flags(request)
 
+    # A customer fare needs a known canonical destination.  We do not treat a
+    # free-text place or an address as normalized merely because it resembles
+    # one; a future live geocoder integration must provide that confirmation.
+    location_is_reliably_routable = location["normalized_city"] is not None
+    if not location_is_reliably_routable:
+        risk_flags.append(UNKNOWN_LOCATION)
+
     try:
-        road_mileage = get_round_trip_mileage(
+        if not location_is_reliably_routable:
+            raise RouteMileageUnavailable("Destination cannot be safely normalized.")
+        # Numeric website estimates deliberately use only the audited city /
+        # landmark archive. Dynamic exact-address routing remains disabled
+        # until its Google Routes + geocoding validation is approved.
+        road_mileage = get_archived_round_trip_mileage(
             request.service_type,
             request.airport_code,
             location_name,
         )
-        mileage_price = price_range_for_route(
-            road_mileage.total_miles,
-            request.airport_code.value,
-            road_mileage.reference_destination,
-        )
+        mileage_price = price_range_for_miles(road_mileage.total_miles)
         minimum_amount = mileage_price.minimum_amount
         maximum_amount = mileage_price.maximum_amount
         suggested_amount = mileage_price.suggested_amount
@@ -80,17 +78,30 @@ def create_quote_estimate(
             "distance_meters": str(road_mileage.distance_meters),
             "base_route": "Rowland Heights → trip stops → Rowland Heights",
             "reference_destination": road_mileage.reference_destination,
+            "location_source": "verified_city_or_landmark_archive",
+            "mileage_source": "verified_closed_loop_road_mileage_archive",
+            "raw_midpoint": str(mileage_price.raw_midpoint.quantize(Decimal("0.01"))),
+            "rounded_midpoint": str(mileage_price.rounded_midpoint),
+            "customer_range": (
+                f"${mileage_price.minimum_amount}-${mileage_price.maximum_amount}"
+            ),
+            "range_half_width": str(mileage_price.half_width.quantize(Decimal("0.01"))),
+            "pricing_rule_version": "pricing_engine_v1_model_a",
+            "leg_1_road_miles": str(road_mileage.leg_1_miles.quantize(Decimal("0.1"))) if road_mileage.leg_1_miles is not None else None,
+            "leg_2_road_miles": str(road_mileage.leg_2_miles.quantize(Decimal("0.1"))) if road_mileage.leg_2_miles is not None else None,
+            "leg_3_road_miles": str(road_mileage.leg_3_miles.quantize(Decimal("0.1"))) if road_mileage.leg_3_miles is not None else None,
         }
-    except RouteMileageUnavailable:
-        risk_flags.append("ROUTE_MILEAGE_UNAVAILABLE")
-        minimum_amount, maximum_amount = TEMPORARY_AIRPORT_RANGES[
-            request.airport_code.value
-        ]
-        suggested_amount = (minimum_amount + maximum_amount) / Decimal("2")
-        pricing_source = TEMPORARY_REFERENCE_PRICING_SOURCE
+    except RouteMileageUnavailable as exc:
+        if "ROUTE_MILEAGE_UNAVAILABLE" not in risk_flags:
+            risk_flags.append("ROUTE_MILEAGE_UNAVAILABLE")
+        minimum_amount = None
+        maximum_amount = None
+        suggested_amount = None
+        pricing_source = ROUTE_MILEAGE_UNAVAILABLE_PRICING_SOURCE
         mileage_factors = {
-            "fallback_reason": "road mileage unavailable",
-            "fallback_scope": "airport reference only; replace with closed-loop mileage",
+            "fallback_reason": str(exc),
+            "fallback_scope": "numeric fare withheld; verified city/landmark closed-loop mileage required",
+            "location_source": "unverified_or_unavailable_location",
         }
 
     manual_review_required = bool(risk_flags)
@@ -105,14 +116,11 @@ def create_quote_estimate(
         vehicle_assessment = QuoteVehicleAssessment.LIKELY_COMFORTABLE
         notices = (
             [
-                "This range is based on a precomputed city-center road route.",
-                "Final price requires Jason confirmation.",
+                "Estimate is based on the selected city or landmark area.",
+                "This is a preliminary estimate based on the route and trip details provided. Jason will review the exact pickup/drop-off location, time, luggage, and availability before confirming the final fare.",
             ]
             if pricing_source == CITY_MILEAGE_ARCHIVE_PRICING_SOURCE
-            else [
-                "This is an estimated range.",
-                "Final price requires Jason confirmation.",
-            ]
+            else []
         )
 
     passenger_count, passenger_count_is_minimum = _passenger_count_values(request)
@@ -148,7 +156,7 @@ def create_quote_estimate(
         suggested_amount=suggested_amount,
         currency_code="USD",
         pricing_source=pricing_source,
-        pricing_rule_version="round_trip_mileage_v1",
+        pricing_rule_version="pricing_engine_v1_model_a",
         pricing_factors={
             "airport_code": request.airport_code.value,
             "pricing_zone": location["pricing_zone"],
@@ -205,19 +213,14 @@ def customer_numeric_fare_is_available(
     Only an actual road-mileage calculation can show a customer fare.
     """
 
-    if pricing_source == TEMPORARY_REFERENCE_PRICING_SOURCE:
-        return True
     return (
-        pricing_source in {
-            ROUTE_MILEAGE_PRICING_SOURCE,
-            CITY_MILEAGE_ARCHIVE_PRICING_SOURCE,
-        }
-        and "ROUTE_MILEAGE_UNAVAILABLE" not in (risk_flags or [])
+        pricing_source == CITY_MILEAGE_ARCHIVE_PRICING_SOURCE
+        and not (risk_flags or [])
     )
 
 
 def _customer_fare_review_notice() -> str:
-    return "Road mileage is temporarily unavailable. Jason will confirm the fare."
+    return "Jason will review the exact route and confirm the fare."
 
 
 def _build_route_summary(request: QuoteEstimateCreate, location_name: str) -> str:

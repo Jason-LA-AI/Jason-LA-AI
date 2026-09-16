@@ -239,7 +239,25 @@ def _pricing_recommendation_text(estimate: object) -> str:
     reason = getattr(estimate, "manual_review_reason", None)
     if reason:
         lines.append(f"Manual Review Reason: {reason}")
+    lines.extend(_pricing_diagnostic_lines(getattr(estimate, "pricing_factors", None)))
     return "\n".join(lines)
+
+
+def _pricing_diagnostic_lines(factors: object) -> tuple[str, ...]:
+    """Keep V1 archive mileage diagnostics in Jason's internal review text."""
+
+    if not isinstance(factors, dict):
+        return ()
+    labels = (
+        ("total_road_miles", "Closed-loop Miles"),
+        ("raw_midpoint", "Raw Midpoint"),
+        ("rounded_midpoint", "Rounded Midpoint"),
+        ("customer_range", "Customer Range"),
+        ("pricing_rule_version", "Pricing Rule"),
+        ("location_source", "Location Source"),
+        ("mileage_source", "Mileage Source"),
+    )
+    return tuple(f"{label}: {factors[key]}" for key, label in labels if factors.get(key) is not None)
 
 
 def _telegram_review_text(

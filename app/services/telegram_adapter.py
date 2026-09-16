@@ -126,4 +126,20 @@ def _pricing_recommendation_lines(payload: dict[str, Any]) -> tuple[str, ...]:
         lines.insert(1, "Manual Review Required")
     if payload.get("manual_review_reason"):
         lines.append(f"Manual Review Reason: {payload['manual_review_reason']}")
+    lines.extend(_pricing_diagnostic_lines(payload.get("pricing_factors")))
     return tuple(lines)
+
+
+def _pricing_diagnostic_lines(factors: object) -> tuple[str, ...]:
+    if not isinstance(factors, dict):
+        return ()
+    labels = (
+        ("total_road_miles", "Closed-loop Miles"),
+        ("raw_midpoint", "Raw Midpoint"),
+        ("rounded_midpoint", "Rounded Midpoint"),
+        ("customer_range", "Customer Range"),
+        ("pricing_rule_version", "Pricing Rule"),
+        ("location_source", "Location Source"),
+        ("mileage_source", "Mileage Source"),
+    )
+    return tuple(f"{label}: {factors[key]}" for key, label in labels if factors.get(key) is not None)

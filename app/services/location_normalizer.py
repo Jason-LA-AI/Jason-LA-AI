@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 from typing import Literal, TypedDict
 
+from app.services.city_mileage_archive import canonical_archive_key, supported_destinations
+
 
 UNKNOWN_LOCATION = "UNKNOWN_LOCATION"
 ZIP_PATTERN = re.compile(r"^\d{5}$")
@@ -29,21 +31,16 @@ class NormalizedLocation(TypedDict):
     pricing_zone: str
 
 
-ZIP_LOCATIONS: dict[str, tuple[str, str]] = {
-    "91748": ("Rowland Heights", "ROWLAND_HEIGHTS"),
-    "91789": ("Walnut", "WALNUT"),
-}
+def _pricing_zone(name: str) -> str:
+    return re.sub(r"[^A-Z0-9]+", "_", name.upper()).strip("_")
 
 
+# This is derived from the locally verified road-mileage archive, so a city
+# that normalizes here has a matching closed-loop road route rather than a
+# generic zone-price fallback.
 CITY_LOCATIONS: dict[str, tuple[str, str]] = {
-    "arcadia": ("Arcadia", "ARCADIA"),
-    "chino": ("Chino", "CHINO"),
-    "chino hills": ("Chino Hills", "CHINO_HILLS"),
-    "ontario": ("Ontario", "ONTARIO"),
-    "rancho cucamonga": ("Rancho Cucamonga", "RANCHO_CUCAMONGA"),
-    "rowland heights": ("Rowland Heights", "ROWLAND_HEIGHTS"),
-    "upland": ("Upland", "UPLAND"),
-    "walnut": ("Walnut", "WALNUT"),
+    key: (name, _pricing_zone(name))
+    for key, name in supported_destinations().items()
 }
 
 
@@ -55,16 +52,9 @@ def normalize_location(location_input: str) -> NormalizedLocation:
         raise ValueError("location_input must not be empty")
 
     if ZIP_PATTERN.fullmatch(cleaned_input):
-        matched_zip = ZIP_LOCATIONS.get(cleaned_input)
-        if matched_zip:
-            city, pricing_zone = matched_zip
-            return {
-                "input": cleaned_input,
-                "input_type": "ZIP",
-                "normalized_city": city,
-                "postal_code": cleaned_input,
-                "pricing_zone": pricing_zone,
-            }
+        # ZIP coverage is wider than a verified city-center or landmark route.
+        # Never turn a ZIP-only request into a neighboring archive estimate;
+        # exact-route pricing is not enabled yet.
         return {
             "input": cleaned_input,
             "input_type": "ZIP",
@@ -73,7 +63,7 @@ def normalize_location(location_input: str) -> NormalizedLocation:
             "pricing_zone": UNKNOWN_LOCATION,
         }
 
-    matched_city = CITY_LOCATIONS.get(cleaned_input.casefold())
+    matched_city = CITY_LOCATIONS.get(canonical_archive_key(cleaned_input))
     if matched_city:
         city, pricing_zone = matched_city
         return {
@@ -105,7 +95,7 @@ def location_has_sufficient_detail(location_input: str) -> bool:
     cleaned = " ".join(location_input.strip().split())
     if not cleaned or ZIP_PATTERN.fullmatch(cleaned):
         return False
-    if cleaned.casefold() in CITY_LOCATIONS:
+    if canonical_archive_key(cleaned) in CITY_LOCATIONS:
         return False
     if STREET_ADDRESS_PATTERN.match(cleaned) or STREET_SUFFIX_PATTERN.search(cleaned):
         return True

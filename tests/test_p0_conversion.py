@@ -1,5 +1,7 @@
 """Regression coverage for mobile navigation and direct-contact conversion paths."""
 
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
 from app.api import dashboard as dashboard_module
@@ -86,10 +88,10 @@ def test_quote_uses_preliminary_fare_wording_and_contact_fallback(client: TestCl
     response = client.get("/quote")
 
     assert response.status_code == 200
-    assert "Estimated Fare Range" in response.text
+    assert "Preliminary Estimated Fare" in response.text
     assert "Fare Review Required" in response.text
-    assert "Street address, hotel, school, apartment, or place name" in response.text
-    assert "This is a preliminary planning range." in response.text
+    assert "city or landmark" in response.text
+    assert "Jason will review the exact route and confirm the fare." in response.text
     assert "before confirming the final fare" in response.text
     assert "Request Jason’s final confirmation" in response.text
     assert "Final fare is not confirmed yet." in response.text
@@ -101,6 +103,14 @@ def test_quote_uses_preliminary_fare_wording_and_contact_fallback(client: TestCl
     assert "development_mock" not in response.text
     assert 'id="estimateErrorContact"' in response.text
     assert 'href="/contact">Contact Jason' in response.text
+
+
+def test_quote_client_uses_a_customer_readable_en_dash_for_fare_ranges() -> None:
+    quote_script = (Path(__file__).resolve().parents[1] / "static" / "quote.js").read_text(
+        encoding="utf-8"
+    )
+
+    assert "estimated_min_amount)}–${formatUsd(estimate.estimated_max_amount)" in quote_script
 
 
 def test_service_pages_offer_quote_and_contact(client: TestClient) -> None:

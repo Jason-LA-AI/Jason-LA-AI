@@ -458,6 +458,8 @@ def _build_inquiry_view(
             quote.pricing_source or "Not provided" if quote else "Not estimated"
         ),
 
+        "pricing_details": _pricing_details(quote),
+
         "language": str(
             analysis.get("detected_language")
             or customer.preferred_language
@@ -604,6 +606,22 @@ def _display_price_range(quote: Quote | None) -> str:
         f"{currency} {quote.suggested_min_amount:,.2f}–"
         f"{quote.suggested_max_amount:,.2f}"
     )
+
+
+def _pricing_details(quote: Quote | None) -> str:
+    """Surface stored V1 audit factors for Jason without a schema change."""
+
+    if quote is None or not isinstance(quote.additional_fee_factors, dict):
+        return "Not available"
+    factors = quote.additional_fee_factors
+    values = (
+        ("Miles", factors.get("total_road_miles")),
+        ("Raw midpoint", factors.get("raw_midpoint")),
+        ("Rounded midpoint", factors.get("rounded_midpoint")),
+        ("Range", factors.get("customer_range")),
+        ("Route source", factors.get("location_source")),
+    )
+    return " · ".join(f"{label}: {value}" for label, value in values if value is not None) or "Not available"
 
 
 

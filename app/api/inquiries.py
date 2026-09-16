@@ -160,11 +160,15 @@ def create_inquiry(
 
     pricing_result = None
 
-    if not analysis.missing_information:
+    if (
+        not analysis.missing_information
+        and analysis.inquiry_type == InquiryType.AIRPORT_PICKUP
+    ):
         pricing_result = calculate_price(
             analysis.extracted_information.airport,
             analysis.extracted_information.destination,
             None,
+            "AIRPORT_PICKUP",
         )
 
 

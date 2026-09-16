@@ -50,6 +50,17 @@ LOS_ANGELES_COUNTY_CITIES = (
     "West Hollywood", "Westlake Village", "Whittier",
 )
 
+# Additional municipal destinations requested for the airport-pricing coverage.
+# These are resolved from the same public California city-centre dataset as the
+# Los Angeles County cities above; they are not hand-entered mileage values.
+REQUESTED_CALIFORNIA_CITIES = (
+    "Chino", "Chino Hills", "Ontario", "Rancho Cucamonga", "Fontana",
+    "Riverside", "Moreno Valley", "San Bernardino", "Eastvale", "Corona",
+    "Redlands", "Upland", "Anaheim", "Fullerton", "Buena Park",
+    "Garden Grove", "Irvine", "Costa Mesa", "Newport Beach", "Laguna Beach",
+    "Lake Forest", "Aliso Viejo", "Santa Ana",
+)
+
 # Public landmark/city reference points requested by Jason. These points are
 # deliberately venue/city centers, not customer street addresses.
 SPECIAL_DESTINATIONS = {
@@ -59,6 +70,23 @@ SPECIAL_DESTINATIONS = {
     "Las Vegas": (-115.1728, 36.1147),
     "UC San Diego": (-117.2340, 32.8801),
     "San Francisco": (-122.4194, 37.7749),
+    # Requested neighborhood and campus reference points.  A city-centre or
+    # named-campus point is only used when the customer enters that place name;
+    # full addresses continue to require live Google road routing.
+    "Downtown Los Angeles": (-118.2468, 34.0407),
+    "Koreatown": (-118.3089, 34.0583),
+    "Hollywood": (-118.3287, 34.0928),
+    "Venice": (-118.4695, 33.9850),
+    "Westchester": (-118.3965, 33.9597),
+    "Hacienda Heights": (-117.9690, 33.9950),
+    "Disneyland": (-117.9190, 33.8121),
+    "UCLA": (-118.4452, 34.0689),
+    "USC": (-118.2851, 34.0224),
+    "UC Irvine": (-117.8443, 33.6405),
+    "UC Riverside": (-117.3281, 33.9737),
+    "Cal Lutheran": (-118.8795, 34.2256),
+    "Santa Monica College": (-118.4705, 34.0187),
+    "LAX Area": (-118.4085, 33.9416),
 }
 
 NO_DRIVING_ROUTE_CITIES = {"Avalon"}
@@ -153,18 +181,34 @@ def airport_profiles(
 
     profiles = []
     for index in range(len(destination_points)):
+        pickup_legs_meters = (
+            base_to_airport,
+            airport_to_destination[index],
+            destination_to_base[index],
+        )
+        dropoff_legs_meters = (
+            base_to_destination[index],
+            destination_to_airport[index],
+            airport_to_base,
+        )
         profiles.append(
             {
                 "airport_pickup_miles": round(
-                    (base_to_airport + airport_to_destination[index] + destination_to_base[index])
+                    sum(pickup_legs_meters)
                     / METERS_PER_MILE,
                     1,
                 ),
                 "airport_dropoff_miles": round(
-                    (base_to_destination[index] + destination_to_airport[index] + airport_to_base)
+                    sum(dropoff_legs_meters)
                     / METERS_PER_MILE,
                     1,
                 ),
+                "airport_pickup_legs_miles": [
+                    round(value / METERS_PER_MILE, 1) for value in pickup_legs_meters
+                ],
+                "airport_dropoff_legs_miles": [
+                    round(value / METERS_PER_MILE, 1) for value in dropoff_legs_meters
+                ],
             }
         )
     return profiles
@@ -172,8 +216,14 @@ def airport_profiles(
 
 def build_archive() -> dict[str, Any]:
     census_points = california_city_points()
+    requested_cities = tuple(
+        city for city in REQUESTED_CALIFORNIA_CITIES
+        if city not in LOS_ANGELES_COUNTY_CITIES
+    )
     routable_cities = [
-        city for city in LOS_ANGELES_COUNTY_CITIES if city not in NO_DRIVING_ROUTE_CITIES
+        city
+        for city in (*LOS_ANGELES_COUNTY_CITIES, *requested_cities)
+        if city not in NO_DRIVING_ROUTE_CITIES
     ]
     city_points: list[tuple[float, float]] = []
     for city in routable_cities:
@@ -189,11 +239,18 @@ def build_archive() -> dict[str, Any]:
     ont_profiles = airport_profiles("ONT", destination_points)
 
     profiles: dict[str, Any] = {}
+    la_city_count = len([city for city in LOS_ANGELES_COUNTY_CITIES if city not in NO_DRIVING_ROUTE_CITIES])
     city_count = len(routable_cities)
     for index, destination in enumerate(destination_names):
         profiles[canonical_key(destination)] = {
             "destination": destination,
-            "category": "LA_COUNTY_CITY" if index < city_count else "SPECIAL_DESTINATION",
+            "category": (
+                "LA_COUNTY_CITY"
+                if index < la_city_count
+                else "REQUESTED_CALIFORNIA_CITY"
+                if index < city_count
+                else "SPECIAL_DESTINATION"
+            ),
             "airports": {"LAX": lax_profiles[index], "ONT": ont_profiles[index]},
         }
 
@@ -209,7 +266,7 @@ def build_archive() -> dict[str, Any]:
     return {
         "schema_version": 1,
         "generated_at": datetime.now(UTC).isoformat(),
-        "coverage": "Los Angeles County incorporated cities plus requested special destinations",
+        "coverage": "Los Angeles County cities, requested Southern California cities, and requested special destinations",
         "reference_route": "Rowland Heights city center → airport → destination center → Rowland Heights city center",
         "source": "Public city-center coordinates plus OpenStreetMap road routing. Refresh with Google Maps Routes before relying on a material fare change.",
         "profiles": profiles,
