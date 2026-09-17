@@ -614,6 +614,15 @@ def _pricing_details(quote: Quote | None) -> str:
     if quote is None or not isinstance(quote.additional_fee_factors, dict):
         return "Not available"
     factors = quote.additional_fee_factors
+    if factors.get("approved_long_distance_range"):
+        return " · ".join(
+            (
+                "APPROVED LONG-DISTANCE RANGE",
+                f"Closed-loop mileage: {factors.get('total_road_miles', 'Not available')} mi",
+                f"Approved customer range: {factors.get('approved_customer_range', 'Not available')}",
+                f"Pricing source: {quote.pricing_source or 'Not available'}",
+            )
+        )
     if factors.get("not_for_quoting"):
         return " · ".join(
             (

@@ -23,6 +23,12 @@ from app.services.location_normalizer import (
     normalize_location,
     suggest_location,
 )
+from app.services.approved_long_distance import (
+    APPROVED_LONG_DISTANCE_PRICING_RULE_VERSION,
+    APPROVED_LONG_DISTANCE_PRICING_SOURCE,
+    approved_long_distance_range,
+    is_approved_long_distance_destination,
+)
 from app.services.route_pricing import (
     CITY_MILEAGE_ARCHIVE_PRICING_SOURCE,
     RouteMileageUnavailable,
@@ -63,6 +69,7 @@ def create_quote_estimate(
     if not location_is_reliably_routable:
         risk_flags.append(UNKNOWN_LOCATION)
 
+    pricing_rule_version = "pricing_engine_v1_model_a"
     try:
         if not location_is_reliably_routable:
             raise RouteMileageUnavailable("Destination cannot be safely normalized.")
@@ -74,46 +81,76 @@ def create_quote_estimate(
             request.airport_code,
             location_name,
         )
-        mileage_price = price_range_for_miles(road_mileage.total_miles)
-        minimum_amount = mileage_price.minimum_amount
-        maximum_amount = mileage_price.maximum_amount
-        suggested_amount = mileage_price.suggested_amount
-        pricing_source = road_mileage.pricing_source
-        mileage_factors = {
-            "total_road_miles": str(road_mileage.total_miles.quantize(Decimal("0.1"))),
-            "distance_meters": str(road_mileage.distance_meters),
-            "base_route": "Rowland Heights → trip stops → Rowland Heights",
-            "reference_destination": road_mileage.reference_destination,
-            "location_source": "verified_city_or_landmark_archive",
-            "mileage_source": "verified_closed_loop_road_mileage_archive",
-            "raw_midpoint": str(mileage_price.raw_midpoint.quantize(Decimal("0.01"))),
-            "rounded_midpoint": str(mileage_price.rounded_midpoint),
-            "customer_range": (
-                f"${mileage_price.minimum_amount}-${mileage_price.maximum_amount}"
-            ),
-            "range_half_width": str(mileage_price.half_width.quantize(Decimal("0.01"))),
-            "pricing_rule_version": "pricing_engine_v1_model_a",
-            "leg_1_road_miles": str(road_mileage.leg_1_miles.quantize(Decimal("0.1"))) if road_mileage.leg_1_miles is not None else None,
-            "leg_2_road_miles": str(road_mileage.leg_2_miles.quantize(Decimal("0.1"))) if road_mileage.leg_2_miles is not None else None,
-            "leg_3_road_miles": str(road_mileage.leg_3_miles.quantize(Decimal("0.1"))) if road_mileage.leg_3_miles is not None else None,
-        }
-        if not auto_quote_closed_loop_mileage_is_eligible(road_mileage.total_miles):
-            # Retain the formula output only as an internal diagnostic.  It is
-            # outside Pricing V1's validation domain and is never a suggested
-            # or recommended fare.
-            mileage_factors.update(
-                {
-                    "raw_model_midpoint": str(mileage_price.rounded_midpoint),
-                    "raw_model_min": str(mileage_price.minimum_amount),
-                    "raw_model_max": str(mileage_price.maximum_amount),
-                    "not_for_quoting": True,
-                }
+        approved_range = approved_long_distance_range(
+            service_type=request.service_type.value,
+            airport_code=request.airport_code.value,
+            destination=location_name,
+        )
+        if approved_range is not None:
+            minimum_amount = approved_range.minimum_amount
+            maximum_amount = approved_range.maximum_amount
+            suggested_amount = approved_range.suggested_amount
+            pricing_source = APPROVED_LONG_DISTANCE_PRICING_SOURCE
+            pricing_rule_version = APPROVED_LONG_DISTANCE_PRICING_RULE_VERSION
+            mileage_factors = {
+                "total_road_miles": str(road_mileage.total_miles.quantize(Decimal("0.1"))),
+                "distance_meters": str(road_mileage.distance_meters),
+                "base_route": "Rowland Heights → trip stops → Rowland Heights",
+                "reference_destination": road_mileage.reference_destination,
+                "location_source": "verified_city_or_landmark_archive",
+                "mileage_source": "verified_closed_loop_road_mileage_archive",
+                "approved_long_distance_range": True,
+                "approved_customer_range": f"${minimum_amount}-${maximum_amount}",
+                "pricing_rule_version": pricing_rule_version,
+            }
+        elif (
+            is_approved_long_distance_destination(location_name)
+            and auto_quote_closed_loop_mileage_is_eligible(road_mileage.total_miles)
+        ):
+            raise RouteMileageUnavailable(
+                "Destination is approved only for LAX airport pickup."
             )
-            mileage_factors.pop("customer_range", None)
-            minimum_amount = None
-            maximum_amount = None
-            suggested_amount = None
-            risk_flags.append(LONG_DISTANCE_REVIEW_REQUIRED)
+        else:
+            mileage_price = price_range_for_miles(road_mileage.total_miles)
+            minimum_amount = mileage_price.minimum_amount
+            maximum_amount = mileage_price.maximum_amount
+            suggested_amount = mileage_price.suggested_amount
+            pricing_source = road_mileage.pricing_source
+            mileage_factors = {
+                "total_road_miles": str(road_mileage.total_miles.quantize(Decimal("0.1"))),
+                "distance_meters": str(road_mileage.distance_meters),
+                "base_route": "Rowland Heights → trip stops → Rowland Heights",
+                "reference_destination": road_mileage.reference_destination,
+                "location_source": "verified_city_or_landmark_archive",
+                "mileage_source": "verified_closed_loop_road_mileage_archive",
+                "raw_midpoint": str(mileage_price.raw_midpoint.quantize(Decimal("0.01"))),
+                "rounded_midpoint": str(mileage_price.rounded_midpoint),
+                "customer_range": (
+                    f"${mileage_price.minimum_amount}-${mileage_price.maximum_amount}"
+                ),
+                "range_half_width": str(mileage_price.half_width.quantize(Decimal("0.01"))),
+                "pricing_rule_version": "pricing_engine_v1_model_a",
+                "leg_1_road_miles": str(road_mileage.leg_1_miles.quantize(Decimal("0.1"))) if road_mileage.leg_1_miles is not None else None,
+                "leg_2_road_miles": str(road_mileage.leg_2_miles.quantize(Decimal("0.1"))) if road_mileage.leg_2_miles is not None else None,
+                "leg_3_road_miles": str(road_mileage.leg_3_miles.quantize(Decimal("0.1"))) if road_mileage.leg_3_miles is not None else None,
+            }
+            if not auto_quote_closed_loop_mileage_is_eligible(road_mileage.total_miles):
+                # Retain the formula output only as an internal diagnostic.  It is
+                # outside Pricing V1's validation domain and is never a suggested
+                # or recommended fare.
+                mileage_factors.update(
+                    {
+                        "raw_model_midpoint": str(mileage_price.rounded_midpoint),
+                        "raw_model_min": str(mileage_price.minimum_amount),
+                        "raw_model_max": str(mileage_price.maximum_amount),
+                        "not_for_quoting": True,
+                    }
+                )
+                mileage_factors.pop("customer_range", None)
+                minimum_amount = None
+                maximum_amount = None
+                suggested_amount = None
+                risk_flags.append(LONG_DISTANCE_REVIEW_REQUIRED)
     except RouteMileageUnavailable as exc:
         if "ROUTE_MILEAGE_UNAVAILABLE" not in risk_flags:
             risk_flags.append("ROUTE_MILEAGE_UNAVAILABLE")
@@ -179,7 +216,7 @@ def create_quote_estimate(
         suggested_amount=suggested_amount,
         currency_code="USD",
         pricing_source=pricing_source,
-        pricing_rule_version="pricing_engine_v1_model_a",
+        pricing_rule_version=pricing_rule_version,
         pricing_factors={
             "airport_code": request.airport_code.value,
             "pricing_zone": location["pricing_zone"],
@@ -242,7 +279,10 @@ def customer_numeric_fare_is_available(
     """
 
     return (
-        pricing_source == CITY_MILEAGE_ARCHIVE_PRICING_SOURCE
+        pricing_source in {
+            CITY_MILEAGE_ARCHIVE_PRICING_SOURCE,
+            APPROVED_LONG_DISTANCE_PRICING_SOURCE,
+        }
         and not (risk_flags or [])
     )
 

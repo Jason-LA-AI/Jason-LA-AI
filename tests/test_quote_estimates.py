@@ -412,8 +412,8 @@ def test_manual_vehicle_review_withholds_customer_numeric_estimate() -> None:
     ("location", "expects_customer_fare"),
     [
         ("Chino", True),
-        ("Las Vegas", False),
-        ("San Francisco", False),
+        ("Las Vegas", True),
+        ("San Francisco", True),
         ("123 Main Street, Riverside, CA 92501", False),
     ],
 )
@@ -449,16 +449,13 @@ def test_quote_request_submission_handles_numeric_and_manual_review_estimates(
     assert outbox.payload["suggested_amount"] is not None if expects_customer_fare else outbox.payload["suggested_amount"] is None
 
     if location in {"Las Vegas", "San Francisco"}:
-        assert "LONG_DISTANCE_REVIEW_REQUIRED" in (estimate.manual_review_reason or "")
-        assert estimate.pricing_factors["not_for_quoting"] is True
-        assert "Suggested Amount" not in _pricing_recommendation_text(estimate)
+        assert estimate.pricing_source == "approved_long_distance_range_v1"
+        assert estimate.pricing_factors["approved_long_distance_range"] is True
+        assert "APPROVED LONG-DISTANCE RANGE" in _pricing_recommendation_text(estimate)
         dashboard_details = _pricing_details(quote)
-        assert "LONG_DISTANCE_REVIEW_REQUIRED" in dashboard_details
+        assert "APPROVED LONG-DISTANCE RANGE" in dashboard_details
         assert "Closed-loop mileage:" in dashboard_details
-        assert "Pricing V1 diagnostic only:" in dashboard_details
-        assert "Do not use automatic fare." in dashboard_details
-        assert "Jason must review manually." in dashboard_details
-        assert "Suggested" not in dashboard_details
+        assert "Approved customer range:" in dashboard_details
 
 
 def test_api_paths_are_not_canonical_redirected(client) -> None:

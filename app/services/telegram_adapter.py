@@ -115,6 +115,13 @@ def _pricing_recommendation_lines(payload: dict[str, Any]) -> tuple[str, ...]:
     source = payload.get("pricing_source") or "Not provided"
     status = payload.get("pricing_status") or "MANUAL_REVIEW_REQUIRED"
     factors = payload.get("pricing_factors")
+    if isinstance(factors, dict) and factors.get("approved_long_distance_range"):
+        return (
+            "APPROVED LONG-DISTANCE RANGE",
+            f"Closed-loop mileage: {factors.get('total_road_miles', 'Not available')} mi",
+            f"Approved customer range: {factors.get('approved_customer_range', 'Not available')}",
+            f"Pricing source: {source}",
+        )
     if isinstance(factors, dict) and factors.get("not_for_quoting"):
         return (
             "LONG_DISTANCE_REVIEW_REQUIRED",

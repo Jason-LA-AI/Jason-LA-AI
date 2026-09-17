@@ -278,23 +278,18 @@ def test_boundary_mileage_controls_persisted_internal_pricing_semantics(
 
 
 @pytest.mark.parametrize("destination", ["Las Vegas", "San Francisco"])
-def test_archived_long_distance_routes_are_internal_only(destination: str) -> None:
+def test_approved_archived_long_distance_routes_are_customer_eligible(destination: str) -> None:
     session = _session()
     response = create_quote_estimate(_request(destination), session)
     stored = session.add.call_args.args[0]
 
-    assert response.status.value == "MANUAL_REVIEW_REQUIRED"
-    assert response.estimated_min_amount is None
-    assert response.estimated_max_amount is None
-    assert LONG_DISTANCE_REVIEW_REQUIRED in response.risk_flags
+    assert response.status.value == "ESTIMATED"
+    assert response.estimated_min_amount is not None
+    assert response.estimated_max_amount is not None
+    assert LONG_DISTANCE_REVIEW_REQUIRED not in response.risk_flags
     assert stored.pricing_factors["total_road_miles"]
-    assert stored.suggested_amount is None
-    assert stored.estimated_min_amount is None
-    assert stored.estimated_max_amount is None
-    assert stored.pricing_factors["not_for_quoting"] is True
-    assert stored.pricing_factors["raw_model_midpoint"]
-    assert stored.pricing_factors["raw_model_min"]
-    assert stored.pricing_factors["raw_model_max"]
+    assert stored.pricing_source == "approved_long_distance_range_v1"
+    assert stored.pricing_factors["approved_long_distance_range"] is True
 
 
 def test_uc_san_diego_remains_within_the_numeric_auto_quote_domain() -> None:
@@ -388,3 +383,73 @@ def test_internal_telegram_pricing_text_keeps_mileage_failure_diagnostics() -> N
     assert "Manual Review Required" in message
     assert "Pricing Source: route_mileage_unavailable" in message
     assert "Manual Review Reason: ROUTE_MILEAGE_UNAVAILABLE, UNKNOWN_LOCATION" in message
+
+
+@pytest.mark.parametrize(
+    ("destination", "minimum", "maximum"),
+    [
+        ("Las Vegas", Decimal("500"), Decimal("750")),
+        ("San Francisco", Decimal("850"), Decimal("1000")),
+        ("San Diego", Decimal("240"), Decimal("280")),
+        ("Santa Barbara", Decimal("220"), Decimal("260")),
+    ],
+)
+def test_lax_pickup_uses_only_explicitly_approved_long_distance_ranges(
+    destination: str, minimum: Decimal, maximum: Decimal
+) -> None:
+    session = _session()
+    response = create_quote_estimate(_request(destination), session)
+    stored = session.add.call_args.args[0]
+
+    assert response.status.value == "ESTIMATED"
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (minimum, maximum)
+    assert stored.pricing_source == "approved_long_distance_range_v1"
+    assert stored.pricing_rule_version == "approved_long_distance_v1"
+    assert stored.pricing_factors["approved_long_distance_range"] is True
+    assert stored.pricing_factors["approved_customer_range"] == f"${minimum}-${maximum}"
+    assert not stored.pricing_factors.get("not_for_quoting")
+
+
+def test_uc_san_diego_remains_a_distinct_v1_destination() -> None:
+    session = _session()
+    response = create_quote_estimate(_request("UC San Diego"), session)
+    stored = session.add.call_args.args[0]
+
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (
+        Decimal("185"), Decimal("225")
+    )
+    assert stored.pricing_source == "city_mileage_pricing_v1"
+
+
+@pytest.mark.parametrize(
+    ("service_type", "airport_code", "destination"),
+    [
+        ("AIRPORT_DROPOFF", "LAX", "Las Vegas"),
+        ("AIRPORT_PICKUP", "ONT", "Las Vegas"),
+        ("AIRPORT_DROPOFF", "LAX", "San Francisco"),
+        ("AIRPORT_PICKUP", "ONT", "San Francisco"),
+        ("AIRPORT_DROPOFF", "LAX", "San Diego"),
+        ("AIRPORT_PICKUP", "ONT", "San Diego"),
+        ("AIRPORT_DROPOFF", "LAX", "Santa Barbara"),
+        ("AIRPORT_PICKUP", "ONT", "Santa Barbara"),
+    ],
+)
+def test_approved_ranges_never_apply_to_reverse_or_other_airport_routes(
+    service_type: str, airport_code: str, destination: str
+) -> None:
+    response = create_quote_estimate(
+        _request(destination, service_type=service_type, airport_code=airport_code), _session()
+    )
+
+    assert response.status.value == "MANUAL_REVIEW_REQUIRED"
+    assert response.estimated_min_amount is None
+    assert response.estimated_max_amount is None
+
+
+@pytest.mark.parametrize("destination", ["San Jose", "Unknown remote destination"])
+def test_unapproved_long_distance_route_remains_manual_review(destination: str) -> None:
+    response = create_quote_estimate(_request(destination), _session())
+
+    assert response.status.value == "MANUAL_REVIEW_REQUIRED"
+    assert response.estimated_min_amount is None
+    assert response.estimated_max_amount is None

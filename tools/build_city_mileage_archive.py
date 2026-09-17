@@ -62,13 +62,12 @@ REQUESTED_CALIFORNIA_CITIES = (
     # Approved Batch 2 runtime coverage.  These remain separate municipalities
     # and must never be normalized through neighboring city profiles.
     "Brea", "La Habra", "Laguna Hills", "Mission Viejo", "Tustin", "Orange",
+    "San Diego", "Santa Barbara",
 )
 
 # These have verified audit mileage but intentionally remain outside the
 # customer-facing runtime archive until long-distance calibration is approved.
-BATCH2_AUDIT_ONLY_CITIES = (
-    "Thousand Oaks", "Oxnard", "Ventura", "Santa Barbara",
-)
+BATCH2_AUDIT_ONLY_CITIES = ("Thousand Oaks", "Oxnard", "Ventura")
 
 # Public landmark/city reference points requested by Jason. These points are
 # deliberately venue/city centers, not customer street addresses.

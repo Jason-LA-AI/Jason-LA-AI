@@ -3847,6 +3847,42 @@
         }
       }
     },
+    "sandiego": {
+      "destination": "San Diego",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 271.4,
+          "airport_dropoff_miles": 270.9,
+          "airport_pickup_legs_miles": [38.7, 124.1, 108.6],
+          "airport_dropoff_legs_miles": [108.4, 124.9, 37.6]
+        },
+        "ONT": {
+          "airport_pickup_miles": 239.9,
+          "airport_dropoff_miles": 240.0,
+          "airport_pickup_legs_miles": [22.1, 109.3, 108.6],
+          "airport_dropoff_legs_miles": [108.4, 109.5, 22.1]
+        }
+      }
+    },
+    "santabarbara": {
+      "destination": "Santa Barbara",
+      "category": "REQUESTED_CALIFORNIA_CITY",
+      "airports": {
+        "LAX": {
+          "airport_pickup_miles": 254.4,
+          "airport_dropoff_miles": 255.7,
+          "airport_pickup_legs_miles": [38.7, 97.2, 118.6],
+          "airport_dropoff_legs_miles": [121.0, 97.1, 37.6]
+        },
+        "ONT": {
+          "airport_pickup_miles": 277.9,
+          "airport_dropoff_miles": 279.6,
+          "airport_pickup_legs_miles": [22.1, 137.2, 118.6],
+          "airport_dropoff_legs_miles": [121.0, 136.4, 22.1]
+        }
+      }
+    },
     "sanfrancisco": {
       "destination": "San Francisco",
       "category": "SPECIAL_DESTINATION",

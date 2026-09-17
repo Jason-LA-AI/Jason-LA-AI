@@ -186,6 +186,39 @@ def test_long_distance_telegram_uses_diagnostic_not_recommendation_wording() -> 
     assert "Suggested Amount" not in message
 
 
+def test_approved_long_distance_internal_copy_is_a_range_not_a_v1_diagnostic() -> None:
+    estimate = type(
+        "Estimate",
+        (),
+        {
+            "suggested_amount": Decimal("625"),
+            "estimated_min_amount": Decimal("500"),
+            "estimated_max_amount": Decimal("750"),
+            "currency_code": "USD",
+            "pricing_source": "approved_long_distance_range_v1",
+            "status": "ESTIMATED",
+            "manual_review_reason": None,
+            "pricing_factors": {
+                "approved_long_distance_range": True,
+                "approved_customer_range": "$500-$750",
+                "total_road_miles": "569.7",
+            },
+        },
+    )()
+
+    text = _pricing_recommendation_text(estimate)
+    telegram = "\n".join(_pricing_recommendation_lines({
+        "pricing_source": "approved_long_distance_range_v1",
+        "pricing_factors": estimate.pricing_factors,
+    }))
+
+    for message in (text, telegram):
+        assert "APPROVED LONG-DISTANCE RANGE" in message
+        assert "Approved customer range: $500-$750" in message
+        assert "Pricing V1 diagnostic only" not in message
+        assert "Do not use automatic fare" not in message
+
+
 def test_dashboard_long_distance_uses_diagnostic_not_recommendation_wording() -> None:
     quote = Quote(
         currency_code="USD",

@@ -70,11 +70,27 @@ def test_batch_2a_profiles_have_verified_directional_mileage(
     assert result.total_miles == Decimal(expected_miles)
 
 
-@pytest.mark.parametrize("location", ["Thousand Oaks", "Oxnard", "Ventura", "Santa Barbara"])
+@pytest.mark.parametrize("location", ["Thousand Oaks", "Oxnard", "Ventura"])
 def test_withheld_long_distance_destinations_remain_unavailable(location: str) -> None:
     assert lookup_archived_mileage(
         service_type="AIRPORT_PICKUP", airport_code="LAX", location=location
     ) is None
+
+
+@pytest.mark.parametrize(
+    ("location", "expected_miles"),
+    [("San Diego", "271.4"), ("Santa Barbara", "254.4")],
+)
+def test_approved_long_distance_runtime_profiles_preserve_city_center_mileage(
+    location: str, expected_miles: str
+) -> None:
+    result = lookup_archived_mileage(
+        service_type="AIRPORT_PICKUP", airport_code="LAX", location=location
+    )
+
+    assert result is not None
+    assert result.destination == location
+    assert result.total_miles == Decimal(expected_miles)
 
 
 @pytest.mark.parametrize("airport", ["SNA", "BUR", "LGB"])
