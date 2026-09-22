@@ -248,6 +248,12 @@ def create_quote_estimate(
         if customer_price_available
         else [_customer_fare_review_notice()]
     )
+    resolution_type = location.get("resolution_type")
+    resolution_message, resolution_suggestions = _resolution_guidance(resolution_type, request.location_input)
+    single_suggestion = suggest_location(request.location_input) if not customer_price_available else None
+    if single_suggestion:
+        resolution_suggestions = [{"label": single_suggestion["display_name"], "canonical_value": single_suggestion["canonical_location"]}]
+        resolution_type = "SUGGEST_CANONICAL"
     return QuoteEstimateResponse(
         estimate_id=estimate.id,
         status=QuoteEstimateStatus(estimate.status),
@@ -259,14 +265,27 @@ def create_quote_estimate(
         requires_jason_review=estimate.requires_jason_review,
         risk_flags=estimate.risk_flags or [],
         notices=customer_notices,
-        location_suggestion=(
-            suggest_location(request.location_input)
-            if not customer_price_available
-            else None
-        ),
+        location_suggestion=single_suggestion,
+        resolution_type=resolution_type if not customer_price_available else None,
+        resolution_message=resolution_message if not customer_price_available else None,
+        resolution_suggestions=resolution_suggestions if not customer_price_available else [],
         valid_until=estimate.expires_at,
     )
 
+
+def _resolution_guidance(resolution_type: str | None, raw: str) -> tuple[str | None, list[dict[str, str]]]:
+    abbreviation = raw.strip().casefold()
+    if resolution_type == "NEEDS_DISAMBIGUATION":
+        if abbreviation == "sb":
+            return "Which location did you mean? / 你指的是哪个地点？", [{"label": "San Bernardino", "canonical_value": "San Bernardino"}, {"label": "Santa Barbara", "canonical_value": "Santa Barbara"}]
+        if abbreviation == "la":
+            return "Please enter the specific Los Angeles-area city or a full street address. / 请输入具体的洛杉矶地区城市名称或完整街道地址。", []
+        if abbreviation == "oc":
+            return "Please enter the specific Orange County city or a full street address. / 请输入具体的橙县城市名称或完整街道地址。", []
+        if abbreviation == "ie":
+            return "Please enter the specific Inland Empire city or a full street address. / 请输入具体的内陆帝国城市名称或完整街道地址。", []
+    messages = {"ZIP_NEEDS_CITY": "Please enter the city or full street address for this ZIP code. / 请输入该邮编对应的城市名称或完整街道地址。", "CITY_ZIP_VALIDATION_REQUIRED": "Please enter the city without the ZIP code, or enter the full street address. / 请输入不带邮编的城市名称，或填写完整街道地址。", "INVALID_LOCATION": "The location information appears inconsistent. Please check the city/state and try again. / 地点信息可能不一致，请检查城市和州后重新输入。", "NEEDS_DISAMBIGUATION": "Please enter a more specific city or full address. / 请输入更具体的城市名称或完整地址。"}
+    return messages.get(resolution_type), []
 
 def customer_numeric_fare_is_available(
     *,

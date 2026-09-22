@@ -107,6 +107,11 @@ class LocationSuggestionResponse(BaseModel):
     display_name: str
 
 
+class LocationResolutionOption(BaseModel):
+    label: str
+    canonical_value: str
+
+
 class QuoteEstimateResponse(BaseModel):
     """Public estimate result returned to the structured quote page."""
 
@@ -121,4 +126,7 @@ class QuoteEstimateResponse(BaseModel):
     risk_flags: list[str] = Field(default_factory=list)
     notices: list[str] = Field(default_factory=list)
     location_suggestion: LocationSuggestionResponse | None = None
+    resolution_type: str | None = None
+    resolution_message: str | None = None
+    resolution_suggestions: list[LocationResolutionOption] = Field(default_factory=list)
     valid_until: datetime

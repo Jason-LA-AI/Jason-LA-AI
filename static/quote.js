@@ -168,6 +168,7 @@
     const fallbackFareReviewMessage = "Jason will review the exact route and confirm the fare.";
     const fareReviewMessage = !hasRange && Array.isArray(estimate.notices) && estimate.notices[0] ? estimate.notices[0] : fallbackFareReviewMessage;
     state.locationSuggestion = fareReviewRequired ? estimate.location_suggestion || null : null;
+    const resolutionSuggestions = fareReviewRequired ? estimate.resolution_suggestions || [] : [];
     const range = document.getElementById("estimateRange"); range.textContent = hasRange ? `${formatUsd(estimate.estimated_min_amount)}–${formatUsd(estimate.estimated_max_amount)}` : ""; range.hidden = !hasRange;
     document.getElementById("estimateLabel").textContent = fareReviewRequired ? "Fare Review Required" : "Preliminary Estimated Fare";
     document.getElementById("estimate-heading").textContent = fareReviewRequired ? "Fare Review Required" : "Preliminary Estimated Fare";
@@ -178,13 +179,29 @@
     const locationReviewMessage = document.getElementById("locationReviewMessage");
     const locationSuggestionActions = document.getElementById("locationSuggestionActions");
     locationReviewHelp.hidden = !fareReviewRequired;
-    locationReviewMessage.textContent = state.locationSuggestion
+    locationReviewMessage.textContent = estimate.resolution_message || (state.locationSuggestion
       ? "We couldn’t automatically price this location."
-      : "We couldn’t automatically price this location. Try entering a city, airport, school, or landmark for a preliminary estimate, or keep this location for Jason to review.";
+      : "We couldn’t automatically price this location. Try entering a city, airport, school, or landmark for a preliminary estimate, or keep this location for Jason to review.");
     locationSuggestionActions.hidden = !state.locationSuggestion;
     if (state.locationSuggestion) {
       document.getElementById("locationSuggestionName").textContent = state.locationSuggestion.display_name;
       document.getElementById("useLocationSuggestionButton").textContent = `Use ${state.locationSuggestion.canonical_location}`;
+    }
+    const resolutionActions = document.getElementById("locationResolutionActions");
+    resolutionActions.hidden = resolutionSuggestions.length < 2;
+    resolutionActions.replaceChildren();
+    if (resolutionSuggestions.length >= 2) {
+      const prompt = document.createElement("p");
+      prompt.textContent = estimate.resolution_message || "Which location did you mean?";
+      resolutionActions.append(prompt);
+      resolutionSuggestions.forEach((item) => {
+        const button = document.createElement("button");
+        button.className = "primary-button";
+        button.type = "button";
+        button.textContent = item.label;
+        button.addEventListener("click", () => rerunResolution(item.canonical_value));
+        resolutionActions.append(button);
+      });
     }
     document.getElementById("estimateRoute").textContent = estimate.route_summary;
     const summary = [["Passengers",trip.passengers],["Luggage",trip.luggage],["Child seat",trip.childSeat === "YES" ? "Requested" : "No"],["Vehicle",displayVehicle(estimate.vehicle_assessment)],["Date & time",`${trip.date} · ${formatTime(trip.time)}`]];
@@ -218,6 +235,7 @@
       setError("estimateRequest", error instanceof EstimateRequestError ? error.message : "Unable to get an estimate right now. Please try again.");
     } finally { setLoading(false); }
   }
+  async function rerunResolution(canonical) { state.locationSuggestion={canonical_location:canonical}; await rerunSuggestedLocation(); }
   function keepOriginalLocation() {
     state.locationSuggestion = null;
     document.getElementById("locationSuggestionActions").hidden = true;

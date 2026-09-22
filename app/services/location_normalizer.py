@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+import unicodedata
 from typing import Literal, TypedDict
 
 from app.services.city_mileage_archive import (
@@ -13,7 +14,7 @@ from app.services.city_mileage_archive import (
 
 
 UNKNOWN_LOCATION = "UNKNOWN_LOCATION"
-ZIP_PATTERN = re.compile(r"^\d{5}$")
+ZIP_PATTERN = re.compile(r"^\d{5}(?:-\d{4})?$")
 CITY_STATE_PATTERN = re.compile(
     r"^(?P<city>.+?)(?:,?\s+)(?P<state>CA|California|NV|Nevada)(?:\s+(?P<zip>\d{5}))?$",
     re.IGNORECASE,
@@ -37,6 +38,8 @@ class NormalizedLocation(TypedDict):
     normalized_city: str | None
     postal_code: str | None
     pricing_zone: str
+    resolution_type: str
+    resolution_reason: str | None
 
 
 class LocationSuggestion(TypedDict):
@@ -74,6 +77,19 @@ SUGGESTION_DISPLAY_NAMES = {
     "laairport": "LAX",
 }
 
+# Direct aliases are finite, reviewed identity mappings.  They never contain
+# prices and target only destinations already present in the runtime archive.
+CHINESE_SAFE_ALIASES = {
+    "罗兰岗": "Rowland Heights", "罗兰高地": "Rowland Heights", "东谷": "Eastvale",
+    "奇诺": "Chino", "尔湾": "Irvine", "河滨": "Riverside", "莫雷诺谷": "Moreno Valley",
+    "圣贝纳迪诺": "San Bernardino", "圣地亚哥": "San Diego", "旧金山": "San Francisco",
+    "拉斯维加斯": "Las Vegas", "圣塔芭芭拉": "Santa Barbara", "圣巴巴拉": "Santa Barbara",
+    "帕萨迪纳": "Pasadena", "阿罕布拉": "Alhambra", "圣盖博": "San Gabriel", "核桃市": "Walnut",
+    "迪士尼乐园": "Disneyland", "洛杉矶市中心": "Downtown Los Angeles",
+    "加州大学圣地亚哥分校": "UC San Diego", "UC圣地亚哥": "UC San Diego",
+}
+AMBIGUOUS_ABBREVIATIONS = {"sb": ("San Bernardino", "Santa Barbara"), "la": (), "oc": (), "ie": ()}
+
 # The verified archive is a California service-area archive, with the one
 # approved Nevada destination recorded explicitly.  This is state metadata,
 # not a city-alias list: all other archive destinations remain CA by policy.
@@ -83,6 +99,35 @@ STATE_NAMES = {"ca": "CA", "california": "CA", "nv": "NV", "nevada": "NV"}
 
 def _expected_state(destination: str) -> str:
     return DESTINATION_STATE_OVERRIDES.get(destination, "CA")
+
+
+def _clean_input(value: str) -> str:
+    """Normalize presentation Unicode without guessing a location."""
+    value = unicodedata.normalize("NFKC", value).replace("，", ",").replace("、", ",")
+    return " ".join(value.strip().split())
+
+
+def _direct_alias_destination(cleaned: str) -> str | None:
+    cleaned = cleaned.strip(" ,.;")
+    if cleaned in CHINESE_SAFE_ALIASES:
+        target = CHINESE_SAFE_ALIASES[cleaned]
+        return target if canonical_archive_key(target) in CITY_LOCATIONS else None
+    # Safe bilingual form: both portions must resolve to exactly one target.
+    candidates = {target for alias, target in CHINESE_SAFE_ALIASES.items() if alias in cleaned}
+    english = re.sub("|".join(map(re.escape, CHINESE_SAFE_ALIASES)), " ", cleaned)
+    english_match = CITY_LOCATIONS.get(canonical_archive_key(english))
+    if english_match:
+        candidates.add(english_match[0])
+    return candidates.pop() if len(candidates) == 1 else None
+
+
+def _has_conflicting_bilingual_destination(cleaned: str) -> bool:
+    chinese_targets = {target for alias, target in CHINESE_SAFE_ALIASES.items() if alias in cleaned}
+    if not chinese_targets:
+        return False
+    english = re.sub("|".join(map(re.escape, CHINESE_SAFE_ALIASES)), " ", cleaned)
+    english_match = CITY_LOCATIONS.get(canonical_archive_key(english))
+    return bool(english_match and any(target != english_match[0] for target in chinese_targets))
 
 
 def _city_state_parts(cleaned_input: str) -> tuple[str, str | None, str | None]:
@@ -106,7 +151,7 @@ def _city_state_parts(cleaned_input: str) -> tuple[str, str | None, str | None]:
 def normalize_location(location_input: str) -> NormalizedLocation:
     """Normalize a configured ZIP or city without guessing unknown places."""
 
-    cleaned_input = " ".join(location_input.strip().split())
+    cleaned_input = _clean_input(location_input)
     if not cleaned_input:
         raise ValueError("location_input must not be empty")
 
@@ -120,7 +165,20 @@ def normalize_location(location_input: str) -> NormalizedLocation:
             "normalized_city": None,
             "postal_code": cleaned_input,
             "pricing_zone": UNKNOWN_LOCATION,
+            "resolution_type": "ZIP_NEEDS_CITY",
+            "resolution_reason": "ZIP_NEEDS_CITY",
         }
+
+    direct_alias = _direct_alias_destination(cleaned_input)
+    if direct_alias:
+        city, pricing_zone = CITY_LOCATIONS[canonical_archive_key(direct_alias)]
+        return {"input": cleaned_input, "input_type": "CITY", "normalized_city": city,
+                "postal_code": None, "pricing_zone": pricing_zone,
+                "resolution_type": "SAFE_CHINESE_ALIAS", "resolution_reason": None}
+    if _has_conflicting_bilingual_destination(cleaned_input):
+        return {"input": cleaned_input, "input_type": "CITY", "normalized_city": None,
+                "postal_code": None, "pricing_zone": UNKNOWN_LOCATION,
+                "resolution_type": "INVALID_LOCATION", "resolution_reason": "CONFLICTING_BILINGUAL_DESTINATION"}
 
     city_part, stated_state, stated_zip = _city_state_parts(cleaned_input)
     # ZIP-bearing city/state input cannot be safely validated yet.  Do not
@@ -133,6 +191,8 @@ def normalize_location(location_input: str) -> NormalizedLocation:
             "normalized_city": None,
             "postal_code": stated_zip,
             "pricing_zone": UNKNOWN_LOCATION,
+            "resolution_type": "CITY_ZIP_VALIDATION_REQUIRED",
+            "resolution_reason": "CITY_ZIP_VALIDATION_REQUIRED",
         }
 
     # Explicit aliases maintained by the mileage archive remain eligible for
@@ -147,6 +207,8 @@ def normalize_location(location_input: str) -> NormalizedLocation:
                 "normalized_city": None,
                 "postal_code": None,
                 "pricing_zone": UNKNOWN_LOCATION,
+                "resolution_type": "INVALID_LOCATION",
+                "resolution_reason": "STATE_MISMATCH",
             }
         return {
             "input": cleaned_input,
@@ -154,6 +216,8 @@ def normalize_location(location_input: str) -> NormalizedLocation:
             "normalized_city": city,
             "postal_code": None,
             "pricing_zone": pricing_zone,
+            "resolution_type": "CANONICAL_DIRECT",
+            "resolution_reason": None,
         }
 
     return {
@@ -162,6 +226,8 @@ def normalize_location(location_input: str) -> NormalizedLocation:
         "normalized_city": None,
         "postal_code": None,
         "pricing_zone": UNKNOWN_LOCATION,
+        "resolution_type": "NEEDS_DISAMBIGUATION" if canonical_location_key(cleaned_input) in AMBIGUOUS_ABBREVIATIONS else "UNKNOWN_LOCATION",
+        "resolution_reason": "AMBIGUOUS_ABBREVIATION" if canonical_location_key(cleaned_input) in AMBIGUOUS_ABBREVIATIONS else None,
     }
 
 
@@ -173,7 +239,7 @@ def suggest_location(location_input: str) -> LocationSuggestion | None:
     are categorically excluded so they cannot be downgraded to a city center.
     """
 
-    cleaned_input = " ".join(location_input.strip().split())
+    cleaned_input = _clean_input(location_input)
     if (
         not cleaned_input
         or ZIP_PATTERN.fullmatch(cleaned_input)
@@ -189,7 +255,10 @@ def suggest_location(location_input: str) -> LocationSuggestion | None:
 
     target_key = CURATED_SUGGESTION_KEYS.get(raw_key)
     if target_key is None:
-        return None
+        candidate = _safe_typo_suggestion(cleaned_input)
+        if candidate is None:
+            return None
+        return {"canonical_location": candidate, "display_name": candidate}
 
     matched_city = CITY_LOCATIONS.get(target_key)
     if matched_city:
@@ -208,6 +277,36 @@ def suggest_location(location_input: str) -> LocationSuggestion | None:
             "display_name": SUGGESTION_DISPLAY_NAMES[raw_key],
         }
     return None
+
+
+def _edit_distance(left: str, right: str) -> int:
+    previous = list(range(len(right) + 1))
+    for index, char in enumerate(left, 1):
+        current = [index]
+        for other_index, other in enumerate(right, 1):
+            current.append(min(current[-1] + 1, previous[other_index] + 1, previous[other_index - 1] + (char != other)))
+        previous = current
+    return previous[-1]
+
+
+def _safe_typo_suggestion(cleaned: str) -> str | None:
+    key = canonical_location_key(cleaned)
+    if len(key) < 5 or key in AMBIGUOUS_ABBREVIATIONS:
+        return None
+    max_distance = 1 if len(key) <= 8 else 2 if len(key) <= 14 else 3
+    ranked = sorted((min(_edit_distance(key, candidate), 1 if _is_adjacent_transpose(key, candidate) else 99), name) for candidate, name in supported_destinations().items())
+    if not ranked or ranked[0][0] > max_distance:
+        return None
+    if len(ranked) > 1 and ranked[1][0] <= ranked[0][0] + 1:
+        return None
+    return ranked[0][1]
+
+
+def _is_adjacent_transpose(left: str, right: str) -> bool:
+    if len(left) != len(right):
+        return False
+    differences = [index for index, (a, b) in enumerate(zip(left, right)) if a != b]
+    return len(differences) == 2 and differences[1] == differences[0] + 1 and left[differences[0]] == right[differences[1]] and left[differences[1]] == right[differences[0]]
 
 
 def location_has_sufficient_detail(location_input: str) -> bool:
