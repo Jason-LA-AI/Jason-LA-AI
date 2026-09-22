@@ -14,6 +14,10 @@ from app.services.city_mileage_archive import (
 
 UNKNOWN_LOCATION = "UNKNOWN_LOCATION"
 ZIP_PATTERN = re.compile(r"^\d{5}$")
+CITY_STATE_PATTERN = re.compile(
+    r"^(?P<city>.+?)(?:,?\s+)(?P<state>CA|California|NV|Nevada)(?:\s+(?P<zip>\d{5}))?$",
+    re.IGNORECASE,
+)
 STREET_ADDRESS_PATTERN = re.compile(r"^\d+[\w-]*(?:\s|,).+")
 STREET_SUFFIX_PATTERN = re.compile(
     r"\b(?:street|st|avenue|ave|road|rd|boulevard|blvd|drive|dr|lane|ln|way|place|pl|court|ct)\b",
@@ -70,6 +74,34 @@ SUGGESTION_DISPLAY_NAMES = {
     "laairport": "LAX",
 }
 
+# The verified archive is a California service-area archive, with the one
+# approved Nevada destination recorded explicitly.  This is state metadata,
+# not a city-alias list: all other archive destinations remain CA by policy.
+DESTINATION_STATE_OVERRIDES = {"Las Vegas": "NV"}
+STATE_NAMES = {"ca": "CA", "california": "CA", "nv": "NV", "nevada": "NV"}
+
+
+def _expected_state(destination: str) -> str:
+    return DESTINATION_STATE_OVERRIDES.get(destination, "CA")
+
+
+def _city_state_parts(cleaned_input: str) -> tuple[str, str | None, str | None]:
+    """Parse a city/state form without treating an address as a city.
+
+    ZIP-bearing forms remain conservative until a ZIP-to-city source exists.
+    """
+
+    if STREET_ADDRESS_PATTERN.match(cleaned_input) or STREET_SUFFIX_PATTERN.search(cleaned_input):
+        return cleaned_input, None, None
+    match = CITY_STATE_PATTERN.fullmatch(cleaned_input)
+    if not match:
+        return cleaned_input, None, None
+    return (
+        " ".join(match.group("city").split()),
+        STATE_NAMES[match.group("state").casefold()],
+        match.group("zip"),
+    )
+
 
 def normalize_location(location_input: str) -> NormalizedLocation:
     """Normalize a configured ZIP or city without guessing unknown places."""
@@ -90,11 +122,32 @@ def normalize_location(location_input: str) -> NormalizedLocation:
             "pricing_zone": UNKNOWN_LOCATION,
         }
 
+    city_part, stated_state, stated_zip = _city_state_parts(cleaned_input)
+    # ZIP-bearing city/state input cannot be safely validated yet.  Do not
+    # infer that a ZIP belongs to the stated city merely because both look
+    # plausible.
+    if stated_zip:
+        return {
+            "input": cleaned_input,
+            "input_type": "CITY",
+            "normalized_city": None,
+            "postal_code": stated_zip,
+            "pricing_zone": UNKNOWN_LOCATION,
+        }
+
     # Explicit aliases maintained by the mileage archive remain eligible for
     # direct pricing because they are known, unambiguous customer inputs.
-    matched_city = CITY_LOCATIONS.get(canonical_archive_key(cleaned_input))
+    matched_city = CITY_LOCATIONS.get(canonical_archive_key(city_part))
     if matched_city:
         city, pricing_zone = matched_city
+        if stated_state and stated_state != _expected_state(city):
+            return {
+                "input": cleaned_input,
+                "input_type": "CITY",
+                "normalized_city": None,
+                "postal_code": None,
+                "pricing_zone": UNKNOWN_LOCATION,
+            }
         return {
             "input": cleaned_input,
             "input_type": "CITY",
