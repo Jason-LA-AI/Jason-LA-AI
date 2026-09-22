@@ -20,6 +20,7 @@ from app.schemas.quote_estimate import (
 )
 from app.services.location_normalizer import (
     UNKNOWN_LOCATION,
+    is_exact_address_candidate,
     normalize_location,
     suggest_location,
 )
@@ -32,6 +33,8 @@ from app.services.approved_long_distance import (
 from app.services.route_pricing import (
     CITY_MILEAGE_ARCHIVE_PRICING_SOURCE,
     RouteMileageUnavailable,
+    EXACT_ADDRESS_PRICING_SOURCE,
+    get_exact_address_round_trip_mileage,
     get_archived_round_trip_mileage,
     price_range_for_miles,
 )
@@ -65,7 +68,8 @@ def create_quote_estimate(
     # A customer fare needs a known canonical destination.  We do not treat a
     # free-text place or an address as normalized merely because it resembles
     # one; a future live geocoder integration must provide that confirmation.
-    location_is_reliably_routable = location["normalized_city"] is not None
+    exact_address_candidate = is_exact_address_candidate(location["input"])
+    location_is_reliably_routable = location["normalized_city"] is not None or exact_address_candidate
     if not location_is_reliably_routable:
         risk_flags.append(UNKNOWN_LOCATION)
 
@@ -73,14 +77,16 @@ def create_quote_estimate(
     try:
         if not location_is_reliably_routable:
             raise RouteMileageUnavailable("Destination cannot be safely normalized.")
-        # Numeric website estimates deliberately use only the audited city /
-        # landmark archive. Dynamic exact-address routing remains disabled
-        # until its Google Routes + geocoding validation is approved.
-        road_mileage = get_archived_round_trip_mileage(
-            request.service_type,
-            request.airport_code,
-            location_name,
-        )
+        if exact_address_candidate:
+            geocoded_address, road_mileage = get_exact_address_round_trip_mileage(
+                request.service_type, request.airport_code, location["input"]
+            )
+            location_name = geocoded_address.city
+            route_summary = _build_route_summary(request, geocoded_address.formatted_address)
+        else:
+            road_mileage = get_archived_round_trip_mileage(
+                request.service_type, request.airport_code, location_name
+            )
         approved_range = approved_long_distance_range(
             service_type=request.service_type.value,
             airport_code=request.airport_code.value,
@@ -97,12 +103,26 @@ def create_quote_estimate(
                 "distance_meters": str(road_mileage.distance_meters),
                 "base_route": "Rowland Heights → trip stops → Rowland Heights",
                 "reference_destination": road_mileage.reference_destination,
-                "location_source": "verified_city_or_landmark_archive",
-                "mileage_source": "verified_closed_loop_road_mileage_archive",
+                "location_source": "verified_exact_address" if exact_address_candidate else "verified_city_or_landmark_archive",
+                "mileage_source": "google_routes_exact_address" if exact_address_candidate else "verified_closed_loop_road_mileage_archive",
                 "approved_long_distance_range": True,
                 "approved_customer_range": f"${minimum_amount}-${maximum_amount}",
                 "pricing_rule_version": pricing_rule_version,
             }
+            if exact_address_candidate:
+                mileage_factors.update({
+                    "exact_address_route": True,
+                    "normalized_address": geocoded_address.formatted_address,
+                    "geocoded_city": geocoded_address.city,
+                    "geocoded_state": geocoded_address.state,
+                    "geocoded_postal_code": geocoded_address.postal_code,
+                    "geocode_source": geocoded_address.provider,
+                    "geocode_place_id": geocoded_address.place_id,
+                    "route_source": "google_routes_v2",
+                    "leg_1_road_miles": str(road_mileage.leg_1_miles.quantize(Decimal("0.1"))),
+                    "leg_2_road_miles": str(road_mileage.leg_2_miles.quantize(Decimal("0.1"))),
+                    "leg_3_road_miles": str(road_mileage.leg_3_miles.quantize(Decimal("0.1"))),
+                })
         elif (
             is_approved_long_distance_destination(location_name)
             and auto_quote_closed_loop_mileage_is_eligible(road_mileage.total_miles)
@@ -121,8 +141,8 @@ def create_quote_estimate(
                 "distance_meters": str(road_mileage.distance_meters),
                 "base_route": "Rowland Heights → trip stops → Rowland Heights",
                 "reference_destination": road_mileage.reference_destination,
-                "location_source": "verified_city_or_landmark_archive",
-                "mileage_source": "verified_closed_loop_road_mileage_archive",
+                "location_source": "verified_exact_address" if exact_address_candidate else "verified_city_or_landmark_archive",
+                "mileage_source": "google_routes_exact_address" if exact_address_candidate else "verified_closed_loop_road_mileage_archive",
                 "raw_midpoint": str(mileage_price.raw_midpoint.quantize(Decimal("0.01"))),
                 "rounded_midpoint": str(mileage_price.rounded_midpoint),
                 "customer_range": (
@@ -134,6 +154,17 @@ def create_quote_estimate(
                 "leg_2_road_miles": str(road_mileage.leg_2_miles.quantize(Decimal("0.1"))) if road_mileage.leg_2_miles is not None else None,
                 "leg_3_road_miles": str(road_mileage.leg_3_miles.quantize(Decimal("0.1"))) if road_mileage.leg_3_miles is not None else None,
             }
+            if exact_address_candidate:
+                mileage_factors.update({
+                    "exact_address_route": True,
+                    "normalized_address": geocoded_address.formatted_address,
+                    "geocoded_city": geocoded_address.city,
+                    "geocoded_state": geocoded_address.state,
+                    "geocoded_postal_code": geocoded_address.postal_code,
+                    "geocode_source": geocoded_address.provider,
+                    "geocode_place_id": geocoded_address.place_id,
+                    "route_source": "google_routes_v2",
+                })
             if not auto_quote_closed_loop_mileage_is_eligible(road_mileage.total_miles):
                 # Retain the formula output only as an internal diagnostic.  It is
                 # outside Pricing V1's validation domain and is never a suggested
@@ -182,6 +213,11 @@ def create_quote_estimate(
             if pricing_source == CITY_MILEAGE_ARCHIVE_PRICING_SOURCE
             else []
         )
+        if pricing_source == EXACT_ADDRESS_PRICING_SOURCE:
+            notices = [
+                "Estimate is based on the exact pickup/drop-off address and current road routing. "
+                "/ 此预估基于您填写的准确地址及当前道路路线。"
+            ]
 
     passenger_count, passenger_count_is_minimum = _passenger_count_values(request)
     large_suitcase_count, large_suitcase_count_is_minimum = _luggage_count_values(request)
@@ -287,6 +323,7 @@ def _resolution_guidance(resolution_type: str | None, raw: str) -> tuple[str | N
     messages = {"ZIP_NEEDS_CITY": "Please enter the city or full street address for this ZIP code. / 请输入该邮编对应的城市名称或完整街道地址。", "CITY_ZIP_VALIDATION_REQUIRED": "Please enter the city without the ZIP code, or enter the full street address. / 请输入不带邮编的城市名称，或填写完整街道地址。", "INVALID_LOCATION": "The location information appears inconsistent. Please check the city/state and try again. / 地点信息可能不一致，请检查城市和州后重新输入。", "NEEDS_DISAMBIGUATION": "Please enter a more specific city or full address. / 请输入更具体的城市名称或完整地址。"}
     return messages.get(resolution_type), []
 
+
 def customer_numeric_fare_is_available(
     *,
     pricing_source: str | None,
@@ -300,6 +337,7 @@ def customer_numeric_fare_is_available(
     return (
         pricing_source in {
             CITY_MILEAGE_ARCHIVE_PRICING_SOURCE,
+            EXACT_ADDRESS_PRICING_SOURCE,
             APPROVED_LONG_DISTANCE_PRICING_SOURCE,
         }
         and not (risk_flags or [])

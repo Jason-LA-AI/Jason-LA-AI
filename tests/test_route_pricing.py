@@ -2,7 +2,13 @@ from decimal import Decimal
 
 import pytest
 
-from app.services.route_pricing import price_range_for_miles, price_range_for_route
+from unittest.mock import MagicMock
+
+from app.services.route_pricing import (
+    get_exact_address_round_trip_mileage,
+    price_range_for_miles,
+    price_range_for_route,
+)
 from app.services.pricing_engine import calculate_price
 
 
@@ -93,3 +99,23 @@ def test_legacy_customer_entry_point_requires_an_explicit_service_direction() ->
     assert review.pricing_source == "route_mileage_unavailable"
     assert pickup.factors["total_road_miles"] == "104.0"
     assert dropoff.factors["total_road_miles"] == "103.5"
+
+
+def test_exact_address_provider_geocodes_then_routes_three_road_legs(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("app.services.route_pricing.settings.google_maps_api_key", "test-key")
+    geocode = MagicMock(ok=True)
+    geocode.json.return_value = {
+        "status": "OK",
+        "results": [{"formatted_address": "13820 Schleisman Rd, Eastvale, CA 92880, USA", "place_id": "place-id", "types": ["street_address"], "geometry": {"location": {"lat": 33.97, "lng": -117.56}}, "address_components": [
+            {"long_name": "Eastvale", "types": ["locality"]}, {"long_name": "California", "types": ["administrative_area_level_1"]}, {"long_name": "92880", "types": ["postal_code"]}, {"long_name": "United States", "types": ["country"]}
+        ]}],
+    }
+    route = MagicMock(ok=True)
+    route.json.return_value = {"routes": [{"distanceMeters": 193121, "legs": [{"distanceMeters": 48280}, {"distanceMeters": 96561}, {"distanceMeters": 48280}]}]}
+    monkeypatch.setattr("app.services.route_pricing.requests.get", lambda *_args, **_kwargs: geocode)
+    monkeypatch.setattr("app.services.route_pricing.requests.post", lambda *_args, **_kwargs: route)
+    address, mileage = get_exact_address_round_trip_mileage("AIRPORT_PICKUP", "LAX", "13820 Schleisman Rd, Eastvale, CA 92880")
+    assert address.city == "Eastvale"
+    assert address.place_id == "place-id"
+    assert mileage.pricing_source == "google_routes_exact_address_v1"
+    assert (mileage.leg_1_miles, mileage.leg_2_miles, mileage.leg_3_miles) == pytest.approx((Decimal("30"), Decimal("60"), Decimal("30")), rel=Decimal("0.01"))

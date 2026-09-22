@@ -114,6 +114,8 @@ def _direct_alias_destination(cleaned: str) -> str | None:
         return target if canonical_archive_key(target) in CITY_LOCATIONS else None
     # Safe bilingual form: both portions must resolve to exactly one target.
     candidates = {target for alias, target in CHINESE_SAFE_ALIASES.items() if alias in cleaned}
+    if not candidates:
+        return None
     english = re.sub("|".join(map(re.escape, CHINESE_SAFE_ALIASES)), " ", cleaned)
     english_match = CITY_LOCATIONS.get(canonical_archive_key(english))
     if english_match:
@@ -220,14 +222,21 @@ def normalize_location(location_input: str) -> NormalizedLocation:
             "resolution_reason": None,
         }
 
+    resolution_type = (
+        "EXACT_ADDRESS_CANDIDATE"
+        if is_exact_address_candidate(cleaned_input)
+        else "NEEDS_DISAMBIGUATION"
+        if canonical_location_key(cleaned_input) in AMBIGUOUS_ABBREVIATIONS
+        else "UNKNOWN_LOCATION"
+    )
     return {
         "input": cleaned_input,
         "input_type": "CITY",
         "normalized_city": None,
         "postal_code": None,
         "pricing_zone": UNKNOWN_LOCATION,
-        "resolution_type": "NEEDS_DISAMBIGUATION" if canonical_location_key(cleaned_input) in AMBIGUOUS_ABBREVIATIONS else "UNKNOWN_LOCATION",
-        "resolution_reason": "AMBIGUOUS_ABBREVIATION" if canonical_location_key(cleaned_input) in AMBIGUOUS_ABBREVIATIONS else None,
+        "resolution_type": resolution_type,
+        "resolution_reason": "AMBIGUOUS_ABBREVIATION" if resolution_type == "NEEDS_DISAMBIGUATION" else None,
     }
 
 
@@ -332,3 +341,19 @@ def location_has_sufficient_detail(location_input: str) -> bool:
     # review, while a single unqualified word remains too ambiguous.
     words = re.findall(r"[A-Za-z][A-Za-z'.-]*", cleaned)
     return len(words) >= 2 and len(cleaned) >= 6
+
+
+def is_exact_address_candidate(location_input: str) -> bool:
+    """Return whether input warrants strict live address verification.
+
+    This is deliberately a narrow syntax gate, not an authorization to price:
+    the provider must still return one complete, unambiguous US address.
+    """
+
+    cleaned = " ".join(location_input.strip().split())
+    return bool(
+        cleaned
+        and not ZIP_PATTERN.fullmatch(cleaned)
+        and STREET_ADDRESS_PATTERN.match(cleaned)
+        and STREET_SUFFIX_PATTERN.search(cleaned)
+    )

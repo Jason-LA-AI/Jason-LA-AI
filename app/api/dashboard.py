@@ -614,6 +614,22 @@ def _pricing_details(quote: Quote | None) -> str:
     if quote is None or not isinstance(quote.additional_fee_factors, dict):
         return "Not available"
     factors = quote.additional_fee_factors
+    if factors.get("exact_address_route"):
+        return " · ".join(
+            (
+                "APPROVED LONG-DISTANCE RANGE · EXACT ADDRESS ROUTE" if factors.get("approved_long_distance_range") else "EXACT ADDRESS ROUTE",
+                f"Exact address: {factors.get('normalized_address', 'Not available')}",
+                f"City: {factors.get('geocoded_city', 'Not available')}",
+                f"Geocode source: {factors.get('geocode_source', 'Not available')}",
+                f"Route source: {factors.get('route_source', 'Not available')}",
+                f"Leg 1: {factors.get('leg_1_road_miles', 'Not available')} mi",
+                f"Leg 2: {factors.get('leg_2_road_miles', 'Not available')} mi",
+                f"Leg 3: {factors.get('leg_3_road_miles', 'Not available')} mi",
+                f"Closed-loop mileage: {factors.get('total_road_miles', 'Not available')} mi",
+                f"Customer range: {factors.get('customer_range') or factors.get('approved_customer_range', 'Not available')}",
+                f"Pricing source: {quote.pricing_source or 'Not available'}",
+            )
+        )
     if factors.get("approved_long_distance_range"):
         return " · ".join(
             (

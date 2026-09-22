@@ -1,6 +1,6 @@
 """Tests for structured airport quote estimates."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from unittest.mock import MagicMock
 from uuid import uuid4
@@ -23,8 +23,26 @@ from app.services.quote_request_service import (
     _pricing_recommendation_text,
     process_quote_request,
 )
-from app.services.route_pricing import RouteMileageUnavailable
+from app.services.route_pricing import (
+    EXACT_ADDRESS_PRICING_SOURCE,
+    GeocodedAddress,
+    RouteMileage,
+    RouteMileageUnavailable,
+)
 from app.api.dashboard import _pricing_details
+
+
+@pytest.fixture(autouse=True)
+def _offline_exact_address_provider(monkeypatch: pytest.MonkeyPatch) -> None:
+    """The ordinary suite never calls Google; focused tests override this fake."""
+
+    def unavailable(*_: object) -> object:
+        raise RouteMileageUnavailable("offline test provider")
+
+    monkeypatch.setattr(
+        "app.services.quote_estimate_service.get_exact_address_round_trip_mileage",
+        unavailable,
+    )
 
 
 def _request(**overrides: object) -> QuoteEstimateCreate:
@@ -129,7 +147,7 @@ def test_zip_only_location_requires_fare_review() -> None:
     assert estimate.estimated_min_amount is None
     assert estimate.estimated_max_amount is None
     assert estimate.pricing_source == "route_mileage_unavailable"
-    assert "UNKNOWN_LOCATION" in response.risk_flags
+    assert "ROUTE_MILEAGE_UNAVAILABLE" in response.risk_flags
 
 
 def test_unknown_zip_requires_fare_review() -> None:
@@ -264,7 +282,7 @@ def test_unverified_street_address_requires_fare_review_and_preserves_route() ->
     assert response.status.value == "MANUAL_REVIEW_REQUIRED"
     assert response.estimated_min_amount is None
     assert response.estimated_max_amount is None
-    assert "UNKNOWN_LOCATION" in response.risk_flags
+    assert "ROUTE_MILEAGE_UNAVAILABLE" in response.risk_flags
     assert response.route_summary == "123 Main Street, Los Angeles → ONT"
     estimate = session.add.call_args.args[0]
     assert estimate.estimated_min_amount is None
@@ -283,6 +301,98 @@ def test_unverified_hotel_requires_fare_review_and_preserves_route() -> None:
     assert response.estimated_max_amount is None
     assert response.route_summary == "Hyatt Regency LAX → ONT"
     assert session.add.call_args.args[0].suggested_amount is None
+
+
+def _exact_address_route(city: str, miles: str = "120") -> tuple[GeocodedAddress, RouteMileage]:
+    return (
+        GeocodedAddress(
+            formatted_address=f"13820 Schleisman Rd, {city}, CA 92880, USA",
+            latitude=Decimal("33.97"), longitude=Decimal("-117.56"), city=city,
+            state="CA", postal_code="92880", country="US", place_id="place-id",
+        ),
+        RouteMileage(
+            total_miles=Decimal(miles), distance_meters=int(Decimal(miles) * Decimal("1609.344")),
+            pricing_source=EXACT_ADDRESS_PRICING_SOURCE, reference_destination=city,
+            leg_1_miles=Decimal("30"), leg_2_miles=Decimal("60"), leg_3_miles=Decimal("30"),
+        ),
+    )
+
+
+def test_exact_address_uses_verified_road_mileage_not_city_archive(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("app.services.quote_estimate_service.get_exact_address_round_trip_mileage", lambda *_: _exact_address_route("Eastvale"))
+    response = create_quote_estimate(_request(service_type="AIRPORT_PICKUP", airport_code="LAX", location_input="13820 Schleisman Rd, Eastvale, CA 92880"), _session())
+    assert response.status.value == "ESTIMATED"
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (Decimal("130"), Decimal("160"))
+    assert response.notices == [
+        "Estimate is based on the exact pickup/drop-off address and current road routing. "
+        "/ 此预估基于您填写的准确地址及当前道路路线。"
+    ]
+
+
+def test_exact_san_diego_lax_pickup_uses_approved_range(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("app.services.quote_estimate_service.get_exact_address_round_trip_mileage", lambda *_: _exact_address_route("San Diego", "271.4"))
+    session = _session()
+    response = create_quote_estimate(_request(service_type="AIRPORT_PICKUP", airport_code="LAX", location_input="4255 Genesee Ave, San Diego, CA 92117"), session)
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (Decimal("240"), Decimal("280"))
+    assert session.add.call_args.args[0].pricing_source == "approved_long_distance_range_v1"
+    assert session.add.call_args.args[0].pricing_factors["exact_address_route"] is True
+
+
+@pytest.mark.parametrize(
+    ("city", "address", "expected"),
+    [
+        ("Las Vegas", "3600 Las Vegas Blvd S, Las Vegas, NV 89109", ("500", "750")),
+        ("San Francisco", "1 Market St, San Francisco, CA 94105", ("850", "1000")),
+    ],
+)
+def test_exact_approved_long_distance_addresses_keep_approved_ranges(
+    monkeypatch: pytest.MonkeyPatch, city: str, address: str, expected: tuple[str, str]
+) -> None:
+    monkeypatch.setattr("app.services.quote_estimate_service.get_exact_address_round_trip_mileage", lambda *_: _exact_address_route(city, "600"))
+    response = create_quote_estimate(_request(service_type="AIRPORT_PICKUP", airport_code="LAX", location_input=address), _session())
+    assert (response.estimated_min_amount, response.estimated_max_amount) == tuple(Decimal(value) for value in expected)
+
+
+def test_uc_san_diego_remains_city_archive_priced() -> None:
+    response = create_quote_estimate(_request(service_type="AIRPORT_PICKUP", airport_code="LAX", location_input="UC San Diego"), _session())
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (Decimal("185"), Decimal("225"))
+
+
+@pytest.mark.parametrize(
+    ("location", "expected"),
+    [
+        ("San Bernardino, CA", ("150", "180")),
+        ("San Bernardino CA", ("150", "180")),
+        ("Moreno Valley, California", ("155", "185")),
+        ("Santa Barbara, CA", ("220", "260")),
+        ("Las Vegas, Nevada", ("500", "750")),
+        ("San Diego, CA", ("240", "280")),
+    ],
+)
+def test_city_state_forms_use_canonical_pricing(location: str, expected: tuple[str, str]) -> None:
+    response = create_quote_estimate(
+        _request(service_type="AIRPORT_PICKUP", airport_code="LAX", location_input=location),
+        _session(),
+    )
+    assert (response.estimated_min_amount, response.estimated_max_amount) == tuple(Decimal(value) for value in expected)
+
+
+@pytest.mark.parametrize(
+    "location",
+    ["San Bernardino, TX", "Moreno Valley, NV", "San Diego, NV", "San Francisco, NV", "Las Vegas, CA", "Santa Barbara, NV", "Ontario, Canada", "Las Vegas, NM", "SB", "LA", "OC", "IE"],
+)
+def test_wrong_state_and_ambiguous_inputs_never_auto_price(location: str) -> None:
+    response = create_quote_estimate(_request(location_input=location), _session())
+    assert response.estimated_min_amount is None
+    assert response.estimated_max_amount is None
+
+
+def test_exact_unapproved_over_300_miles_requires_review(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("app.services.quote_estimate_service.get_exact_address_round_trip_mileage", lambda *_: _exact_address_route("San Jose", "350"))
+    response = create_quote_estimate(_request(service_type="AIRPORT_PICKUP", airport_code="LAX", location_input="1 Market St, San Jose, CA 95113"), _session())
+    assert response.status.value == "MANUAL_REVIEW_REQUIRED"
+    assert response.estimated_min_amount is None
+    assert "LONG_DISTANCE_REVIEW_REQUIRED" in response.risk_flags
 
 
 def test_unavailable_road_mileage_requires_manual_fare_review(
@@ -333,7 +443,7 @@ def test_quote_estimate_endpoint_returns_frontend_contract(
         json={
             "service_type": "AIRPORT_DROPOFF",
             "airport_code": "ONT",
-            "service_date": "2026-09-17",
+            "service_date": (datetime.now(ZoneInfo("America/Los_Angeles")).date() + timedelta(days=1)).isoformat(),
             "service_time": "08:30",
             "service_timezone": "America/Los_Angeles",
             "flight_number": "UA123",
@@ -359,8 +469,11 @@ def test_quote_estimate_endpoint_returns_frontend_contract(
         "requires_jason_review",
         "risk_flags",
         "notices",
-        "location_suggestion",
-        "valid_until",
+            "location_suggestion",
+            "resolution_type",
+            "resolution_message",
+            "resolution_suggestions",
+            "valid_until",
     }
     assert body["status"] == "MANUAL_REVIEW_REQUIRED"
     assert body["estimated_min_amount"] is None

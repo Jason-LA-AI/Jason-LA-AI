@@ -81,6 +81,7 @@ def test_zip_guidance_never_prices_or_guesses_a_city(raw, resolution_type):
 def test_full_address_never_normalizes_to_a_city_center():
     normalized = normalize_location("13820 Schleisman Rd, Eastvale, CA 92880")
     assert normalized["normalized_city"] is None
+    assert normalized["resolution_type"] == "EXACT_ADDRESS_CANDIDATE"
     assert suggest_location("13820 Schleisman Rd, Eastvale, CA 92880") is None
 
 

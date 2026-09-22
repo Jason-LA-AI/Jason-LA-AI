@@ -227,6 +227,22 @@ def _pricing_recommendation_text(estimate: object) -> str:
     maximum = getattr(estimate, "estimated_max_amount", None)
     currency = getattr(estimate, "currency_code", None) or "USD"
     factors = getattr(estimate, "pricing_factors", None)
+    if isinstance(factors, dict) and factors.get("exact_address_route"):
+        return "\n".join(
+            line for line in (
+                "APPROVED LONG-DISTANCE RANGE · EXACT ADDRESS ROUTE" if factors.get("approved_long_distance_range") else "EXACT ADDRESS ROUTE",
+                f"Exact address: {factors.get('normalized_address', 'Not available')}",
+                f"City: {factors.get('geocoded_city', 'Not available')}",
+                f"Geocode source: {factors.get('geocode_source', 'Not available')}",
+                f"Route source: {factors.get('route_source', 'Not available')}",
+                f"Leg 1: {factors.get('leg_1_road_miles', 'Not available')} mi",
+                f"Leg 2: {factors.get('leg_2_road_miles', 'Not available')} mi",
+                f"Leg 3: {factors.get('leg_3_road_miles', 'Not available')} mi",
+                f"Closed-loop mileage: {factors.get('total_road_miles', 'Not available')} mi",
+                f"Customer range: {factors.get('customer_range') or factors.get('approved_customer_range', 'Not available')}",
+                f"Pricing source: {source}",
+            )
+        )
     if isinstance(factors, dict) and factors.get("approved_long_distance_range"):
         return "\n".join((
             "APPROVED LONG-DISTANCE RANGE",

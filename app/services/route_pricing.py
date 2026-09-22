@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
 
 GOOGLE_ROUTES_URL = "https://routes.googleapis.com/directions/v2:computeRoutes"
+GOOGLE_GEOCODING_URL = "https://maps.googleapis.com/maps/api/geocode/json"
 METERS_PER_MILE = Decimal("1609.344")
 MODEL_A_BASE_FARE = Decimal("33.53")
 MODEL_A_FIRST_BAND_MILES = Decimal("50")
@@ -25,6 +26,7 @@ MODEL_A_SECOND_BAND_RATE = Decimal("0.90")
 MODEL_A_LONG_BAND_RATE = Decimal("0.40")
 CITY_MILEAGE_ARCHIVE_PRICING_SOURCE = "city_mileage_pricing_v1"
 GOOGLE_ROUTES_PRICING_SOURCE = "google_routes_mileage_v1"
+EXACT_ADDRESS_PRICING_SOURCE = "google_routes_exact_address_v1"
 
 AIRPORT_ADDRESSES = {
     "LAX": "Los Angeles International Airport, 1 World Way, Los Angeles, CA 90045",
@@ -37,6 +39,21 @@ AIRPORT_ADDRESSES = {
 
 class RouteMileageUnavailable(RuntimeError):
     """Raised when a safe road-mileage result cannot be obtained."""
+
+
+@dataclass(frozen=True)
+class GeocodedAddress:
+    """A verified, unambiguous US street-address endpoint."""
+
+    formatted_address: str
+    latitude: Decimal
+    longitude: Decimal
+    city: str
+    state: str
+    postal_code: str
+    country: str
+    place_id: str | None
+    provider: str = "google_geocoding_v1"
 
 
 @dataclass(frozen=True)
@@ -201,6 +218,96 @@ def get_round_trip_mileage(
         leg_2_miles=Decimal(leg_distances[1]) / METERS_PER_MILE,
         leg_3_miles=Decimal(leg_distances[2]) / METERS_PER_MILE,
     )
+
+
+def geocode_exact_us_address(address: str) -> GeocodedAddress:
+    """Geocode one complete US street address without a city-center fallback."""
+
+    api_key = settings.google_maps_api_key
+    if not api_key:
+        raise RouteMileageUnavailable("Exact-address geocoding is not configured.")
+    try:
+        response = requests.get(
+            GOOGLE_GEOCODING_URL,
+            params={"address": address, "key": api_key},
+            timeout=5,
+        )
+    except requests.RequestException as exc:
+        raise RouteMileageUnavailable("Exact-address geocoding is unavailable.") from exc
+    if not response.ok:
+        raise RouteMileageUnavailable("Exact-address geocoding failed.")
+    try:
+        payload = response.json()
+        results = payload["results"]
+    except (KeyError, TypeError, ValueError) as exc:
+        raise RouteMileageUnavailable("Exact-address geocoding returned no usable result.") from exc
+    # A single full street/premise result is required.  Never silently choose
+    # among multiple candidates or turn a partial result into a city center.
+    if payload.get("status") != "OK" or len(results) != 1:
+        raise RouteMileageUnavailable("Exact-address geocoding is ambiguous or unavailable.")
+    result = results[0]
+    if result.get("partial_match") or not {"street_address", "premise", "subpremise"}.intersection(result.get("types", [])):
+        raise RouteMileageUnavailable("Exact-address geocoding did not verify a complete street address.")
+    components = {
+        item_type: component.get("long_name")
+        for component in result.get("address_components", [])
+        for item_type in component.get("types", [])
+    }
+    if components.get("country") != "United States":
+        raise RouteMileageUnavailable("Exact-address routing supports US addresses only.")
+    city = components.get("locality") or components.get("postal_town")
+    state = components.get("administrative_area_level_1")
+    postal_code = components.get("postal_code")
+    try:
+        coordinates = result["geometry"]["location"]
+        latitude = Decimal(str(coordinates["lat"]))
+        longitude = Decimal(str(coordinates["lng"]))
+    except (KeyError, TypeError, ValueError) as exc:
+        raise RouteMileageUnavailable("Exact-address geocoding returned invalid coordinates.") from exc
+    if not all((city, state, postal_code)):
+        raise RouteMileageUnavailable("Exact-address geocoding returned incomplete address details.")
+    return GeocodedAddress(
+        formatted_address=result.get("formatted_address") or address,
+        latitude=latitude,
+        longitude=longitude,
+        city=city,
+        state=state,
+        postal_code=postal_code,
+        country="US",
+        place_id=result.get("place_id"),
+    )
+
+
+def get_exact_address_round_trip_mileage(
+    service_type: "QuoteServiceType", airport_code: "QuoteAirportCode", address: str
+) -> tuple[GeocodedAddress, RouteMileage]:
+    """Return one verified geocode plus the 3-leg Google Routes closed loop."""
+
+    geocoded = geocode_exact_us_address(address)
+    api_key = settings.google_maps_api_key
+    if not api_key:
+        raise RouteMileageUnavailable("Exact-address routing is not configured.")
+    service_type_value = getattr(service_type, "value", service_type)
+    airport_code_value = getattr(airport_code, "value", airport_code)
+    airport = AIRPORT_ADDRESSES[airport_code_value]
+    exact_stop = {"location": {"latLng": {"latitude": float(geocoded.latitude), "longitude": float(geocoded.longitude)}}}
+    stops = [{"address": airport}, exact_stop] if service_type_value == "AIRPORT_PICKUP" else [exact_stop, {"address": airport}]
+    payload = {"origin": {"address": settings.jason_base_route_address}, "destination": {"address": settings.jason_base_route_address}, "intermediates": stops, "travelMode": "DRIVE", "routingPreference": "TRAFFIC_UNAWARE"}
+    try:
+        response = requests.post(GOOGLE_ROUTES_URL, json=payload, headers={"Content-Type": "application/json", "X-Goog-Api-Key": api_key, "X-Goog-FieldMask": "routes.distanceMeters,routes.legs.distanceMeters"}, timeout=10)
+    except requests.RequestException as exc:
+        raise RouteMileageUnavailable("Exact-address road routing is unavailable.") from exc
+    if not response.ok:
+        raise RouteMileageUnavailable("Exact-address road routing failed.")
+    try:
+        route = response.json()["routes"][0]
+        total = int(route["distanceMeters"])
+        legs = [int(leg["distanceMeters"]) for leg in route["legs"]]
+    except (IndexError, KeyError, TypeError, ValueError) as exc:
+        raise RouteMileageUnavailable("Exact-address road routing returned no usable route.") from exc
+    if total <= 0 or len(legs) != 3 or any(distance <= 0 for distance in legs):
+        raise RouteMileageUnavailable("Exact-address road routing returned incomplete route legs.")
+    return geocoded, RouteMileage(total_miles=Decimal(total) / METERS_PER_MILE, distance_meters=total, pricing_source=EXACT_ADDRESS_PRICING_SOURCE, reference_destination=geocoded.city, leg_1_miles=Decimal(legs[0]) / METERS_PER_MILE, leg_2_miles=Decimal(legs[1]) / METERS_PER_MILE, leg_3_miles=Decimal(legs[2]) / METERS_PER_MILE)
 
 
 def price_range_for_miles(total_miles: Decimal) -> MileagePriceRange:
