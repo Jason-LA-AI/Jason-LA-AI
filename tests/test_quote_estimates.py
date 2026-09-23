@@ -338,6 +338,21 @@ def test_exact_san_diego_lax_pickup_uses_approved_range(monkeypatch: pytest.Monk
     assert session.add.call_args.args[0].pricing_factors["exact_address_route"] is True
 
 
+def test_exact_san_diego_lax_dropoff_uses_reverse_approved_range(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("app.services.quote_estimate_service.get_exact_address_round_trip_mileage", lambda *_: _exact_address_route("San Diego", "270.9"))
+    session = _session()
+    response = create_quote_estimate(_request(service_type="AIRPORT_DROPOFF", airport_code="LAX", location_input="4255 Genesee Ave, San Diego, CA 92117"), session)
+
+    assert response.status.value == "ESTIMATED"
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (Decimal("240"), Decimal("280"))
+    stored = session.add.call_args.args[0]
+    assert stored.pricing_source == "approved_long_distance_range_v1"
+    assert stored.pricing_factors["exact_address_route"] is True
+    assert stored.pricing_factors["total_road_miles"] == "270.9"
+    assert stored.pricing_factors["approved_route"] == "13820 Schleisman Rd, San Diego, CA 92880, USA → LAX"
+    assert stored.pricing_factors["approved_direction"] == "AIRPORT_DROPOFF"
+
+
 @pytest.mark.parametrize(
     ("city", "address", "expected"),
     [
@@ -375,6 +390,22 @@ def test_city_state_forms_use_canonical_pricing(location: str, expected: tuple[s
         _session(),
     )
     assert (response.estimated_min_amount, response.estimated_max_amount) == tuple(Decimal(value) for value in expected)
+
+
+@pytest.mark.parametrize(
+    "location",
+    ["San Diego", "San Diego, CA", "San Diego CA", "San Diego, California", "圣地亚哥"],
+)
+def test_lax_san_diego_dropoff_forms_use_only_the_reverse_approved_range(location: str) -> None:
+    session = _session()
+    response = create_quote_estimate(
+        _request(service_type="AIRPORT_DROPOFF", airport_code="LAX", location_input=location),
+        session,
+    )
+
+    assert response.status.value == "ESTIMATED"
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (Decimal("240"), Decimal("280"))
+    assert session.add.call_args.args[0].pricing_source == "approved_long_distance_range_v1"
 
 
 @pytest.mark.parametrize(

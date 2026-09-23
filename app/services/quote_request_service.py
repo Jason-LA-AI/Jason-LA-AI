@@ -231,6 +231,7 @@ def _pricing_recommendation_text(estimate: object) -> str:
         return "\n".join(
             line for line in (
                 "APPROVED LONG-DISTANCE RANGE · EXACT ADDRESS ROUTE" if factors.get("approved_long_distance_range") else "EXACT ADDRESS ROUTE",
+                *((f"Route: {factors.get('approved_route', 'Not available')}", f"Direction: {factors.get('approved_direction', 'Not available')}") if factors.get("approved_long_distance_range") else ()),
                 f"Exact address: {factors.get('normalized_address', 'Not available')}",
                 f"City: {factors.get('geocoded_city', 'Not available')}",
                 f"Geocode source: {factors.get('geocode_source', 'Not available')}",
@@ -246,6 +247,8 @@ def _pricing_recommendation_text(estimate: object) -> str:
     if isinstance(factors, dict) and factors.get("approved_long_distance_range"):
         return "\n".join((
             "APPROVED LONG-DISTANCE RANGE",
+            f"Route: {factors.get('approved_route', 'Not available')}",
+            f"Direction: {factors.get('approved_direction', 'Not available')}",
             f"Closed-loop mileage: {factors.get('total_road_miles', 'Not available')} mi",
             f"Approved customer range: {factors.get('approved_customer_range', 'Not available')}",
             f"Pricing source: {source}",

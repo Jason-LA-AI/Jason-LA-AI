@@ -410,6 +410,19 @@ def test_lax_pickup_uses_only_explicitly_approved_long_distance_ranges(
     assert not stored.pricing_factors.get("not_for_quoting")
 
 
+def test_lax_san_diego_dropoff_uses_explicit_reverse_approved_range() -> None:
+    session = _session()
+    response = create_quote_estimate(_request("San Diego", service_type="AIRPORT_DROPOFF"), session)
+    stored = session.add.call_args.args[0]
+
+    assert response.status.value == "ESTIMATED"
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (Decimal("240"), Decimal("280"))
+    assert stored.pricing_source == "approved_long_distance_range_v1"
+    assert stored.pricing_factors["total_road_miles"] == "270.9"
+    assert stored.pricing_factors["approved_route"] == "San Diego → LAX"
+    assert stored.pricing_factors["approved_direction"] == "AIRPORT_DROPOFF"
+
+
 def test_uc_san_diego_remains_a_distinct_v1_destination() -> None:
     session = _session()
     response = create_quote_estimate(_request("UC San Diego"), session)
@@ -428,7 +441,6 @@ def test_uc_san_diego_remains_a_distinct_v1_destination() -> None:
         ("AIRPORT_PICKUP", "ONT", "Las Vegas"),
         ("AIRPORT_DROPOFF", "LAX", "San Francisco"),
         ("AIRPORT_PICKUP", "ONT", "San Francisco"),
-        ("AIRPORT_DROPOFF", "LAX", "San Diego"),
         ("AIRPORT_PICKUP", "ONT", "San Diego"),
         ("AIRPORT_DROPOFF", "LAX", "Santa Barbara"),
         ("AIRPORT_PICKUP", "ONT", "Santa Barbara"),
@@ -444,6 +456,15 @@ def test_approved_ranges_never_apply_to_reverse_or_other_airport_routes(
     assert response.status.value == "MANUAL_REVIEW_REQUIRED"
     assert response.estimated_min_amount is None
     assert response.estimated_max_amount is None
+
+
+@pytest.mark.parametrize("location", ["UC San Diego", "UCSD", "UC圣地亚哥", "加州大学圣地亚哥分校"])
+def test_uc_san_diego_dropoff_does_not_match_san_diego_reverse_approval(location: str) -> None:
+    session = _session()
+    response = create_quote_estimate(_request(location, service_type="AIRPORT_DROPOFF"), session)
+
+    assert session.add.call_args.args[0].pricing_source != "approved_long_distance_range_v1"
+    assert (response.estimated_min_amount, response.estimated_max_amount) != (Decimal("240"), Decimal("280"))
 
 
 @pytest.mark.parametrize("destination", ["San Jose", "Unknown remote destination"])

@@ -107,6 +107,8 @@ def create_quote_estimate(
                 "mileage_source": "google_routes_exact_address" if exact_address_candidate else "verified_closed_loop_road_mileage_archive",
                 "approved_long_distance_range": True,
                 "approved_customer_range": f"${minimum_amount}-${maximum_amount}",
+                "approved_route": route_summary,
+                "approved_direction": request.service_type.value,
                 "pricing_rule_version": pricing_rule_version,
             }
             if exact_address_candidate:
