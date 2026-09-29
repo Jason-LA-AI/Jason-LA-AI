@@ -120,6 +120,7 @@ class QuoteEstimateResponse(BaseModel):
     route_summary: str
     estimated_min_amount: Decimal | None
     estimated_max_amount: Decimal | None
+    is_fixed_fare: bool = False
     currency_code: Literal["USD"] = "USD"
     vehicle_assessment: QuoteVehicleAssessment
     requires_jason_review: bool

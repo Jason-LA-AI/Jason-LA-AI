@@ -13,6 +13,8 @@ from decimal import Decimal
 
 APPROVED_LONG_DISTANCE_PRICING_SOURCE = "approved_long_distance_range_v1"
 APPROVED_LONG_DISTANCE_PRICING_RULE_VERSION = "approved_long_distance_v1"
+APPROVED_FIXED_ROUTE_PRICING_SOURCE = "approved_fixed_route_fare_v1"
+APPROVED_FIXED_ROUTE_PRICING_RULE_VERSION = "approved_fixed_route_fare_v1"
 
 
 @dataclass(frozen=True)
@@ -25,6 +27,13 @@ class ApprovedLongDistanceRange:
         return (self.minimum_amount + self.maximum_amount) / Decimal("2")
 
 
+@dataclass(frozen=True)
+class ApprovedFixedRouteFare:
+    """A direction-scoped, customer-facing fixed preliminary fare."""
+
+    amount: Decimal
+
+
 _APPROVED_ROUTE_RANGES = {
     # These keys deliberately include the direction.  A range is a commercial
     # authorization for one route, never an inference about its reverse.
@@ -33,6 +42,11 @@ _APPROVED_ROUTE_RANGES = {
     ("LAX", "AIRPORT_PICKUP", "San Diego"): ("240", "280"),
     ("LAX", "AIRPORT_PICKUP", "Santa Barbara"): ("220", "260"),
     ("LAX", "AIRPORT_DROPOFF", "San Diego"): ("240", "280"),
+}
+
+_APPROVED_FIXED_ROUTE_FARES = {
+    # This is deliberately pickup-only.  It does not authorize San Diego → ONT.
+    ("ONT", "AIRPORT_PICKUP", "San Diego"): "280",
 }
 
 
@@ -47,7 +61,19 @@ def approved_long_distance_range(
     return ApprovedLongDistanceRange(*(Decimal(amount) for amount in amounts))
 
 
+def approved_fixed_route_fare(
+    *, service_type: str, airport_code: str, destination: str
+) -> ApprovedFixedRouteFare | None:
+    """Return a fixed approval only for its exact airport, direction, and city."""
+
+    amount = _APPROVED_FIXED_ROUTE_FARES.get((airport_code, service_type, destination))
+    return ApprovedFixedRouteFare(Decimal(amount)) if amount is not None else None
+
+
 def is_approved_long_distance_destination(destination: str) -> bool:
     """Whether a destination is approval-scoped rather than V1-scoped."""
 
-    return any(route_destination == destination for _, _, route_destination in _APPROVED_ROUTE_RANGES)
+    return any(route_destination == destination for _, _, route_destination in (
+        *_APPROVED_ROUTE_RANGES,
+        *_APPROVED_FIXED_ROUTE_FARES,
+    ))

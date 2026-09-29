@@ -169,7 +169,7 @@
     const fareReviewMessage = !hasRange && Array.isArray(estimate.notices) && estimate.notices[0] ? estimate.notices[0] : fallbackFareReviewMessage;
     state.locationSuggestion = fareReviewRequired ? estimate.location_suggestion || null : null;
     const resolutionSuggestions = fareReviewRequired ? estimate.resolution_suggestions || [] : [];
-    const range = document.getElementById("estimateRange"); range.textContent = hasRange ? `${formatUsd(estimate.estimated_min_amount)}–${formatUsd(estimate.estimated_max_amount)}` : ""; range.hidden = !hasRange;
+    const range = document.getElementById("estimateRange"); range.textContent = hasRange ? (estimate.is_fixed_fare ? formatUsd(estimate.estimated_min_amount) : `${formatUsd(estimate.estimated_min_amount)}–${formatUsd(estimate.estimated_max_amount)}`) : ""; range.hidden = !hasRange;
     document.getElementById("estimateLabel").textContent = fareReviewRequired ? "Fare Review Required" : "Preliminary Estimated Fare";
     document.getElementById("estimate-heading").textContent = fareReviewRequired ? "Fare Review Required" : "Preliminary Estimated Fare";
     document.getElementById("manualReview").hidden = !(manual || fareReviewRequired);

@@ -25,8 +25,11 @@ from app.services.location_normalizer import (
     suggest_location,
 )
 from app.services.approved_long_distance import (
+    APPROVED_FIXED_ROUTE_PRICING_RULE_VERSION,
+    APPROVED_FIXED_ROUTE_PRICING_SOURCE,
     APPROVED_LONG_DISTANCE_PRICING_RULE_VERSION,
     APPROVED_LONG_DISTANCE_PRICING_SOURCE,
+    approved_fixed_route_fare,
     approved_long_distance_range,
     is_approved_long_distance_destination,
 )
@@ -48,6 +51,7 @@ ROUTE_MILEAGE_UNAVAILABLE_PRICING_SOURCE = "route_mileage_unavailable"
 # useful internally, but it must not produce a customer-facing auto-quote.
 MAX_AUTO_QUOTE_CLOSED_LOOP_MILES = Decimal("300")
 LONG_DISTANCE_REVIEW_REQUIRED = "LONG_DISTANCE_REVIEW_REQUIRED"
+ONT_MIN_CUSTOMER_FARE = Decimal("80")
 
 
 def create_quote_estimate(
@@ -87,12 +91,49 @@ def create_quote_estimate(
             road_mileage = get_archived_round_trip_mileage(
                 request.service_type, request.airport_code, location_name
             )
+        approved_fixed = approved_fixed_route_fare(
+            service_type=request.service_type.value,
+            airport_code=request.airport_code.value,
+            destination=location_name,
+        )
         approved_range = approved_long_distance_range(
             service_type=request.service_type.value,
             airport_code=request.airport_code.value,
             destination=location_name,
         )
-        if approved_range is not None:
+        if approved_fixed is not None:
+            minimum_amount = maximum_amount = suggested_amount = approved_fixed.amount
+            pricing_source = APPROVED_FIXED_ROUTE_PRICING_SOURCE
+            pricing_rule_version = APPROVED_FIXED_ROUTE_PRICING_RULE_VERSION
+            mileage_factors = {
+                "total_road_miles": str(road_mileage.total_miles.quantize(Decimal("0.1"))),
+                "distance_meters": str(road_mileage.distance_meters),
+                "base_route": "Rowland Heights → trip stops → Rowland Heights",
+                "reference_destination": road_mileage.reference_destination,
+                "location_source": "verified_exact_address" if exact_address_candidate else "verified_city_or_landmark_archive",
+                "mileage_source": "google_routes_exact_address" if exact_address_candidate else "verified_closed_loop_road_mileage_archive",
+                "approved_fixed_route_fare": True,
+                "is_fixed_fare": True,
+                "approved_fixed_amount": str(approved_fixed.amount),
+                "approved_route": route_summary,
+                "approved_direction": request.service_type.value,
+                "pricing_rule_version": pricing_rule_version,
+            }
+            if exact_address_candidate:
+                mileage_factors.update({
+                    "exact_address_route": True,
+                    "normalized_address": geocoded_address.formatted_address,
+                    "geocoded_city": geocoded_address.city,
+                    "geocoded_state": geocoded_address.state,
+                    "geocoded_postal_code": geocoded_address.postal_code,
+                    "geocode_source": geocoded_address.provider,
+                    "geocode_place_id": geocoded_address.place_id,
+                    "route_source": "google_routes_v2",
+                    "leg_1_road_miles": str(road_mileage.leg_1_miles.quantize(Decimal("0.1"))),
+                    "leg_2_road_miles": str(road_mileage.leg_2_miles.quantize(Decimal("0.1"))),
+                    "leg_3_road_miles": str(road_mileage.leg_3_miles.quantize(Decimal("0.1"))),
+                })
+        elif approved_range is not None:
             minimum_amount = approved_range.minimum_amount
             maximum_amount = approved_range.maximum_amount
             suggested_amount = approved_range.suggested_amount
@@ -156,6 +197,16 @@ def create_quote_estimate(
                 "leg_2_road_miles": str(road_mileage.leg_2_miles.quantize(Decimal("0.1"))) if road_mileage.leg_2_miles is not None else None,
                 "leg_3_road_miles": str(road_mileage.leg_3_miles.quantize(Decimal("0.1"))) if road_mileage.leg_3_miles is not None else None,
             }
+            ont_minimum_applied = False
+            if request.airport_code.value == "ONT" and minimum_amount < ONT_MIN_CUSTOMER_FARE:
+                minimum_amount = ONT_MIN_CUSTOMER_FARE
+                maximum_amount = max(maximum_amount, minimum_amount + Decimal("20"))
+                ont_minimum_applied = True
+            mileage_factors.update({
+                "raw_customer_range": f"${mileage_price.minimum_amount}-${mileage_price.maximum_amount}",
+                "customer_range": f"${minimum_amount}-${maximum_amount}",
+                "ont_minimum_applied": ont_minimum_applied,
+            })
             if exact_address_candidate:
                 mileage_factors.update({
                     "exact_address_route": True,
@@ -208,6 +259,9 @@ def create_quote_estimate(
         status = QuoteEstimateStatus.ESTIMATED
         vehicle_assessment = QuoteVehicleAssessment.LIKELY_COMFORTABLE
         notices = (
+            ["Final fare requires Jason confirmation."]
+            if pricing_source == APPROVED_FIXED_ROUTE_PRICING_SOURCE
+            else
             [
                 "Estimate is based on the selected city or landmark area.",
                 "This is a preliminary estimate based on the route and trip details provided. Jason will review the exact pickup/drop-off location, time, luggage, and availability before confirming the final fare.",
@@ -298,6 +352,7 @@ def create_quote_estimate(
         route_summary=estimate.route_summary,
         estimated_min_amount=(estimate.estimated_min_amount if customer_price_available else None),
         estimated_max_amount=(estimate.estimated_max_amount if customer_price_available else None),
+        is_fixed_fare=bool(estimate.pricing_factors.get("is_fixed_fare")) if customer_price_available else False,
         currency_code="USD",
         vehicle_assessment=QuoteVehicleAssessment(estimate.vehicle_assessment),
         requires_jason_review=estimate.requires_jason_review,
@@ -341,6 +396,7 @@ def customer_numeric_fare_is_available(
             CITY_MILEAGE_ARCHIVE_PRICING_SOURCE,
             EXACT_ADDRESS_PRICING_SOURCE,
             APPROVED_LONG_DISTANCE_PRICING_SOURCE,
+            APPROVED_FIXED_ROUTE_PRICING_SOURCE,
         }
         and not (risk_flags or [])
     )

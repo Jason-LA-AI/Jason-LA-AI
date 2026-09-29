@@ -227,6 +227,15 @@ def _pricing_recommendation_text(estimate: object) -> str:
     maximum = getattr(estimate, "estimated_max_amount", None)
     currency = getattr(estimate, "currency_code", None) or "USD"
     factors = getattr(estimate, "pricing_factors", None)
+    if isinstance(factors, dict) and factors.get("is_fixed_fare"):
+        return "\n".join((
+            "APPROVED FIXED ROUTE FARE",
+            f"Route: {factors.get('approved_route', 'Not available')}",
+            f"Direction: {factors.get('approved_direction', 'Not available')}",
+            f"Fare: ${factors.get('approved_fixed_amount', 'Not available')}",
+            f"Closed-loop mileage: {factors.get('total_road_miles', 'Not available')} mi",
+            f"Pricing source: {source}",
+        ))
     if isinstance(factors, dict) and factors.get("exact_address_route"):
         return "\n".join(
             line for line in (
@@ -292,7 +301,9 @@ def _pricing_diagnostic_lines(factors: object) -> tuple[str, ...]:
         ("total_road_miles", "Closed-loop Miles"),
         ("raw_midpoint", "Raw Midpoint"),
         ("rounded_midpoint", "Rounded Midpoint"),
+        ("raw_customer_range", "Raw V1 Range"),
         ("customer_range", "Customer Range"),
+        ("ont_minimum_applied", "ONT Minimum Applied"),
         ("pricing_rule_version", "Pricing Rule"),
         ("location_source", "Location Source"),
         ("mileage_source", "Mileage Source"),

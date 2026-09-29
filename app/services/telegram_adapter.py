@@ -115,6 +115,15 @@ def _pricing_recommendation_lines(payload: dict[str, Any]) -> tuple[str, ...]:
     source = payload.get("pricing_source") or "Not provided"
     status = payload.get("pricing_status") or "MANUAL_REVIEW_REQUIRED"
     factors = payload.get("pricing_factors")
+    if isinstance(factors, dict) and factors.get("is_fixed_fare"):
+        return (
+            "APPROVED FIXED ROUTE FARE",
+            f"Route: {factors.get('approved_route', 'Not available')}",
+            f"Direction: {factors.get('approved_direction', 'Not available')}",
+            f"Fare: ${factors.get('approved_fixed_amount', 'Not available')}",
+            f"Closed-loop mileage: {factors.get('total_road_miles', 'Not available')} mi",
+            f"Pricing source: {source}",
+        )
     if isinstance(factors, dict) and factors.get("exact_address_route"):
         return (
             "APPROVED LONG-DISTANCE RANGE · EXACT ADDRESS ROUTE" if factors.get("approved_long_distance_range") else "EXACT ADDRESS ROUTE",
@@ -172,7 +181,9 @@ def _pricing_diagnostic_lines(factors: object) -> tuple[str, ...]:
         ("total_road_miles", "Closed-loop Miles"),
         ("raw_midpoint", "Raw Midpoint"),
         ("rounded_midpoint", "Rounded Midpoint"),
+        ("raw_customer_range", "Raw V1 Range"),
         ("customer_range", "Customer Range"),
+        ("ont_minimum_applied", "ONT Minimum Applied"),
         ("pricing_rule_version", "Pricing Rule"),
         ("location_source", "Location Source"),
         ("mileage_source", "Mileage Source"),

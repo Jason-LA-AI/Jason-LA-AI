@@ -338,6 +338,16 @@ def test_exact_san_diego_lax_pickup_uses_approved_range(monkeypatch: pytest.Monk
     assert session.add.call_args.args[0].pricing_factors["exact_address_route"] is True
 
 
+def test_exact_san_diego_ont_pickup_uses_approved_fixed_fare(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr("app.services.quote_estimate_service.get_exact_address_round_trip_mileage", lambda *_: _exact_address_route("San Diego", "270.4"))
+    session = _session()
+    response = create_quote_estimate(_request(service_type="AIRPORT_PICKUP", airport_code="ONT", location_input="4255 Genesee Ave, San Diego, CA 92117"), session)
+
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (Decimal("280"), Decimal("280"))
+    assert session.add.call_args.args[0].pricing_source == "approved_fixed_route_fare_v1"
+    assert session.add.call_args.args[0].pricing_factors["exact_address_route"] is True
+
+
 def test_exact_san_diego_lax_dropoff_uses_reverse_approved_range(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("app.services.quote_estimate_service.get_exact_address_round_trip_mileage", lambda *_: _exact_address_route("San Diego", "270.9"))
     session = _session()
@@ -495,6 +505,7 @@ def test_quote_estimate_endpoint_returns_frontend_contract(
         "route_summary",
         "estimated_min_amount",
         "estimated_max_amount",
+        "is_fixed_fare",
         "currency_code",
         "vehicle_assessment",
         "requires_jason_review",

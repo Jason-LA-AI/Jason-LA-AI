@@ -434,6 +434,54 @@ def test_uc_san_diego_remains_a_distinct_v1_destination() -> None:
     assert stored.pricing_source == "city_mileage_pricing_v1"
 
 
+@pytest.mark.parametrize("destination", ["Chino", "Brea", "La Habra"])
+def test_ont_numeric_routes_apply_the_customer_facing_eighty_dollar_floor(destination: str) -> None:
+    session = _session()
+    response = create_quote_estimate(_request(destination, airport_code="ONT"), session)
+    stored = session.add.call_args.args[0]
+
+    assert response.status.value == "ESTIMATED"
+    assert response.estimated_min_amount >= Decimal("80")
+    assert response.estimated_max_amount - response.estimated_min_amount >= Decimal("20")
+    assert stored.pricing_factors["ont_minimum_applied"] is True
+    assert stored.pricing_factors["raw_customer_range"] != stored.pricing_factors["customer_range"]
+
+
+def test_ont_floor_does_not_change_lax_v1_fares() -> None:
+    response = create_quote_estimate(_request("Chino", airport_code="LAX"), _session())
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (Decimal("115"), Decimal("145"))
+
+
+@pytest.mark.parametrize("location", ["San Diego", "San Diego, CA", "San Diego CA", "San Diego, California", "圣地亚哥"])
+def test_ont_san_diego_pickup_is_an_explicit_fixed_fare(location: str) -> None:
+    session = _session()
+    response = create_quote_estimate(_request(location, airport_code="ONT"), session)
+    stored = session.add.call_args.args[0]
+
+    assert (response.estimated_min_amount, response.estimated_max_amount) == (Decimal("280"), Decimal("280"))
+    assert stored.pricing_source == "approved_fixed_route_fare_v1"
+    assert stored.pricing_factors["approved_fixed_route_fare"] is True
+    assert stored.pricing_factors["is_fixed_fare"] is True
+    assert response.is_fixed_fare is True
+    assert stored.pricing_factors["approved_fixed_amount"] == "280"
+
+
+@pytest.mark.parametrize("location", ["UC San Diego", "UCSD", "UC圣地亚哥", "加州大学圣地亚哥分校"])
+def test_ont_uc_san_diego_does_not_match_generic_fixed_san_diego_fare(location: str) -> None:
+    session = _session()
+    response = create_quote_estimate(_request(location, airport_code="ONT"), session)
+    assert session.add.call_args.args[0].pricing_source != "approved_fixed_route_fare_v1"
+    assert (response.estimated_min_amount, response.estimated_max_amount) != (Decimal("280"), Decimal("280"))
+
+
+def test_san_diego_to_ont_does_not_receive_the_pickup_only_fixed_fare() -> None:
+    response = create_quote_estimate(
+        _request("San Diego", service_type="AIRPORT_DROPOFF", airport_code="ONT"), _session()
+    )
+    assert response.estimated_min_amount is None
+    assert response.estimated_max_amount is None
+
+
 @pytest.mark.parametrize(
     ("service_type", "airport_code", "destination"),
     [
@@ -441,7 +489,6 @@ def test_uc_san_diego_remains_a_distinct_v1_destination() -> None:
         ("AIRPORT_PICKUP", "ONT", "Las Vegas"),
         ("AIRPORT_DROPOFF", "LAX", "San Francisco"),
         ("AIRPORT_PICKUP", "ONT", "San Francisco"),
-        ("AIRPORT_PICKUP", "ONT", "San Diego"),
         ("AIRPORT_DROPOFF", "LAX", "Santa Barbara"),
         ("AIRPORT_PICKUP", "ONT", "Santa Barbara"),
     ],

@@ -614,6 +614,15 @@ def _pricing_details(quote: Quote | None) -> str:
     if quote is None or not isinstance(quote.additional_fee_factors, dict):
         return "Not available"
     factors = quote.additional_fee_factors
+    if factors.get("is_fixed_fare"):
+        return " · ".join((
+            "APPROVED FIXED ROUTE FARE",
+            f"Route: {factors.get('approved_route', 'Not available')}",
+            f"Direction: {factors.get('approved_direction', 'Not available')}",
+            f"Fare: ${factors.get('approved_fixed_amount', 'Not available')}",
+            f"Closed-loop mileage: {factors.get('total_road_miles', 'Not available')} mi",
+            f"Pricing source: {quote.pricing_source or 'Not available'}",
+        ))
     if factors.get("exact_address_route"):
         return " · ".join(
             (
@@ -658,7 +667,9 @@ def _pricing_details(quote: Quote | None) -> str:
         ("Miles", factors.get("total_road_miles")),
         ("Raw midpoint", factors.get("raw_midpoint")),
         ("Rounded midpoint", factors.get("rounded_midpoint")),
+        ("Raw V1 range", factors.get("raw_customer_range")),
         ("Range", factors.get("customer_range")),
+        ("ONT minimum applied", "YES" if factors.get("ont_minimum_applied") else "NO"),
         ("Route source", factors.get("location_source")),
     )
     return " · ".join(f"{label}: {value}" for label, value in values if value is not None) or "Not available"
