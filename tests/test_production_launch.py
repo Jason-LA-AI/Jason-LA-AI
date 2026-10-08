@@ -21,6 +21,34 @@ def test_seo_endpoints_and_metadata(client: TestClient) -> None:
     assert sitemap.status_code == 200
     assert "/gallery</loc>" in sitemap.text
     assert "/dashboard</loc>" not in sitemap.text
+    assert "/quote/confirmation</loc>" not in sitemap.text
+    assert "/chat</loc>" not in sitemap.text
+
+
+def test_homepage_acquisition_metadata_and_primary_cta(client: TestClient) -> None:
+    response = client.get("/")
+
+    assert response.status_code == 200
+    assert "洛杉矶机场接送 | LAX & ONT 中文司机 | Jason-LA" in response.text
+    assert "<h1>洛杉矶机场接送｜LAX &amp; ONT 中文私人司机</h1>" in response.text
+    assert 'content="https://jason-la.com/"' in response.text
+    assert 'name="description"' in response.text
+    assert 'property="og:title" content="洛杉矶机场接送 | LAX & ONT 中文司机 | Jason-LA"' in response.text
+    assert 'name="twitter:card" content="summary_large_image"' in response.text
+    assert 'name="twitter:title" content="洛杉矶机场接送 | LAX & ONT 中文司机 | Jason-LA"' in response.text
+    assert 'href="/quote">立即查询价格</a>' in response.text
+
+
+def test_quote_metadata_and_non_search_flow_pages_are_noindex(client: TestClient) -> None:
+    quote = client.get("/quote")
+    confirmation = client.get("/quote/confirmation")
+    chat = client.get("/chat")
+
+    assert "LAX & ONT Airport Transportation Quote | Jason-LA" in quote.text
+    assert 'property="og:title" content="LAX & ONT Airport Transportation Quote | Jason-LA"' in quote.text
+    assert 'name="twitter:card" content="summary_large_image"' in quote.text
+    assert '<meta name="robots" content="noindex,follow">' in confirmation.text
+    assert '<meta name="robots" content="noindex,follow">' in chat.text
 
 
 def test_core_service_pages_have_contextual_internal_links(client: TestClient) -> None:

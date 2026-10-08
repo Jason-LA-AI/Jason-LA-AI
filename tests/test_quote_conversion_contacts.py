@@ -53,6 +53,13 @@ def test_source_is_optional_and_defaults_to_unknown_for_storage() -> None:
     assert _source_for_request(request) == "UNKNOWN"
 
 
+@pytest.mark.parametrize("source", ["FACEBOOK", "XIAOHONGSHU", "GOOGLE", "WEBSITE"])
+def test_selected_source_survives_into_request_storage_value(source: str) -> None:
+    request = _request(phone="6265550100", source=source)
+
+    assert _source_for_request(request) == source
+
+
 def test_preferred_contact_is_optional_when_a_channel_is_present() -> None:
     request = _request(email="customer@example.com")
 

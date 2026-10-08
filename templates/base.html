@@ -36,6 +36,11 @@
     <meta property="og:locale" content="en_US">
     <meta property="og:url" content="{{ site_url }}{{ request.url.path }}">
     <meta property="og:image" content="{{ site_url }}/static/images/service/01-airport-pickup.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{% block twitter_title %}Jason Transportation | Los Angeles Private Driver{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}Private airport transportation in Los Angeles, including LAX, Ontario Airport, Disneyland and San Diego rides.{% endblock %}">
+    <meta name="twitter:image" content="{{ site_url }}/static/images/service/01-airport-pickup.webp">
+    {% block robots_meta %}{% endblock %}
 
 
     <link rel="stylesheet" href="/static/home.css?v=20260807-2">
@@ -46,8 +51,9 @@
 {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "name": "Jason Transportation",
-  "description": "Los Angeles private transportation service including airport pickup, Disneyland transportation and long distance rides.",
+  "name": "Jason-LA",
+  "url": "https://jason-la.com",
+  "description": "Private airport transportation personally driven by Jason for LAX and Ontario Airport, with Chinese and English communication.",
   "areaServed": [
     "Los Angeles County",
     "Orange County",
@@ -58,13 +64,7 @@
     "Private Driver Service",
     "Disneyland Transportation",
     "Long Distance Transportation"
-  ],
-  "address": {
-    "@type": "PostalAddress",
-    "addressLocality": "Los Angeles",
-    "addressRegion": "CA",
-    "addressCountry": "US"
-  }
+  ]
 }
 
 </script>

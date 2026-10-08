@@ -10,6 +10,7 @@
   const todayValue = dateInTimeZone("America/Los_Angeles");
   document.getElementById("serviceDate").min = todayValue;
   populateArrivalTimes();
+  prefillSourceFromQuery();
   updateContactFields();
 
   form.querySelectorAll("[data-choice-group]").forEach((group) => group.addEventListener("click", (event) => {
@@ -137,6 +138,13 @@
     if (state.contactMethod === "LINE" && !hasLine) { line.setAttribute("aria-invalid","true"); setError("contact","Enter a LINE ID or other contact information."); return false; }
     if (hasEmail && !email.checkValidity()) { email.setAttribute("aria-invalid","true"); setError("contact","Enter a valid email address."); return false; }
     clearError("contact"); return true;
+  }
+  function prefillSourceFromQuery() {
+    const source = new URLSearchParams(window.location.search).get("source");
+    const normalized = source ? source.trim().toLowerCase() : "";
+    const allowedSources = { facebook: "FACEBOOK", xiaohongshu: "XIAOHONGSHU", google: "GOOGLE", direct: "WEBSITE", website: "WEBSITE" };
+    const selected = allowedSources[normalized];
+    if (selected) document.getElementById("source").value = selected;
   }
 
   function updateContactFields() {

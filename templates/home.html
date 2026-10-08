@@ -1,13 +1,26 @@
 {% extends "base.html" %}
-{% block title %}Jason | Los Angeles Airport Transportation | Chinese Private Driver{% endblock %}
-{% block description %}Private airport transportation personally driven by Jason. Serving LAX, Ontario Airport, Los Angeles, Orange County, and surrounding areas in English and Chinese.{% endblock %}
+{% block title %}洛杉矶机场接送 | LAX & ONT 中文司机 | Jason-LA{% endblock %}
+{% block description %}洛杉矶 LAX、ONT 机场私人接送，Jason 本人驾驶，中文沟通。在线输入接送地点即可查看初步价格，再由 Jason 最终确认行程与费用。{% endblock %}
+{% block og_title %}洛杉矶机场接送 | LAX & ONT 中文司机 | Jason-LA{% endblock %}
+{% block og_description %}Jason personally provides private airport transportation for LAX and Ontario Airport, with Chinese communication and online preliminary fare estimates.{% endblock %}
+{% block twitter_title %}洛杉矶机场接送 | LAX & ONT 中文司机 | Jason-LA{% endblock %}
+{% block twitter_description %}Jason personally provides private airport transportation for LAX and Ontario Airport, with Chinese communication and online preliminary fare estimates.{% endblock %}
+
+{% block extra_css %}
+<style>
+  .home-hero h1 { text-wrap: balance; }
+  @media (max-width: 420px) {
+    .home-hero h1 { font-size: 2rem; line-height: 1.15; }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
 <header class="home-hero">
   <p class="eyebrow">PRIVATE AIRPORT TRANSPORTATION</p>
-  <h1>Welcome to Los Angeles.</h1>
-  <p>中文沟通 · 私人接送 · Jason 全程亲自服务</p>
-  <div class="hero-actions"><a class="home-button home-button--light" href="/quote">Get a Quote</a><a class="text-link" href="/gallery">See real service photos →</a></div>
+  <h1>洛杉矶机场接送｜LAX &amp; ONT 中文私人司机</h1>
+  <p>Jason personally drives private airport transportation for LAX and Ontario Airport, with Chinese communication and online preliminary fare estimates.</p>
+  <div class="hero-actions"><a class="home-button home-button--light" href="/quote">立即查询价格</a><a class="text-link" href="/gallery">See real service photos →</a></div>
 </header>
 
 <section class="wide-section meet-jason">
