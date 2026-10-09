@@ -512,6 +512,7 @@ def test_quote_estimate_endpoint_returns_frontend_contract(
         "risk_flags",
         "notices",
             "location_suggestion",
+            "verified_location",
             "resolution_type",
             "resolution_message",
             "resolution_suggestions",
@@ -540,13 +541,13 @@ def test_only_road_mileage_pricing_can_show_customer_fare() -> None:
         pricing_source="google_routes_mileage_v1",
         risk_flags=[],
     )
-    assert not customer_numeric_fare_is_available(
+    assert customer_numeric_fare_is_available(
         pricing_source=ROUTE_MILEAGE_PRICING_SOURCE,
         risk_flags=["LARGE_LUGGAGE_4_PLUS"],
     )
 
 
-def test_manual_vehicle_review_withholds_customer_numeric_estimate() -> None:
+def test_manual_vehicle_review_preserves_customer_numeric_estimate() -> None:
     response = create_quote_estimate(
         _request(
             service_type="AIRPORT_PICKUP",
@@ -558,9 +559,9 @@ def test_manual_vehicle_review_withholds_customer_numeric_estimate() -> None:
     )
 
     assert response.status.value == "MANUAL_REVIEW_REQUIRED"
-    assert response.estimated_min_amount is None
-    assert response.estimated_max_amount is None
-    assert response.notices == ["Jason will review the exact route and confirm the fare."]
+    assert response.estimated_min_amount == Decimal("115")
+    assert response.estimated_max_amount == Decimal("145")
+    assert response.notices == ["Jason will review your trip details and confirm the fare."]
 
 
 @pytest.mark.parametrize(

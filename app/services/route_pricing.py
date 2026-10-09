@@ -284,6 +284,13 @@ def get_exact_address_round_trip_mileage(
     """Return one verified geocode plus the 3-leg Google Routes closed loop."""
 
     geocoded = geocode_exact_us_address(address)
+    return get_verified_endpoint_round_trip_mileage(service_type, airport_code, geocoded)
+
+
+def get_verified_endpoint_round_trip_mileage(
+    service_type: "QuoteServiceType", airport_code: "QuoteAirportCode", geocoded: GeocodedAddress
+) -> tuple[GeocodedAddress, RouteMileage]:
+    """Route a previously verified endpoint without another geocoding call."""
     api_key = settings.google_maps_api_key
     if not api_key:
         raise RouteMileageUnavailable("Exact-address routing is not configured.")

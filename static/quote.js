@@ -170,6 +170,10 @@
     return body;
   }
   function renderEstimate(estimate, trip) {
+    const ambiguous = estimate.resolution_type === "AMBIGUOUS_PLACE";
+    document.getElementById("contactDetails").hidden = ambiguous;
+    document.getElementById("requestConfirmationButton").closest(".estimate-next-step").hidden = ambiguous;
+    document.getElementById("submitRequestButton").disabled = ambiguous;
     const manual = estimate.status === "MANUAL_REVIEW_REQUIRED";
     const hasRange = estimate.estimated_min_amount != null && estimate.estimated_max_amount != null;
     const fareReviewRequired = !hasRange;
@@ -178,10 +182,11 @@
     state.locationSuggestion = fareReviewRequired ? estimate.location_suggestion || null : null;
     const resolutionSuggestions = fareReviewRequired ? estimate.resolution_suggestions || [] : [];
     const range = document.getElementById("estimateRange"); range.textContent = hasRange ? (estimate.is_fixed_fare ? formatUsd(estimate.estimated_min_amount) : `${formatUsd(estimate.estimated_min_amount)}–${formatUsd(estimate.estimated_max_amount)}`) : ""; range.hidden = !hasRange;
-    document.getElementById("estimateLabel").textContent = fareReviewRequired ? "Fare Review Required" : "Preliminary Estimated Fare";
+    document.getElementById("estimateLabel").hidden = true;
     document.getElementById("estimate-heading").textContent = fareReviewRequired ? "Fare Review Required" : "Preliminary Estimated Fare";
     document.getElementById("manualReview").hidden = !(manual || fareReviewRequired);
-    document.getElementById("manualReviewTitle").textContent = fareReviewRequired ? "Fare Review Required" : "Jason will confirm final price shortly.";
+    document.getElementById("manualReviewTitle").hidden = fareReviewRequired;
+    document.getElementById("manualReviewTitle").textContent = "Vehicle suitability needs confirmation.";
     document.getElementById("manualReviewMessage").textContent = fareReviewRequired ? fareReviewMessage : "";
     const locationReviewHelp = document.getElementById("locationReviewHelp");
     const locationReviewMessage = document.getElementById("locationReviewMessage");
@@ -189,19 +194,18 @@
     locationReviewHelp.hidden = !fareReviewRequired;
     locationReviewMessage.textContent = estimate.resolution_message || (state.locationSuggestion
       ? "We couldn’t automatically price this location."
-      : "We couldn’t automatically price this location. Try entering a city, airport, school, or landmark for a preliminary estimate, or keep this location for Jason to review.");
+      : "We couldn’t confidently identify this location. Please enter the full street address. / 我们暂时无法准确识别这个地点，请输入完整地址。");
     locationSuggestionActions.hidden = !state.locationSuggestion;
     if (state.locationSuggestion) {
       document.getElementById("locationSuggestionName").textContent = state.locationSuggestion.display_name;
       document.getElementById("useLocationSuggestionButton").textContent = `Use ${state.locationSuggestion.canonical_location}`;
     }
+    document.getElementById("verifiedLocation").hidden = !estimate.verified_location;
+    document.getElementById("verifiedLocation").textContent = estimate.verified_location ? `Verified location: ${estimate.verified_location}` : "";
     const resolutionActions = document.getElementById("locationResolutionActions");
     resolutionActions.hidden = resolutionSuggestions.length < 2;
     resolutionActions.replaceChildren();
     if (resolutionSuggestions.length >= 2) {
-      const prompt = document.createElement("p");
-      prompt.textContent = estimate.resolution_message || "Which location did you mean?";
-      resolutionActions.append(prompt);
       resolutionSuggestions.forEach((item) => {
         const button = document.createElement("button");
         button.className = "primary-button";
@@ -215,11 +219,12 @@
     const summary = [["Passengers",trip.passengers],["Luggage",trip.luggage],["Child seat",trip.childSeat === "YES" ? "Requested" : "No"],["Vehicle",displayVehicle(estimate.vehicle_assessment)],["Date & time",`${trip.date} · ${formatTime(trip.time)}`]];
     document.getElementById("estimateSummary").innerHTML = summary.map(([k,v])=>`<div><dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd></div>`).join("");
     const notices = fareReviewRequired
-      ? [fareReviewMessage]
+      ? []
       : (Array.isArray(estimate.notices) && estimate.notices.length
         ? estimate.notices
         : ["This is a preliminary estimate based on the route and trip details provided. Jason will review the exact pickup/drop-off location, time, luggage, and availability before confirming the final fare."]);
     if (trip.childSeat === "YES") notices.push("Child seat availability will be confirmed with your trip.");
+    document.getElementById("estimateNotices").hidden = notices.length === 0;
     document.getElementById("estimateNotices").innerHTML = notices.map((x)=>`<p>${escapeHtml(x)}</p>`).join("");
     document.getElementById("estimateValidity").textContent = formatValidity(estimate.valid_until);
   }
@@ -261,7 +266,7 @@
     }
   }
   function setLoading(on) { continueButton.disabled=on; continueButton.textContent=on ? "Getting estimate…" : "Next: Get Estimate"; form.setAttribute("aria-busy",String(on)); }
-  function updateLabels() { const drop=state.serviceType === "AIRPORT_DROPOFF"; document.getElementById("locationLabel").textContent=drop?"Pickup city or landmark":"Drop-off city or landmark"; document.getElementById("dateLabel").textContent=drop?"Pickup Date":"Flight Arrival Date"; document.getElementById("timeLabel").textContent=drop?"Pickup Time":"Flight Arrival Time"; document.getElementById("scheduleGuidance").textContent=drop?"Select a pickup city or landmark for a preliminary estimate. Exact street addresses require Jason’s route review. Los Angeles time zone.":"Select a drop-off city or landmark for a preliminary estimate. Exact street addresses require Jason’s route review. Los Angeles time zone."; }
+  function updateLabels() { const drop=state.serviceType === "AIRPORT_DROPOFF"; document.getElementById("locationLabel").textContent=drop?"Pickup city or landmark":"Drop-off city or landmark"; document.getElementById("dateLabel").textContent=drop?"Pickup Date":"Flight Arrival Date"; document.getElementById("timeLabel").textContent=drop?"Pickup Time":"Flight Arrival Time"; document.getElementById("scheduleGuidance").textContent=drop?"Select a pickup city or landmark for a preliminary estimate. Enter a full street address or a specific hotel name. Los Angeles time zone.":"Select a drop-off city or landmark for a preliminary estimate. Enter a full street address or a specific hotel name. Los Angeles time zone."; }
   function focusFirstError(){ const target=form.querySelector('[aria-invalid="true"], .field-error:not(:empty)'); if(target){ target.focus?.(); target.scrollIntoView({behavior:"smooth",block:"center"}); } }
   function setError(key,msg){ const el=form.querySelector(`[data-error-for="${key}"]`); if(el) el.textContent=msg; if(key === "estimateRequest") document.getElementById("estimateErrorContact").hidden = !msg; } function clearError(key){setError(key,"");} function value(id){return document.getElementById(id).value;}
   function formatUsd(v){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",maximumFractionDigits:0}).format(Number(v));}

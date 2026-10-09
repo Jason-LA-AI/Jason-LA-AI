@@ -22,3 +22,9 @@
 @media(max-width:460px){.estimate-next-step__button,.contact-block>.primary-button{min-width:0;width:100%}}
 .location-review-help{background:#fff8e9;border:1px solid #e4c48e;border-radius:12px;font-size:.86rem;line-height:1.45;margin:14px 0 0;padding:13px;text-align:left}.location-review-help>p{margin:0}.location-suggestion-actions{border-top:1px solid #e4c48e;margin-top:11px;padding-top:11px}.location-suggestion-actions p{font-weight:700;margin:0 0 9px}.location-suggestion-actions .primary-button,.location-suggestion-actions .secondary-button{margin:4px 6px 0 0;max-width:100%;white-space:normal}
 @media(max-width:460px){.location-suggestion-actions .primary-button,.location-suggestion-actions .secondary-button{display:block;margin:8px 0 0;width:100%}}
+
+/* Place choices remain readable and touchable on narrow phones. */
+#locationResolutionActions { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; gap: 10px; }
+#locationResolutionActions[hidden] { display: none; }
+#locationResolutionActions button { width: 100%; min-height: 48px; white-space: normal; overflow-wrap: anywhere; text-align: left; }
+#verifiedLocation { overflow-wrap: anywhere; }

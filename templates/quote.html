@@ -7,7 +7,7 @@
 {% block twitter_title %}LAX & ONT Airport Transportation Quote | Jason-LA{% endblock %}
 {% block twitter_description %}Get a preliminary fare estimate for private LAX or Ontario Airport transportation before Jason confirms your final trip details and fare.{% endblock %}
 
-{% block extra_css %}<link rel="stylesheet" href="/static/quote.css?v=20260915-1">{% endblock %}
+{% block extra_css %}<link rel="stylesheet" href="/static/quote.css?v=20261009-1">{% endblock %}
 
 {% block content %}
 <main class="quote-page">
@@ -50,7 +50,7 @@
           <label class="field"><span>Flight Number <small>(optional)</small></span><input id="flightNumber" name="flight_number" type="text" maxlength="30" autocomplete="off" placeholder="e.g. UA123"></label>
           <label class="field field--location"><span id="locationLabel">Drop-off city or landmark</span><input id="locationInput" name="locationInput" type="text" maxlength="240" autocomplete="street-address" placeholder="City, landmark, or exact address" required></label>
         </div>
-        <p class="field-hint" id="scheduleGuidance">Select a city or landmark for a preliminary estimate. Exact street addresses require Jason’s route review. Los Angeles time zone.</p>
+        <p class="field-hint" id="scheduleGuidance">Select a city or landmark for a preliminary estimate. Enter a full street address or a specific hotel name. Los Angeles time zone.</p>
         <p class="field-error" data-error-for="schedule" role="alert"></p>
         <p class="field-error" data-error-for="locationInput" role="alert"></p>
       </div>
@@ -72,7 +72,7 @@
       <section class="estimate-panel" id="estimatePanel" aria-labelledby="estimate-heading" tabindex="-1" hidden>
         <div class="section-heading"><span>✓</span><h2 id="estimate-heading">Preliminary Estimated Fare</h2></div>
         <div class="estimate-card">
-          <p class="estimate-card__label" id="estimateLabel">Preliminary Estimated Fare</p><p class="estimate-card__price" id="estimateRange"></p>
+          <p id="verifiedLocation" hidden></p><p class="estimate-card__label" id="estimateLabel" hidden>Preliminary Estimated Fare</p><p class="estimate-card__price" id="estimateRange"></p>
           <div class="manual-review" id="manualReview" hidden><strong id="manualReviewTitle">Fare Review Required</strong><span id="manualReviewMessage">Jason will review the exact route and confirm the fare.</span></div>
           <div class="location-review-help" id="locationReviewHelp" hidden>
             <p id="locationReviewMessage"></p>
@@ -138,4 +138,4 @@
 </main>
 {% endblock %}
 
-{% block extra_js %}<script src="/static/quote.js?v=20261007-1" defer></script>{% endblock %}
+{% block extra_js %}<script src="/static/quote.js?v=20261009-2" defer></script>{% endblock %}

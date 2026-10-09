@@ -57,6 +57,9 @@ def process_quote_request(
 
     try:
         estimate = get_valid_quote_estimate(db, request.estimate_id)
+        factors = estimate.pricing_factors
+        if isinstance(factors, dict) and factors.get("resolution_type") == "AMBIGUOUS_PLACE":
+            raise QuoteRequestError("AMBIGUOUS_LOCATION")
         phone, email, wechat_id, line_id, contact_method = _resolve_contact(request)
         source = _source_for_request(request)
 

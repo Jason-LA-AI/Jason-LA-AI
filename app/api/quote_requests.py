@@ -28,6 +28,7 @@ ERROR_STATUS_CODES = {
 }
 
 ERROR_MESSAGES = {
+    "AMBIGUOUS_LOCATION": "Please choose a suggested location and get a new estimate first.",
     "CONTACT_METHOD_REQUIRED": "Provide a phone number, email address, WeChat ID, or LINE ID.",
     "PHONE_REQUIRED_FOR_SMS": "A phone number is required for SMS contact.",
     "EMAIL_REQUIRED_FOR_EMAIL": "An email address is required for email contact.",

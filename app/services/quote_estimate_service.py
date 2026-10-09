@@ -38,10 +38,15 @@ from app.services.route_pricing import (
     RouteMileageUnavailable,
     EXACT_ADDRESS_PRICING_SOURCE,
     get_exact_address_round_trip_mileage,
+    get_verified_endpoint_round_trip_mileage,
     get_archived_round_trip_mileage,
     price_range_for_miles,
 )
 
+from app.services.place_resolution import resolve_safe_place
+
+
+VEHICLE_REVIEW_FLAGS = {"PASSENGER_COUNT_5_PLUS", "LARGE_LUGGAGE_4_PLUS", "OVERSIZED_ITEMS"}
 
 LOS_ANGELES_TIMEZONE = ZoneInfo("America/Los_Angeles")
 ROUTE_MILEAGE_PRICING_SOURCE = CITY_MILEAGE_ARCHIVE_PRICING_SOURCE
@@ -69,11 +74,12 @@ def create_quote_estimate(
     route_summary = _build_route_summary(request, location_name)
     risk_flags = _risk_flags(request)
 
-    # A customer fare needs a known canonical destination.  We do not treat a
-    # free-text place or an address as normalized merely because it resembles
-    # one; a future live geocoder integration must provide that confirmation.
     exact_address_candidate = is_exact_address_candidate(location["input"])
-    location_is_reliably_routable = location["normalized_city"] is not None or exact_address_candidate
+    place_candidate = location["resolution_type"] == "UNKNOWN_LOCATION" and suggest_location(location["input"]) is None
+    exact_endpoint_candidate = exact_address_candidate or place_candidate
+    place_result = None
+    geocoded_address = None
+    location_is_reliably_routable = location["normalized_city"] is not None or exact_endpoint_candidate
     if not location_is_reliably_routable:
         risk_flags.append(UNKNOWN_LOCATION)
 
@@ -81,7 +87,19 @@ def create_quote_estimate(
     try:
         if not location_is_reliably_routable:
             raise RouteMileageUnavailable("Destination cannot be safely normalized.")
-        if exact_address_candidate:
+        if place_candidate:
+            location["resolution_type"] = "UNKNOWN_PLACE"
+            place_result = resolve_safe_place(location["input"])
+            location["resolution_type"] = place_result.resolution_type
+            if place_result.endpoint is None:
+                risk_flags.append(UNKNOWN_LOCATION)
+                raise RouteMileageUnavailable("Place cannot be confidently identified.")
+            geocoded_address, road_mileage = get_verified_endpoint_round_trip_mileage(
+                request.service_type, request.airport_code, place_result.endpoint
+            )
+            location_name = geocoded_address.city
+            route_summary = _build_route_summary(request, geocoded_address.formatted_address)
+        elif exact_address_candidate:
             geocoded_address, road_mileage = get_exact_address_round_trip_mileage(
                 request.service_type, request.airport_code, location["input"]
             )
@@ -110,8 +128,8 @@ def create_quote_estimate(
                 "distance_meters": str(road_mileage.distance_meters),
                 "base_route": "Rowland Heights → trip stops → Rowland Heights",
                 "reference_destination": road_mileage.reference_destination,
-                "location_source": "verified_exact_address" if exact_address_candidate else "verified_city_or_landmark_archive",
-                "mileage_source": "google_routes_exact_address" if exact_address_candidate else "verified_closed_loop_road_mileage_archive",
+                "location_source": "verified_exact_address" if exact_endpoint_candidate else "verified_city_or_landmark_archive",
+                "mileage_source": "google_routes_exact_address" if exact_endpoint_candidate else "verified_closed_loop_road_mileage_archive",
                 "approved_fixed_route_fare": True,
                 "is_fixed_fare": True,
                 "approved_fixed_amount": str(approved_fixed.amount),
@@ -119,7 +137,7 @@ def create_quote_estimate(
                 "approved_direction": request.service_type.value,
                 "pricing_rule_version": pricing_rule_version,
             }
-            if exact_address_candidate:
+            if exact_endpoint_candidate:
                 mileage_factors.update({
                     "exact_address_route": True,
                     "normalized_address": geocoded_address.formatted_address,
@@ -144,15 +162,15 @@ def create_quote_estimate(
                 "distance_meters": str(road_mileage.distance_meters),
                 "base_route": "Rowland Heights → trip stops → Rowland Heights",
                 "reference_destination": road_mileage.reference_destination,
-                "location_source": "verified_exact_address" if exact_address_candidate else "verified_city_or_landmark_archive",
-                "mileage_source": "google_routes_exact_address" if exact_address_candidate else "verified_closed_loop_road_mileage_archive",
+                "location_source": "verified_exact_address" if exact_endpoint_candidate else "verified_city_or_landmark_archive",
+                "mileage_source": "google_routes_exact_address" if exact_endpoint_candidate else "verified_closed_loop_road_mileage_archive",
                 "approved_long_distance_range": True,
                 "approved_customer_range": f"${minimum_amount}-${maximum_amount}",
                 "approved_route": route_summary,
                 "approved_direction": request.service_type.value,
                 "pricing_rule_version": pricing_rule_version,
             }
-            if exact_address_candidate:
+            if exact_endpoint_candidate:
                 mileage_factors.update({
                     "exact_address_route": True,
                     "normalized_address": geocoded_address.formatted_address,
@@ -184,8 +202,8 @@ def create_quote_estimate(
                 "distance_meters": str(road_mileage.distance_meters),
                 "base_route": "Rowland Heights → trip stops → Rowland Heights",
                 "reference_destination": road_mileage.reference_destination,
-                "location_source": "verified_exact_address" if exact_address_candidate else "verified_city_or_landmark_archive",
-                "mileage_source": "google_routes_exact_address" if exact_address_candidate else "verified_closed_loop_road_mileage_archive",
+                "location_source": "verified_exact_address" if exact_endpoint_candidate else "verified_city_or_landmark_archive",
+                "mileage_source": "google_routes_exact_address" if exact_endpoint_candidate else "verified_closed_loop_road_mileage_archive",
                 "raw_midpoint": str(mileage_price.raw_midpoint.quantize(Decimal("0.01"))),
                 "rounded_midpoint": str(mileage_price.rounded_midpoint),
                 "customer_range": (
@@ -207,7 +225,7 @@ def create_quote_estimate(
                 "customer_range": f"${minimum_amount}-${maximum_amount}",
                 "ont_minimum_applied": ont_minimum_applied,
             })
-            if exact_address_candidate:
+            if exact_endpoint_candidate:
                 mileage_factors.update({
                     "exact_address_route": True,
                     "normalized_address": geocoded_address.formatted_address,
@@ -248,6 +266,18 @@ def create_quote_estimate(
             "location_source": "unverified_or_unavailable_location",
         }
 
+    mileage_factors["resolution_type"] = location["resolution_type"]
+    if geocoded_address is not None:
+        mileage_factors.update({"normalized_address": geocoded_address.formatted_address,
+                                "geocoded_city": geocoded_address.city,
+                                "geocoded_state": geocoded_address.state,
+                                "geocoded_postal_code": geocoded_address.postal_code,
+                                "geocode_place_id": geocoded_address.place_id,
+                                "geocoded_latitude": str(geocoded_address.latitude),
+                                "geocoded_longitude": str(geocoded_address.longitude),
+                                "resolution_type": location["resolution_type"]})
+    if place_candidate and location["resolution_type"] == "UNKNOWN_LOCATION":
+        location["resolution_type"] = "UNKNOWN_PLACE"
     manual_review_required = bool(risk_flags)
     if manual_review_required:
         status = QuoteEstimateStatus.MANUAL_REVIEW_REQUIRED
@@ -342,6 +372,8 @@ def create_quote_estimate(
     )
     resolution_type = location.get("resolution_type")
     resolution_message, resolution_suggestions = _resolution_guidance(resolution_type, request.location_input)
+    if place_result and place_result.suggestions:
+        resolution_suggestions = list(place_result.suggestions)
     single_suggestion = suggest_location(request.location_input) if not customer_price_available else None
     if single_suggestion:
         resolution_suggestions = [{"label": single_suggestion["display_name"], "canonical_value": single_suggestion["canonical_location"]}]
@@ -359,7 +391,8 @@ def create_quote_estimate(
         risk_flags=estimate.risk_flags or [],
         notices=customer_notices,
         location_suggestion=single_suggestion,
-        resolution_type=resolution_type if not customer_price_available else None,
+        resolution_type=resolution_type if not customer_price_available or resolution_type == "VERIFIED_PLACE" else None,
+        verified_location=geocoded_address.formatted_address if resolution_type == "VERIFIED_PLACE" and geocoded_address else None,
         resolution_message=resolution_message if not customer_price_available else None,
         resolution_suggestions=resolution_suggestions if not customer_price_available else [],
         valid_until=estimate.expires_at,
@@ -377,6 +410,10 @@ def _resolution_guidance(resolution_type: str | None, raw: str) -> tuple[str | N
             return "Please enter the specific Orange County city or a full street address. / 请输入具体的橙县城市名称或完整街道地址。", []
         if abbreviation == "ie":
             return "Please enter the specific Inland Empire city or a full street address. / 请输入具体的内陆帝国城市名称或完整街道地址。", []
+    if resolution_type in {"UNKNOWN_PLACE", "AMBIGUOUS_PLACE"}:
+        return (("We found several possible locations. Please choose one. / 我们找到几个可能的地点，请选择一个。"
+                 if resolution_type == "AMBIGUOUS_PLACE" else
+                 "We couldn’t confidently identify this hotel or landmark. Please choose a suggested location or enter the full street address. / 我们暂时无法准确识别这个酒店或地标，请选择建议地点或输入完整地址。"), [])
     messages = {"ZIP_NEEDS_CITY": "Please enter the city or full street address for this ZIP code. / 请输入该邮编对应的城市名称或完整街道地址。", "CITY_ZIP_VALIDATION_REQUIRED": "Please enter the city without the ZIP code, or enter the full street address. / 请输入不带邮编的城市名称，或填写完整街道地址。", "INVALID_LOCATION": "The location information appears inconsistent. Please check the city/state and try again. / 地点信息可能不一致，请检查城市和州后重新输入。", "NEEDS_DISAMBIGUATION": "Please enter a more specific city or full address. / 请输入更具体的城市名称或完整地址。"}
     return messages.get(resolution_type), []
 
@@ -398,7 +435,7 @@ def customer_numeric_fare_is_available(
             APPROVED_LONG_DISTANCE_PRICING_SOURCE,
             APPROVED_FIXED_ROUTE_PRICING_SOURCE,
         }
-        and not (risk_flags or [])
+        and not (set(risk_flags or []) - VEHICLE_REVIEW_FLAGS)
     )
 
 

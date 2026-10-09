@@ -118,6 +118,9 @@ def _direct_alias_destination(cleaned: str) -> str | None:
         return None
     english = re.sub("|".join(map(re.escape, CHINESE_SAFE_ALIASES)), " ", cleaned)
     english_match = CITY_LOCATIONS.get(canonical_archive_key(english))
+    if english.strip(" ,.;") and not english_match:
+        # Additional hotel/address text must never collapse to a city alias.
+        return None
     if english_match:
         candidates.add(english_match[0])
     return candidates.pop() if len(candidates) == 1 else None
